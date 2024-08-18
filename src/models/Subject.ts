@@ -14,6 +14,7 @@ class Subject extends Model {
   public frontal_hours!: number | null;
   public intro_folder!: string | null;
   public subject_folder!: string | null;
+  public tecnologies!: string | null;
   public notes!: string | null;
   public valid!: boolean;
   public hour_configs!: HourConfig[];
@@ -72,6 +73,10 @@ Subject.init({
     allowNull: true,
   },
   subject_folder: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  tecnologies: {
     type: DataTypes.STRING,
     allowNull: true,
   },

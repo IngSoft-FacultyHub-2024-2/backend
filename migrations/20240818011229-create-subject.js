@@ -52,7 +52,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      needs: {
+      tecnologies: {
         type: Sequelize.STRING,
         allowNull: true,
       },

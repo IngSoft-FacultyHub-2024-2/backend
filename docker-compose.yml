@@ -18,8 +18,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: >
-      bash -c "npx sequelize-cli db:migrate && npm start"
 
 
   postgres:

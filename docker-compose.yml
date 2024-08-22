@@ -10,11 +10,11 @@ services:
     depends_on:
       - postgres
     environment:
-      - DB_NAME=faculty_hub_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_HOST=postgres
-      - DB_PORT=5432
+      - NAME_DB=faculty_hub_db
+      - USER_DB=postgres
+      - PASSWORD_DB=postgres
+      - HOST_DB=postgres
+      - PORT_DB=5432
     volumes:
       - .:/app
       - /app/node_modules

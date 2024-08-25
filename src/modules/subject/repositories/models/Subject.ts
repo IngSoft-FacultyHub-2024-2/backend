@@ -35,19 +35,19 @@ Subject.init({
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   subject_code: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   study_plan_year: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
   },
   associated_teacher: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
     // references: {
     //   model: 'Teachers',
     //   key: 'id',
@@ -62,12 +62,12 @@ Subject.init({
     // },
   },
   index: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
+    type: DataTypes.DOUBLE,
+    allowNull: false,
   },
   frontal_hours: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
   },
   intro_folder: {
     type: DataTypes.STRING,

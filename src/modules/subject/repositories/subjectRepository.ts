@@ -1,9 +1,10 @@
 import Subject from './models/Subject';
-
+import HourConfig from './models/HourConfig';
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
-    console.log("subject", subject)
-    return await Subject.create(subject);
+    return await Subject.create(subject, {
+    include: [{ model: HourConfig, as: 'hourConfigs' }],
+  });
   }
 }
 

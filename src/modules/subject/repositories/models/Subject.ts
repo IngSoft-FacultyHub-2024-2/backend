@@ -1,6 +1,7 @@
 import { Model, DataTypes, HasMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
+import Need from './Need';
 
 // TODO: UNCOMMENT THE REFERENCE FOR THE ASSOCIATED TEACHER AND COORDINATOR
 class Subject extends Model {
@@ -18,11 +19,11 @@ class Subject extends Model {
   public notes!: string | null;
   public valid!: boolean;
   public hourConfigs!: HourConfig[];
-  // public needs!: Need[];
+  public needs!: Need[];
 
   public static associations: {
     hourConfigs: HasMany<Subject, HourConfig>;
-  //   needs: HasMany<Subject, Need>;
+    needs: HasMany<Subject, Need>;
   };
 }
 
@@ -96,13 +97,6 @@ Subject.init({
   timestamps: true,
 });
 
-
-// Subject.hasMany(Need, {
-//   sourceKey: 'id',
-//   foreignKey: 'subject_id',
-//   as: 'needs',
-// });
-
 Subject.hasMany(HourConfig, {
   sourceKey: 'id',
   foreignKey: 'subject_id',
@@ -112,6 +106,17 @@ Subject.hasMany(HourConfig, {
 HourConfig.belongsTo(Subject, {
 foreignKey: 'subject_id',
 as: 'subject',
+});
+
+Subject.hasMany(Need, {
+  sourceKey: 'id',
+  foreignKey: 'subject_id',
+  as: 'needs',
+});
+
+Need.belongsTo(Subject, {
+  foreignKey: 'subject_id',
+  as: 'subject',
 });
 
 console.log("Subject")

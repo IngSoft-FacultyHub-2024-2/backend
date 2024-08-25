@@ -3,7 +3,6 @@ import { Response } from 'express';
 import { DataBaseError, ResourceNotFound } from './customExceptions';
 
 export async function returnError(res: Response, error: Error){
-    console.log("ADA", error);
     if (error instanceof yup.ValidationError || error instanceof DataBaseError){
         console.log("ValidationError: ", error.message);
         res.status(400).json({"error": error.message});

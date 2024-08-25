@@ -49,8 +49,4 @@ HourConfig.init({
   timestamps: true,
 });
 
-console.log("ACA22")
-console.log(typeof HourConfig);
-console.log(typeof Subject);
-
 export default HourConfig;

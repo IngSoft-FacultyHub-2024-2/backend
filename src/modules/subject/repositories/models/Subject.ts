@@ -119,6 +119,4 @@ Need.belongsTo(Subject, {
   as: 'subject',
 });
 
-console.log("Subject")
-console.log(typeof Subject);
 export default Subject;

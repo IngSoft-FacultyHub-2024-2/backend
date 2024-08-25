@@ -1,10 +1,8 @@
 import subjectRepository from '../repositories/subjectRepository';
+import Subject from '../repositories/models/Subject';
 
 class SubjectService {
-  async addSubject(subject: any) {
-    // TODO: remove the any type from subject in the parameter
-    // TODO: Add validation
-    console.log("acc validatioon");
+  async addSubject(subject: Partial<Subject>) {
     return await subjectRepository.addSubject(subject);
   }
 }

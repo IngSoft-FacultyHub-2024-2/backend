@@ -1,5 +1,5 @@
 import sequelize from "./config/database";
-import { subjectRouter }  from "./modules/subject";
+import subjectRouter  from "./routers/subjectRouter";
 import dotenv from 'dotenv';
 
 dotenv.config();

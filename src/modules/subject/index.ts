@@ -1,3 +1,3 @@
-import subjectRouter from './routers/subjectRouter';
+import {addSubject} from './services/subjectService';
 
-export { subjectRouter };
+export { addSubject };

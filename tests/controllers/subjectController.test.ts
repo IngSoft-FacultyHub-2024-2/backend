@@ -1,13 +1,8 @@
 import { Request, Response } from 'express';
-import subjectService from '../../../../src/modules/subject/services/subjectService';
-import inputSubjectSchema from '../../../../src/modules/subject/controllers/schemas/inputSubjectSchema';
-import subjectController from '../../../../src/modules/subject/controllers/subjectController';
-import { returnError } from '../../../../src/shared/utils/exceptions/handleExceptions';
-import Subject from '../../../../src/modules/subject/repositories/models/Subject';
+import {addSubject} from '../../src/modules/subject';
+import subjectController from '../../src/controllers/subjectController';
 
-jest.mock('../../../../src/modules/subject/services/subjectService');
-jest.mock('../../../../src/modules/subject/controllers/schemas/inputSubjectSchema');
-jest.mock('../../../../src/shared/utils/exceptions/handleExceptions');
+jest.mock('../../src/modules/subject');
 
 describe('SubjectController', () => {
   let subjectBody: any = {"name": "andy2",
@@ -43,25 +38,20 @@ describe('SubjectController', () => {
   });
 
   it('should add a subject successfully', async () => {
-    (inputSubjectSchema.validate as jest.Mock).mockResolvedValue(mockReq.body);
-    (subjectService.addSubject as jest.Mock).mockImplementation(async (subject: Partial<Subject>) => {
+    (addSubject as jest.Mock).mockImplementation(async (subject: Partial<any>) => {
       return { id: 1, ...subjectBody };
     });
 
     await subjectController.addSubject(mockReq, mockRes);
 
-    expect(inputSubjectSchema.validate).toHaveBeenCalledWith(mockReq.body);
-    expect(subjectService.addSubject).toHaveBeenCalledWith(mockReq.body);
+    expect(addSubject).toHaveBeenCalledWith(mockReq.body);
     expect(mockRes.status).toHaveBeenCalledWith(201);
     expect(mockRes.json).toHaveBeenCalledWith({ id: 1, ...subjectBody });
   });
 
   it('should handle errors when adding a subject fails', async () => {
-    const error = new Error('Validation failed');
-    (inputSubjectSchema.validate as jest.Mock).mockRejectedValue(error);
-
+    mockReq.body = {};
     await subjectController.addSubject(mockReq, mockRes);
-
-    expect(returnError).toHaveBeenCalledWith(mockRes, error);
+    expect(mockRes.status).toHaveBeenCalledWith(400);
   });
 });

@@ -1,8 +1,9 @@
 import { Model, DataTypes, HasMany } from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
 import Need from './Need';
 
+// TODO: UNCOMMENT THE REFERENCE FOR THE ASSOCIATED TEACHER AND COORDINATOR
 class Subject extends Model {
   public id!: number;
   public name!: string | null;
@@ -17,7 +18,7 @@ class Subject extends Model {
   public technologies!: string | null;
   public notes!: string | null;
   public valid!: boolean;
-  public hour_configs!: HourConfig[];
+  public hourConfigs!: HourConfig[];
   public needs!: Need[];
 
   public static associations: {
@@ -47,18 +48,18 @@ Subject.init({
   associated_teacher: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'Teachers',
-      key: 'id',
-    },
+    // references: {
+    //   model: 'Teachers',
+    //   key: 'id',
+    // },
   },
   associated_coordinator: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Teachers',
-      key: 'id',
-    },
+    allowNull: true,
+    // references: {
+    //   model: 'Teachers',
+    //   key: 'id',
+    // },
   },
   index: {
     type: DataTypes.DOUBLE,
@@ -102,10 +103,20 @@ Subject.hasMany(HourConfig, {
   as: 'hourConfigs',
 });
 
+HourConfig.belongsTo(Subject, {
+foreignKey: 'subject_id',
+as: 'subject',
+});
+
 Subject.hasMany(Need, {
   sourceKey: 'id',
   foreignKey: 'subject_id',
   as: 'needs',
+});
+
+Need.belongsTo(Subject, {
+  foreignKey: 'subject_id',
+  as: 'subject',
 });
 
 export default Subject;

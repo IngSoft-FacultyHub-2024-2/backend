@@ -1,3 +1,4 @@
 import {addSubject} from './services/subjectService';
+import { getEvents, addEvent } from './services/eventService';
 
-export { addSubject };
+export { addSubject, getEvents, addEvent };

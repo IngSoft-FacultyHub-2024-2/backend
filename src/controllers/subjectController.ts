@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {addSubject} from '../modules/subject';
+import { addSubject } from '../modules/subject';
 import inputSubjectSchema from './schemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 

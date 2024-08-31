@@ -31,7 +31,7 @@ jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
 describe('getEvents', () => {
   it('retrieves events successfully', async () => {
     // Arrange
-    const mockEvents = [{ id: 1, name: 'Obligatorio 1' }, { id: 2, name: 'Parcial 1' }];
+    const mockEvents = [{ id: 1, title: 'Obligatorio 1' }, { id: 2, title: 'Parcial 1' }];
     (eventRepository.getEvents as jest.Mock).mockResolvedValue(mockEvents);
 
     // Act
@@ -41,6 +41,21 @@ describe('getEvents', () => {
     expect(eventRepository.getEvents).toHaveBeenCalled();
     expect(result).toEqual(mockEvents);
   });
+
+  it('retrieves events with filters successfully', async () => {
+    // Arrange
+    const filters = { title: 'Obligatorio' };
+    const mockFilteredEvents = [{ id: 1, title: 'Obligatorio 1' }];
+    (eventRepository.getEvents as jest.Mock).mockResolvedValue(mockFilteredEvents);
+
+    // Act
+    const result = await getEvents(filters);
+
+    // Assert
+    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters);
+    expect(result).toEqual(mockFilteredEvents);
+  });
+
 });
 
 describe('addEvent', () => {

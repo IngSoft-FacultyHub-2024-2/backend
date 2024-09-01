@@ -33,11 +33,11 @@ module.exports = {
         },
       },
       role_teacher_1: {
-        type: Sequelize.ENUM('Teorico', 'Tecnología'),
+        type: Sequelize.ENUM('Teórico', 'Tecnología'),
         allowNull: false,
       },
       role_teacher_2: {
-        type: Sequelize.ENUM('Teorico', 'Tecnología'),
+        type: Sequelize.ENUM('Teórico', 'Tecnología'),
         allowNull: false,
       },
       start_date: {

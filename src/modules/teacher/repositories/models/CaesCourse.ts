@@ -1,5 +1,5 @@
 import { Model, DataTypes, BelongsTo } from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 
 class CaesCourse extends Model {
@@ -40,11 +40,6 @@ CaesCourse.init({
   modelName: 'CaesCourse',
   tableName: 'CaesCourses',
   timestamps: true,
-});
-
-CaesCourse.belongsTo(Teacher, {
-  foreignKey: 'teacher_id',
-  as: 'teacher',
 });
 
 export default CaesCourse;

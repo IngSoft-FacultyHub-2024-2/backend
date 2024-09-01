@@ -4,6 +4,7 @@ import { DataBaseError, ResourceNotFound } from './customExceptions';
 
 export async function returnError(res: Response, error: Error){
     if (error instanceof yup.ValidationError || error instanceof DataBaseError){
+        console.log(error)
         console.log("ValidationError: ", error.message);
         res.status(400).json({"error": error.message});
     } else if (error instanceof ResourceNotFound) {

@@ -25,7 +25,8 @@ describe('SubjectController', () => {
         "name": "laboratorio"
     },{
         "name": "salon de 25 personas"
-    }]
+    }],
+    "events": []
   };
   const mockReq = { body: subjectBody } as Request;
   const mockRes = {
@@ -44,7 +45,7 @@ describe('SubjectController', () => {
 
     await subjectController.addSubject(mockReq, mockRes);
 
-    expect(addSubject).toHaveBeenCalledWith(mockReq.body);
+    expect(addSubject).toHaveBeenCalledWith(mockReq.body, mockReq.body.events);
     expect(mockRes.status).toHaveBeenCalledWith(201);
     expect(mockRes.json).toHaveBeenCalledWith({ id: 1, ...subjectBody });
   });

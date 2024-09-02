@@ -8,6 +8,10 @@ class EventRepository {
   async getEvents(filters?: Partial<Event>) {
     return await Event.findAll({ where: filters });
   }
+
+  async getEventById(id: number) {
+    return await Event.findByPk(id);
+  }
 }
 
 export default new EventRepository();

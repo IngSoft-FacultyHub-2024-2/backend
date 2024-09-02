@@ -8,3 +8,7 @@ export async function addEvent(event: Partial<Event>) {
 export async function getEvents(filters?: Partial<Event>) {
     return await eventRepository.getEvents(filters);
 }
+
+export async function getEventById(id: number) {
+    return await eventRepository.getEventById(id);
+}

@@ -1,32 +1,91 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
+import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
+import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
-  addSubject: jest.fn(),
+  addSubject: jest.fn(),  addEventToSubject: jest.fn(),
 }));
-
-describe('addSubject', () => {
-  it('calls addSubject with the correct subject', async () => {
-    // Arrange
-    const mockSubject = { name: 'Mathematics' };
-    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
-
-    // Act
-    const result = await addSubject(mockSubject);
-
-    // Assert
-    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-    expect(result).toEqual(mockSubject);
-  });
-});
+jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
 
 // Jest mock for eventRepository
 jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
-  getEvents: jest.fn(), addEvent: jest.fn(),
+  getEvents: jest.fn(), addEvent: jest.fn(), getEventById: jest.fn(),
 }));
+
+describe('addSubject', () => {
+  const mockSubjectDto: SubjectRequestDto = {
+    name: 'Mathematics',
+    subject_code: 'MATH101',
+    study_plan_year: 1,
+    associated_teacher: 1,
+    index: 1,
+    frontal_hours: 30,
+    valid: true,
+  };
+
+  const mockEventDto: SubjectEventRequestDto = {
+    eventId: 1,
+    description: 'Introduction to Mathematics',
+  };
+
+  const mockSubject = {
+    id: 1,
+    ...mockSubjectDto,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('adds a subject successfully without events', async () => {
+    // Arrange
+    (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
+    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
+
+    // Act
+    const result = await addSubject(mockSubjectDto, []);
+
+    // Assert
+    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
+    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
+    expect(result).toEqual(mockSubject);
+  });
+
+  it('adds a subject successfully with events', async () => {
+    // Arrange
+    (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
+    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
+    (eventRepository.getEventById as jest.Mock).mockResolvedValue(true);
+    (subjectRepository.addEventToSubject as jest.Mock).mockResolvedValue(undefined);
+
+    // Act
+    const result = await addSubject(mockSubjectDto, [mockEventDto]);
+
+    // Assert
+    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
+    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
+    expect(eventRepository.getEventById).toHaveBeenCalledWith(mockEventDto.eventId);
+    expect(subjectRepository.addEventToSubject).toHaveBeenCalledWith(mockSubject.id, mockEventDto.eventId, mockEventDto.description);
+    expect(result).toEqual(mockSubject);
+  });
+
+  it('throws an error if event does not exist', async () => {
+    // Arrange
+    (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
+    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
+    (eventRepository.getEventById as jest.Mock).mockResolvedValue(false);
+
+    // Act & Assert
+    await expect(addSubject(mockSubjectDto, [mockEventDto])).rejects.toThrow(ResourceNotFound);
+    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
+    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
+    expect(eventRepository.getEventById).toHaveBeenCalledWith(mockEventDto.eventId);
+  });
+});
 
 describe('getEvents', () => {
   it('retrieves events successfully', async () => {

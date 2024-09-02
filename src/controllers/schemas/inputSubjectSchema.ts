@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import inputHourConfigSchema from './inputHourConfigSchema';
 import inputNeedSchema from './inputNeedSchema';
+import inputSubjectEventSchema from './inputSubjectEventSchema';
 
 const inputSubjectSchema = yup.object().shape({
     name: yup.string().required(),
@@ -17,6 +18,7 @@ const inputSubjectSchema = yup.object().shape({
     valid: yup.boolean().required().default(true),
     hour_configs:  yup.array().of(inputHourConfigSchema).nullable(),
     needs: yup.array().of(inputNeedSchema).nullable(),
+    events: yup.array().of(inputSubjectEventSchema).nullable(),
 });
   
 export default inputSubjectSchema;

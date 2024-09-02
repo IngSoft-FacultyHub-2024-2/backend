@@ -29,8 +29,8 @@ class Teacher extends Model {
   //   await this.addBenefits(benefits, { transaction: options.transaction });
   // }
   public id!: number;
-  public name!: string | null;
-  public surname!: string | null;
+  public name!: string;
+  public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
   public cv_file!: string | null;

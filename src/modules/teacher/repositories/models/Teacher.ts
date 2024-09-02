@@ -72,7 +72,7 @@ Teacher.init({
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   surname: {
     type: DataTypes.STRING,

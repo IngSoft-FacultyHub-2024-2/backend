@@ -45,7 +45,7 @@ describe('SubjectController', () => {
 
     await subjectController.addSubject(mockReq, mockRes);
 
-    expect(addSubject).toHaveBeenCalledWith(mockReq.body, mockReq.body.events);
+    expect(addSubject).toHaveBeenCalledWith(mockReq.body);
     expect(mockRes.status).toHaveBeenCalledWith(201);
     expect(mockRes.json).toHaveBeenCalledWith({ id: 1, ...subjectBody });
   });

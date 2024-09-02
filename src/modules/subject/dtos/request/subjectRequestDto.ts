@@ -3,6 +3,8 @@ import { NeedRequestDto, NeedRequestDtoHelper } from './needRequestDto';
 import Subject from "../../repositories/models/Subject";
 import Need from "../../repositories/models/Need";
 import HourConfig from '../../repositories/models/HourConfig';
+import { SubjectEventRequestDto, SubjectEventRequestDtoHelper } from './subjectEventRequestDto';
+import SubjectEvent from '../../repositories/models/SubjectEvent';
 
 export interface SubjectRequestDto {
     id?: number;
@@ -20,6 +22,7 @@ export interface SubjectRequestDto {
     valid?: boolean;
     hourConfigs?: HourConfigRequestDto[];
     needs?: NeedRequestDto[];
+    events?: SubjectEventRequestDto[];
 }
 
 export class SubjectRequestDtoHelper {
@@ -41,6 +44,7 @@ public static toModel(dto: SubjectRequestDto): Partial<Subject> {
     ...(dto.valid !== undefined && { valid: dto.valid }),
     hourConfigs: dto.hourConfigs?.map((hc) => HourConfigRequestDtoHelper.toModel(hc) as HourConfig) || [] as HourConfig[],    
     needs: dto.needs?.map((n) => NeedRequestDtoHelper.toModel(n) as Need) || [] as Need[],
+    events: dto.events?.map((e) => SubjectEventRequestDtoHelper.toModel(e) as SubjectEvent)  || [] as SubjectEvent[],
     };
   }
 }

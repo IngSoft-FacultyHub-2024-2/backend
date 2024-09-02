@@ -6,7 +6,11 @@ import SubjectEvent from './models/SubjectEvent';
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
     return await Subject.create(subject, {
-    include: [{ model: HourConfig, as: 'hourConfigs' }, { model: Need, as: 'needs' }],
+    include: [
+      { model: HourConfig, as: 'hourConfigs' }, 
+      { model: Need, as: 'needs' },
+      { model: SubjectEvent, as: 'events' }
+    ],
     });
   }
 

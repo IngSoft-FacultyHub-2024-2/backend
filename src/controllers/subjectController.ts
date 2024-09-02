@@ -7,7 +7,7 @@ class SubjectController {
   async addSubject(req: Request, res: Response) {
     try{
       await inputSubjectSchema.validate(req.body)
-      const subject = await addSubject(req.body, req.body.events);
+      const subject = await addSubject(req.body);
       res.status(201).json(subject);
     } catch (error) {
       console.log(error);

@@ -50,17 +50,6 @@ describe('addSubject', () => {
     expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
     expect(result).toEqual(mockSubject);
   });
-
-  /*it('throws an error if event does not exist', async () => {
-    // Arrange
-    (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
-    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
-
-    // Act & Assert
-    await expect(addSubject(mockSubjectDto)).rejects.toThrow(ResourceNotFound);
-    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
-    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-  });*/
 });
 
 describe('getEvents', () => {
@@ -87,7 +76,25 @@ describe('getEvents', () => {
     const result = await getEvents(filters);
 
     // Assert
-    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters);
+    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
+    expect(result).toEqual(mockFilteredEvents);
+  });
+
+  it('retrieves events with filters and pages successfully', async () => {
+    // Arrange
+    const filters = { title: 'Obligatorio'}
+    const sortField = 'title';
+    const sortOrder = 'ASC';
+    const page = 1; 
+    const pageSize = 10;
+    const mockFilteredEvents = [{ id: 1, title: 'Obligatorio 1' }];
+    (eventRepository.getEvents as jest.Mock).mockResolvedValue(mockFilteredEvents);
+
+    // Act
+    const result = await getEvents(filters, sortField, sortOrder, page, pageSize);
+
+    // Assert
+    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
     expect(result).toEqual(mockFilteredEvents);
   });
 

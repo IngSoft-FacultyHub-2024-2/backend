@@ -16,6 +16,21 @@ class SubjectController {
       }
     }
   }
+
+  /*async getSubjects(req: Request, res: Response) {
+    try {
+      const queryParams = req.query;
+      console.log('Query Parameters:', queryParams);
+
+      const subjects = await getSubjects(queryParams);
+      // TODO: Implement pagination, and convert to DTO
+      res.status(200).json(subjects);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }*/
 }
 
 export default new SubjectController();

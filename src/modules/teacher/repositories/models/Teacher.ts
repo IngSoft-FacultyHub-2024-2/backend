@@ -12,22 +12,6 @@ import Category from './Category';
 import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
 
 class Teacher extends Model {
-  // async addCategories(categories: Category[], options: { transaction: import("sequelize").Transaction }) {
-  //   if (!categories || categories.length === 0) {
-  //     throw new Error("No categories provided");
-  //   }
-
-  //   // Asociar las categorías al profesor usando la transacción
-  //   await this.addCategories(categories, { transaction: options.transaction });
-  // }
-  // async addBenefits(benefits: Benefit[], options: { transaction: import("sequelize").Transaction }) {
-  //   if (!benefits || benefits.length === 0) {
-  //     throw new Error("No benefits provided");
-  //   }
-
-  //   // Asociar las categorías al profesor usando la transacción
-  //   await this.addBenefits(benefits, { transaction: options.transaction });
-  // }
   public id!: number;
   public name!: string;
   public surname!: string;

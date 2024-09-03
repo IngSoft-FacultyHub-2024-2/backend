@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { addSubject } from '../modules/subject';
+import { addSubject, getSubjects } from '../modules/subject';
 import inputSubjectSchema from './schemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
+import { extractParameters } from '../shared/utils/queryParamsHelper';
 
 class SubjectController {
   async addSubject(req: Request, res: Response) {
@@ -17,12 +18,11 @@ class SubjectController {
     }
   }
 
-  /*async getSubjects(req: Request, res: Response) {
+  async getSubjects(req: Request, res: Response) {
     try {
       const queryParams = req.query;
-      console.log('Query Parameters:', queryParams);
-
-      const subjects = await getSubjects(queryParams);
+      const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
+      const subjects = await getSubjects(filters, sortField, sortOrder, page, pageSize);
       // TODO: Implement pagination, and convert to DTO
       res.status(200).json(subjects);
     } catch (error) {
@@ -30,7 +30,7 @@ class SubjectController {
         returnError(res, error);
       }
     }
-  }*/
+  }
 }
 
 export default new SubjectController();

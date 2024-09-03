@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {addSubject} from '../../src/modules/subject';
+import {addSubject, getSubjects} from '../../src/modules/subject';
 import subjectController from '../../src/controllers/subjectController';
 
 jest.mock('../../src/modules/subject');
@@ -54,5 +54,19 @@ describe('SubjectController', () => {
     mockReq.body = {};
     await subjectController.addSubject(mockReq, mockRes);
     expect(mockRes.status).toHaveBeenCalledWith(400);
+  });
+
+  it('should get subjects successfully', async () => {
+    const mockSubjects = [{ id: 1, name: 'Subject 1' }];
+    const queryParams = { name: 'Subject 1', sortField: 'name', sortOrder: 'asc', page: '1', pageSize: '10' };
+
+    mockReq.query = queryParams;
+    (getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
+
+    await subjectController.getSubjects(mockReq, mockRes);
+
+    expect(getSubjects).toHaveBeenCalledWith({ name: 'Subject 1' }, 'name', 'asc', 1, 10);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockSubjects);
   });
 });

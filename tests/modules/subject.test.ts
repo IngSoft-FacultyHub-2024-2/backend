@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto, getSubjects } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
@@ -7,7 +7,7 @@ import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExcept
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
-  addSubject: jest.fn()
+  addSubject: jest.fn(), getSubjects: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
 
@@ -51,6 +51,53 @@ describe('addSubject', () => {
     expect(result).toEqual(mockSubject);
   });
 });
+
+describe('getSubjects', () => {
+  it('retrieves subjects successfully', async () => {
+    // Arrange
+    const mockSubjects = [{ id: 1, name: 'Mathematics' }, { id: 2, name: 'Physics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
+
+    // Act
+    const result = await getSubjects();
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalled();
+    expect(result).toEqual(mockSubjects);
+  });
+
+  it('retrieves subjects with filters successfully', async () => {
+    // Arrange
+    const filters = { name: 'Mathematics' };
+    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
+
+    // Act
+    const result = await getSubjects(filters);
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
+    expect(result).toEqual(mockFilteredSubjects);
+  });
+
+  it('retrieves subjects with filters and pages successfully', async () => {
+    // Arrange
+    const filters = { name: 'Mathematics' };
+    const sortField = 'name';
+    const sortOrder = 'ASC';
+    const page = 1;
+    const pageSize = 10;
+    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
+
+    // Act
+    const result = await getSubjects(filters, sortField, sortOrder, page, pageSize);
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
+    expect(result).toEqual(mockFilteredSubjects);
+  });
+})
 
 describe('getEvents', () => {
   it('retrieves events successfully', async () => {

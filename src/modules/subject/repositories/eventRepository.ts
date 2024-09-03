@@ -12,7 +12,6 @@ class EventRepository {
     page: number = 1, 
     pageSize: number = 10,
   ) {
-    console.log('Filters:', sortField, sortOrder, page, pageSize);
     const offset = (page - 1) * pageSize;
     const limit = pageSize;
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;

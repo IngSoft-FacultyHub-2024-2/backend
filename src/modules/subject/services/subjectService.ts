@@ -8,3 +8,7 @@ export async function addSubject(subjectDto: SubjectRequestDto) {
   return newSubject;
 }
 
+export async function getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+  return await subjectRepository.getSubjects(filters, sortField, sortOrder, page, pageSize);
+}
+

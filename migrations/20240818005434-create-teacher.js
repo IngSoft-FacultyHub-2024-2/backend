@@ -10,11 +10,11 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       surname: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       birth_date: {
         type: Sequelize.DATE,

@@ -1,5 +1,5 @@
 import { Model, DataTypes, BelongsTo } from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 
 class Contact extends Model {
@@ -47,11 +47,6 @@ Contact.init({
   modelName: 'Contact',
   tableName: 'Contacts',
   timestamps: true,
-});
-
-Contact.belongsTo(Teacher, {
-	foreignKey: 'teacher_id',
-	as: 'teacher',
 });
 
 export default Contact;

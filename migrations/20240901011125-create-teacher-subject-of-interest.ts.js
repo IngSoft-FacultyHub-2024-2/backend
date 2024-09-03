@@ -21,10 +21,10 @@ module.exports = {
       subject_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        // references: {
-        //   model: 'Subjects',
-        //   key: 'id',
-        // },
+        references: {
+          model: 'Subjects',
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,

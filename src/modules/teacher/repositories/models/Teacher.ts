@@ -179,6 +179,10 @@ Category.belongsToMany(Teacher, {
   foreignKey: 'category_id',
   otherKey: 'teacher_id'
 })
+Teacher.hasMany(TeacherCategory, {as: 'teacher_categories'});
+TeacherCategory.belongsTo(Teacher);
+Category.hasMany(TeacherCategory);
+TeacherCategory.belongsTo(Category);
 
 Teacher.belongsToMany(Benefit, {
   through: TeacherBenefit,
@@ -192,6 +196,10 @@ Benefit.belongsToMany(Teacher, {
   foreignKey: 'benefit_id',
   otherKey: 'teacher_id'
 })
+Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
+TeacherBenefit.belongsTo(Teacher);
+Benefit.hasMany(TeacherBenefit);
+TeacherBenefit.belongsTo(Benefit);
 
 // Teacher.hasMany(TeacherPair, {
 //   sourceKey: 'id',

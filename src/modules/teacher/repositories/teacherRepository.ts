@@ -24,19 +24,11 @@ class TeacherRepository {
                     { model: Contact, as: 'contacts' },
                     { model: Prize, as: 'prizes' },
                     { model: TeacherSubject, as: 'subjects' },
+                    { model: TeacherCategory, as: 'teacher_categories' },
+                    { model: TeacherBenefit, as: 'teacher_benefits' },
                 ],
                 transaction,
             });
-
-            // Asociar las categorías
-            if (categories.length > 0) {
-                await this.associateCategories(newTeacher.id, categories, transaction);
-            }
-
-            // Asociar los beneficios
-            if (benefits.length > 0) {
-                await this.associateBenefits(newTeacher.id, benefits, transaction);
-            }
 
             // Asociar subjects_of_interest
             if (subjects_of_interest.length > 0) {
@@ -54,22 +46,6 @@ class TeacherRepository {
             await transaction.rollback();
             throw error;
         }
-    }
-
-    private async associateCategories(teacherId: number, categoryIds: any[], transaction: any) {
-        const categoryAssociations = categoryIds.map(categoryId => ({
-            teacher_id: teacherId,
-            category_id: categoryId,
-        }));
-        await TeacherCategory.bulkCreate(categoryAssociations, { transaction });
-    }
-
-    private async associateBenefits(teacherId: number, benefitIds: any[], transaction: any) {
-        const benefitAssociations = benefitIds.map(benefitId => ({
-            teacher_id: teacherId,
-            benefit_id: benefitId,
-        }));
-        await TeacherBenefit.bulkCreate(benefitAssociations, { transaction });
     }
 
     private async associateSubjectsOfInterest(teacherId: number, subjectIds: any[], transaction: any) {

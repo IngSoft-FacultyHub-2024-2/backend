@@ -1,6 +1,5 @@
 import { Model, DataTypes, BelongsTo } from 'sequelize';
-import sequelize from '../config/database';
-import Subject from './Subject';
+import sequelize from '../../../../config/database';
 
 class Benefit extends Model {
   public id!: number;

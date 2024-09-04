@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { addSubject, getSubjects } from '../modules/subject';
-import inputSubjectSchema from './schemas/inputSubjectSchema';
+import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
 
@@ -11,7 +11,7 @@ class SubjectController {
       const subject = await addSubject(req.body);
       res.status(201).json(subject);
     } catch (error) {
-      console.log(error);
+      console.log('error adding subject:', error);
       if (error instanceof Error) {
         returnError(res, error);
       }

@@ -1,9 +1,10 @@
 import HourConfig from "../../repositories/models/HourConfig";
+import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
 export interface HourConfigRequestDto {
   id?: number;
   subject_id?: number;
-  role: 'Teorico' | 'Tecnología';
+  role: TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY;
   total_hours: number;
   weekly_hours: number;
 }

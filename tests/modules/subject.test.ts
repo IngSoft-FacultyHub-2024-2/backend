@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto, getSubjects } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';

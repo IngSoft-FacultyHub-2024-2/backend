@@ -1,5 +1,5 @@
 import { Model, DataTypes, BelongsTo } from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 
 class Prize extends Model {
@@ -22,7 +22,11 @@ Prize.init({
   teacher_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  },
+    references: {
+			model: 'Teachers',
+			key: 'id',
+    },
+	},
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -36,11 +40,6 @@ Prize.init({
   modelName: 'Prize',
   tableName: 'Prizes',
   timestamps: true,
-});
-
-Prize.belongsTo(Teacher, {
-  foreignKey: 'teacher_id',
-  as: 'teacher',
 });
 
 export default Prize;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getEvents, addEvent } from '../modules/subject';
-import inputEventSchema from './schemas/inputEventSchema';
+import inputEventSchema from './validationSchemas/subjectSchemas/inputEventSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 
 class EventController {

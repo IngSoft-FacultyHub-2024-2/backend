@@ -1,8 +1,9 @@
 import * as yup from 'yup';
+import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/teacherRoles';
 
 // TODO: role options should come from a table
 const inputHourConfigSchema = yup.object().shape({
-    role: yup.mixed<'Teorico' | 'Tecnología'>().oneOf(['Teorico', 'Tecnología']).required(),
+    role: yup.mixed<TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY>().oneOf(getTeacherRoles()).required(),
     total_hours: yup.number().positive().required(),
     weekly_hours: yup.number().positive().required(),
 });

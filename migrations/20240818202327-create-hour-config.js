@@ -17,7 +17,7 @@ module.exports = {
         },
       },
       role: {
-        type: Sequelize.ENUM('Teorico', 'Tecnología'),
+        type: Sequelize.ENUM('Teórico', 'Tecnología'),
         allowNull: false,
       },
       total_hours: {

@@ -1,6 +1,7 @@
 import sequelize from "./config/database";
 import subjectRouter  from "./routers/subjectRouter";
 import eventRouter from "./routers/eventRouter";
+import teacherRouter  from "./routers/teacherRouter";
 import dotenv from 'dotenv';
 import { initializeDatabase } from "./initializingData";
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/subjects", subjectRouter);
 app.use("/api/events", eventRouter);
+app.use("/api/teachers", teacherRouter);
 
 const PORT = process.env.PORT || 3000;
 

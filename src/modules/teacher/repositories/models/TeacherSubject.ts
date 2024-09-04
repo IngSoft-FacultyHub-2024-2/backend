@@ -1,19 +1,18 @@
 import { Model, DataTypes, BelongsTo } from 'sequelize';
-import sequelize from '../config/database';
+import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
-import Subject from './Subject';
+import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
 class TeacherSubject extends Model {
   public id!: number;
-  public subject_id!: number;
   public teacher_id!: number;
-  public role!: 'Teorico' | 'Tecnología';
+  public subject_id!: number;
+  public role!: string;
   public start_date!: Date;
   public end_date!: Date | null;
 
   public static associations: {
     teacher: BelongsTo<TeacherSubject, Teacher>;
-    subject: BelongsTo<TeacherSubject, Subject>;
   };
 }
 
@@ -23,24 +22,24 @@ TeacherSubject.init({
     autoIncrement: true,
     primaryKey: true,
   },
-  subject_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Subjects',
-      key: 'id',
-    },
-  },
   teacher_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Teachers',
-      key: 'id',
+			model: 'Teachers',
+			key: 'id',
     },
+	},
+  subject_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    // references: {
+    //   model: 'Subjects',
+    //   key: 'id',
+    // },
   },
   role: {
-    type: DataTypes.ENUM('Teorico', 'Tecnología'),
+    type: DataTypes.ENUM(TeacherRoles.TECHNOLOGY, TeacherRoles.THEORY),
     allowNull: false,
   },
   start_date: {
@@ -56,16 +55,6 @@ TeacherSubject.init({
   modelName: 'TeacherSubject',
   tableName: 'TeacherSubjects',
   timestamps: true,
-});
-
-TeacherSubject.belongsTo(Teacher, {
-  foreignKey: 'teacher_id',
-  as: 'teacher',
-});
-
-TeacherSubject.belongsTo(Subject, {
-  foreignKey: 'subject_id',
-  as: 'subject',
 });
 
 export default TeacherSubject;

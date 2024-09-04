@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { addSubject } from '../modules/subject';
-import inputSubjectSchema from './schemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
+import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 
 class SubjectController {
   async addSubject(req: Request, res: Response) {
@@ -10,7 +10,7 @@ class SubjectController {
       const subject = await addSubject(req.body);
       res.status(201).json(subject);
     } catch (error) {
-      console.log(error);
+      console.log('error adding subject:', error);
       if (error instanceof Error) {
         returnError(res, error);
       }

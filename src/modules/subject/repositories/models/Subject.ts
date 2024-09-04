@@ -107,8 +107,8 @@ Subject.hasMany(HourConfig, {
 });
 
 HourConfig.belongsTo(Subject, {
-foreignKey: 'subject_id',
-as: 'subject',
+  foreignKey: 'subject_id',
+  as: 'subject',
 });
 
 Subject.hasMany(Need, {

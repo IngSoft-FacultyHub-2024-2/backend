@@ -1,3 +1,6 @@
 import {addSubject} from './services/subjectService';
+import { getEvents, addEvent } from './services/eventService';
+import { SubjectRequestDto } from './dtos/request/subjectRequestDto';
+import { SubjectEventRequestDto } from './dtos/request/subjectEventRequestDto';
 
-export { addSubject };
+export { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto };

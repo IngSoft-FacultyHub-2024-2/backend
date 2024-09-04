@@ -25,7 +25,8 @@ describe('SubjectController', () => {
         "name": "laboratorio"
     },{
         "name": "salon de 25 personas"
-    }]
+    }],
+    "events": []
   };
   const mockReq = { body: subjectBody } as Request;
   const mockRes = {

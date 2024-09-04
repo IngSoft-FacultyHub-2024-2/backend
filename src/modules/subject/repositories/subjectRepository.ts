@@ -2,6 +2,7 @@ import Subject from './models/Subject';
 import HourConfig from './models/HourConfig';
 import Need from './models/Need';
 import SubjectEvent from './models/SubjectEvent';
+import Event from './models/Event'; 
 import { Order } from 'sequelize';
 
 class SubjectRepository {
@@ -32,7 +33,13 @@ class SubjectRepository {
       include: [
         { model: HourConfig, as: 'hourConfigs' }, 
         { model: Need, as: 'needs' },
-        { model: SubjectEvent, as: 'events' }
+        {
+          model: SubjectEvent,
+          as: 'events',
+          /*include: [
+            { model: Event, as: 'event' } // Include Event details through SubjectEvent
+          ]*/
+        }
       ],
     });
   }

@@ -185,14 +185,6 @@ TeacherBenefit.belongsTo(Teacher);
 Benefit.hasMany(TeacherBenefit);
 TeacherBenefit.belongsTo(Benefit);
 
-// Teacher.hasMany(TeacherPair, {
-//   sourceKey: 'id',
-//   foreignKey: 'teacher_id',
-//   as: 'teacher_pairs',
-// });
-
-// Teacher.belongsToMany(Teacher, { through: TeacherPair, as: 'teacher_pairs', })
-
 Teacher.hasMany(TeacherSubject, {
   sourceKey: 'id',
   foreignKey: 'teacher_id',

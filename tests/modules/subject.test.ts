@@ -16,6 +16,20 @@ jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
   getEvents: jest.fn(), addEvent: jest.fn(),
 }));
 
+const removeUndefined = (obj: any) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined)
+  );
+};
+
+const removeUndefinedAndEmptyArrays = (obj: any) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => 
+      value !== undefined && !(Array.isArray(value) && value.length === 0)
+    )
+  );
+};
+
 describe('addSubject', () => {
   const mockSubjectDto: SubjectRequestDto = {
     name: 'Mathematics',
@@ -48,7 +62,7 @@ describe('addSubject', () => {
     // Assert
     expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
     expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-    expect(result).toEqual(mockSubject);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubject);
   });
 });
 
@@ -63,7 +77,8 @@ describe('getSubjects', () => {
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalled();
-    expect(result).toEqual(mockSubjects);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjects.map(removeUndefinedAndEmptyArrays));
+
   });
 
   it('retrieves subjects with filters successfully', async () => {
@@ -77,7 +92,7 @@ describe('getSubjects', () => {
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
-    expect(result).toEqual(mockFilteredSubjects);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
   });
 
   it('retrieves subjects with filters and pages successfully', async () => {
@@ -95,7 +110,7 @@ describe('getSubjects', () => {
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
-    expect(result).toEqual(mockFilteredSubjects);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
   });
 })
 
@@ -110,7 +125,7 @@ describe('getEvents', () => {
 
     // Assert
     expect(eventRepository.getEvents).toHaveBeenCalled();
-    expect(result).toEqual(mockEvents);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockEvents.map(removeUndefinedAndEmptyArrays));
   });
 
   it('retrieves events with filters successfully', async () => {

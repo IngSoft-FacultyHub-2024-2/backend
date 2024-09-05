@@ -17,7 +17,11 @@ class Teacher extends Model {
   public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
-  public cv_file!: string | null;
+  // cv_file: {
+  //   type: DataTypes.TEXT,
+  //   allowNull: true,
+  // },
+  public cv_file!: string | null; 
   public how_they_found_us!: string | null;
   public id_photo!: string | null;
   public hiring_date!: Date | null;
@@ -72,7 +76,7 @@ Teacher.init({
     unique: true,
   },
   cv_file: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   how_they_found_us: {
@@ -80,7 +84,7 @@ Teacher.init({
     allowNull: true,
   },
   id_photo: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   hiring_date: {

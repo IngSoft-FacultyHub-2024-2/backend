@@ -1,14 +1,14 @@
 import SubjectEvent from "../../repositories/models/SubjectEvent";
 
 export interface SubjectEventRequestDto {
-  eventId: number;
+  event_id: number;
   description: string;
 }
 
 export class SubjectEventRequestDtoHelper {
   public static toModel(dto: SubjectEventRequestDto): Partial<SubjectEvent> {
     return {
-    eventId: dto.eventId,
+    event_id: dto.event_id,
     description: dto.description,
     };
   }

@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 const inputSubjectEventSchema = yup.object().shape({
-    eventId: yup.number().required(),
+    event_id: yup.number().required(),
     description: yup.string().required(),
 });
 

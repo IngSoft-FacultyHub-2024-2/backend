@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
 import { getTeacherById } from '../modules/teacher';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
@@ -35,6 +35,16 @@ class SubjectController {
       }
       // TODO: convert to DTO
       res.status(200).json(subjectsWithCoordinator);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+  async getSubject(req: Request, res: Response) {
+    try {
+      const subject = await getSubjectById(parseInt(req.params.id));
+      res.status(200).json(subject);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

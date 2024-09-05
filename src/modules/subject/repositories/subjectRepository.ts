@@ -16,8 +16,8 @@ class SubjectRepository {
     });
   }
 
-  async addEventToSubject(subjectId: number, eventId: number, description: string) {
-    return await SubjectEvent.create({ subjectId, eventId, description });
+  async addEventToSubject(subject_id: number, event_id: number, description: string) {
+    return await SubjectEvent.create({ subject_id, event_id, description });
   }
 
   async getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
@@ -36,10 +36,23 @@ class SubjectRepository {
         {
           model: SubjectEvent,
           as: 'events',
-          /*include: [
+        },
+      ],
+    });
+  }
+
+  async getSubjectById(id: number) {
+    return await Subject.findByPk(id, {
+      include: [
+        { model: HourConfig, as: 'hourConfigs' }, 
+        { model: Need, as: 'needs' },
+        {
+          model: SubjectEvent,
+          as: 'events',
+          include: [
             { model: Event, as: 'event' } // Include Event details through SubjectEvent
-          ]*/
-        }
+          ]
+        },
       ],
     });
   }

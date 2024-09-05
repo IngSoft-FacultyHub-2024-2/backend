@@ -39,7 +39,7 @@ describe('addSubject', () => {
     index: 1,
     frontal_hours: 30,
     valid: true,
-    events: [{ eventId: 1, description: 'Introduction to Mathematics' }],
+    events: [{ event_id: 1, description: 'Introduction to Mathematics' }],
   };
 
   const mockSubject = {

@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import {addSubject, getSubjects} from '../../src/modules/subject';
+import {addSubject, getSubjects, getSubjectById} from '../../src/modules/subject';
 import { getTeacherById } from '../../src/modules/teacher';
 import subjectController from '../../src/controllers/subjectController';
+import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
 jest.mock('../../src/modules/subject');
 jest.mock('../../src/modules/teacher');
+jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 
 describe('SubjectController', () => {
   let subjectBody: any = {"name": "andy2",
@@ -96,4 +98,47 @@ describe('getSubjects', () => {
     expect(jsonMock).toHaveBeenCalledWith([mockSubjectDto1, mockSubjectDto2]);
   });
 
+});
+
+describe('getSubject', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let statusMock: jest.Mock;
+  let jsonMock: jest.Mock;
+
+  beforeEach(() => {
+    req = {
+      params: { id: '1' }
+    };
+    statusMock = jest.fn().mockReturnThis();
+    jsonMock = jest.fn();
+    res = {
+      status: statusMock,
+      json: jsonMock
+    };
+    jest.clearAllMocks();
+  });
+
+  it('should return subject if found', async () => {
+    const mockSubject = { id: 1, name: 'Math' };
+    (getSubjectById as jest.Mock).mockResolvedValue(mockSubject);
+
+    await subjectController.getSubject(req as Request, res as Response);
+
+    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(statusMock).toHaveBeenCalledWith(200);
+    expect(jsonMock).toHaveBeenCalledWith(mockSubject);
+  });
+
+  it('should handle errors', async () => {
+    const error = new Error('Something went wrong');
+    (getSubjectById as jest.Mock).mockImplementation(() => {
+      throw error;
+    });
+
+    await subjectController.getSubject(req as Request, res as Response);
+
+    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(returnError).toHaveBeenCalledWith(res, error);
+  });
 });

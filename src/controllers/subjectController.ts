@@ -41,6 +41,7 @@ class SubjectController {
       }
     }
   }
+  
   async getSubject(req: Request, res: Response) {
     try {
       const subject = await getSubjectById(parseInt(req.params.id));

@@ -17,10 +17,6 @@ class Teacher extends Model {
   public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
-  // cv_file: {
-  //   type: DataTypes.TEXT,
-  //   allowNull: true,
-  // },
   public cv_file!: string | null; 
   public how_they_found_us!: string | null;
   public id_photo!: string | null;

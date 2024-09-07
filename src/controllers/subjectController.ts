@@ -30,7 +30,6 @@ class SubjectController {
       let subjectsWithCoordinator: SubjectSummaryResponseControllerDto[] = [];
       for (const subject of subjects) {
         let associated_coordinator = await getTeacherById(subject.associated_coordinator);
-        console.log(associated_coordinator)
         let subject_with_coordinator = SubjectSummaryResponseControllerDtoHelper.fromModel(subject, associated_coordinator.name + " " + associated_coordinator.surname); 
         subjectsWithCoordinator.push(subject_with_coordinator)
       }

@@ -26,7 +26,7 @@ class Teacher extends Model {
   public graduated!: boolean;
   public notes!: string | null;
   public state!: 'activo' | 'baja temporal' | 'baja';
-  public unsusbribe_risk!: number;
+  public unsubscribe_risk!: number;
   public prizes!: Prize[];
   public caes_courses!: CaesCourse[];
   public contacts!: Contact[];

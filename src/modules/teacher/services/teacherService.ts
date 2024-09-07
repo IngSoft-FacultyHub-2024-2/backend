@@ -1,10 +1,14 @@
 import Teacher from "../repositories/models/Teacher";
-import TeacherPair from "../repositories/models/TeacherPair";
 import teacherRepository from "../repositories/teacherRepository";
 import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
 
 export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
+}
+
+export async function getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+  const teachers: Teacher[] = await teacherRepository.getSubjects(filters, sortField, sortOrder, page, pageSize);
+  return teachers;
 }
 
 export async function getTeacherById(id: number) {

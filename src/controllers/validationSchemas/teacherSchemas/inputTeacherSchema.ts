@@ -2,7 +2,6 @@ import * as yup from 'yup';
 import inputPrizeSchema from './inputPrizeSchema';
 import inputCaesCourseSchema from './inputCaesCourseSchema';
 import inputContactSchema from './inputContactSchema';
-import inputTeacherPairsSchema from './inputTeacherPairsSchema';
 import inputSubjectSchema from './inputSubjectSchema';
 
 const inputTeacherSchema = yup.object().shape({
@@ -25,6 +24,7 @@ const inputTeacherSchema = yup.object().shape({
     benefits: yup.array().of(yup.number()).nullable(),
     subjects: yup.array().of(inputSubjectSchema).nullable(),
     subjects_of_interest: yup.array().of(yup.number()).nullable(),
+
 });
 
 export default inputTeacherSchema;

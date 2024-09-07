@@ -5,7 +5,6 @@ import CaesCourse from './CaesCourse';
 import Contact from './Contact';
 import TeacherCategory from './TeacherCategory';
 import TeacherBenefit from './TeacherBenefit';
-import TeacherPair from './TeacherPair';
 import TeacherSubject from './TeacherSubject';
 import Benefit from './Benefit';
 import Category from './Category';
@@ -32,7 +31,6 @@ class Teacher extends Model {
   public contacts!: Contact[];
   public categories!: TeacherCategory[];
   public benefits!: TeacherBenefit[];
-  public teacher_pairs!: TeacherPair[];
   public subjects!: TeacherSubject[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
 
@@ -42,7 +40,6 @@ class Teacher extends Model {
     contacts: HasMany<Teacher, Contact>;
     categories: BelongsToMany<Teacher, Category>;
     benefits: BelongsToMany<Teacher, Benefit>;
-    teacher_pairs: BelongsToMany<Teacher, TeacherPair>;
     subjects: HasMany<Teacher, TeacherSubject>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
   };

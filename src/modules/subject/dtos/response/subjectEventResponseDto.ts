@@ -1,10 +1,12 @@
 import SubjectEvent from "../../repositories/models/SubjectEvent";
+import { EventResponseDto, EventResponseDtoHelper } from "./eventResponseDto";
+import Event from "../../repositories/models/Event";
 
 export interface SubjectEventResponseDto {
   subject_id: number;
   event_id: number;
   description: string;
-  event?: Event;
+  event?: EventResponseDto;
 }
 
 interface SubjectEventWithEvent extends SubjectEvent {
@@ -17,7 +19,7 @@ export class SubjectEventResponseDtoHelper {
       subject_id: subjectEvent.subject_id,
       event_id: subjectEvent.event_id,
       description: subjectEvent.description,
-      ...(subjectEvent.event ? { event: subjectEvent.event } : {}),
+      ...(subjectEvent.event ? { event: EventResponseDtoHelper.fromModel(subjectEvent.event) } : {}),
     };
   }
 }

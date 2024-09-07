@@ -1,7 +1,6 @@
 import { Model, DataTypes, HasMany, BelongsToMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
-import Event from './Event';
 import Need from './Need';
 import SubjectEvent from './SubjectEvent';
 

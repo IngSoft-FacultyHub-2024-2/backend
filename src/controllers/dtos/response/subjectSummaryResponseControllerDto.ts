@@ -1,14 +1,13 @@
-import { HourConfigResponseControllerDto, HourConfigResponseControllerDtoHelper } from './hourConfigResponseControllerDto';
-import {SubjectResponseDto} from "../../../modules/subject";
+import {SubjectResponseDto, HourConfigResponseDto } from "../../../modules/subject";
 
 export interface SubjectSummaryResponseControllerDto {
     id: number;
-    name: string | null;
-    subject_code: string | null;
-    study_plan_year: number | null;
-    associated_coordinator_name: string | null;
-    index: number | null;
-    hourConfigs?: HourConfigResponseControllerDto[];
+    name: string;
+    subject_code: string;
+    study_plan_year: number;
+    associated_coordinator_name: string
+    index: number;
+    hourConfigs?: HourConfigResponseDto[];
 }
 
 export class SubjectSummaryResponseControllerDtoHelper {
@@ -21,7 +20,7 @@ export class SubjectSummaryResponseControllerDtoHelper {
           study_plan_year: subject.study_plan_year,
           associated_coordinator_name: associated_coordinator_name,
           index: subject.index,
-          hourConfigs: subject.hourConfigs?.map((hc) => HourConfigResponseControllerDtoHelper.fromModel(hc)) || [],
+          hourConfigs: subject.hourConfigs,
       };
   }
 }

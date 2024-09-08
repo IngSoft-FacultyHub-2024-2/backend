@@ -5,7 +5,7 @@ import eventController from '../../src/controllers/eventController';
 jest.mock('../../src/modules/subject');
 
 describe('EventController', () => {
-  const mockReq = {} as Request;
+  let mockReq = {} as Request;
   const mockRes = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
@@ -15,16 +15,21 @@ describe('EventController', () => {
     jest.clearAllMocks();
   });
 
-  it('should get all events successfully', async () => {
-    (getEvents as jest.Mock).mockImplementation(async () => {
-      return [{ id: 1, title: 'event1' }];
-    });
+  it('retrieves events successfully with filters, sorting, and pagination', async () => {
+    // Arrange
+    const mockEvents = [{ id: 1, name: 'Event 1' }];
+    const queryParams = { type: 'conference', sortField: 'date', sortOrder: 'asc', page: '1', pageSize: '10' };
 
-    await eventController.getEvents(mockReq, mockRes);
+    mockReq.query = queryParams;
+    (getEvents as jest.Mock).mockResolvedValue(mockEvents);
 
-    expect(getEvents).toHaveBeenCalled();
+    // Act
+    await eventController.getEvents(mockReq, mockRes)
+
+    // Assert
+    expect(getEvents).toHaveBeenCalledWith({ type: 'conference' }, 'date', 'asc', 1, 10);
     expect(mockRes.status).toHaveBeenCalledWith(200);
-    expect(mockRes.json).toHaveBeenCalledWith([{ id: 1, title: 'event1' }]);
+    expect(mockRes.json).toHaveBeenCalledWith(mockEvents);
   });
 
   it('should create an event successfully', async () => {

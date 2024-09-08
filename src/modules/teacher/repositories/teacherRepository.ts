@@ -55,6 +55,19 @@ class TeacherRepository {
         }));
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
     }
+
+    async getTeacherById(id: number) {
+        return await Teacher.findByPk(id, {
+            include: [
+                { model: CaesCourse, as: 'caes_courses' },
+                { model: Contact, as: 'contacts' },
+                { model: Prize, as: 'prizes' },
+                { model: TeacherSubject, as: 'subjects' },
+                { model: TeacherCategory, as: 'teacher_categories' },
+                { model: TeacherBenefit, as: 'teacher_benefits' },
+            ],
+        });
+    }
 }
 
 export default new TeacherRepository();

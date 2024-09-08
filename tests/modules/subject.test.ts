@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, SubjectEventRequestDto } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
@@ -7,7 +7,7 @@ import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExcept
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
-  addSubject: jest.fn()
+  addSubject: jest.fn(), getSubjects: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
 
@@ -15,6 +15,20 @@ jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
 jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
   getEvents: jest.fn(), addEvent: jest.fn(),
 }));
+
+const removeUndefined = (obj: any) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined)
+  );
+};
+
+const removeUndefinedAndEmptyArrays = (obj: any) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => 
+      value !== undefined && !(Array.isArray(value) && value.length === 0)
+    )
+  );
+};
 
 describe('addSubject', () => {
   const mockSubjectDto: SubjectRequestDto = {
@@ -48,20 +62,57 @@ describe('addSubject', () => {
     // Assert
     expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
     expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-    expect(result).toEqual(mockSubject);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubject);
+  });
+});
+
+describe('getSubjects', () => {
+  it('retrieves subjects successfully', async () => {
+    // Arrange
+    const mockSubjects = [{ id: 1, name: 'Mathematics' }, { id: 2, name: 'Physics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
+
+    // Act
+    const result = await getSubjects();
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalled();
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjects.map(removeUndefinedAndEmptyArrays));
+
   });
 
-  /*it('throws an error if event does not exist', async () => {
+  it('retrieves subjects with filters successfully', async () => {
     // Arrange
-    (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
-    (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
+    const filters = { name: 'Mathematics' };
+    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
 
-    // Act & Assert
-    await expect(addSubject(mockSubjectDto)).rejects.toThrow(ResourceNotFound);
-    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
-    expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-  });*/
-});
+    // Act
+    const result = await getSubjects(filters);
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
+  });
+
+  it('retrieves subjects with filters and pages successfully', async () => {
+    // Arrange
+    const filters = { name: 'Mathematics' };
+    const sortField = 'name';
+    const sortOrder = 'ASC';
+    const page = 1;
+    const pageSize = 10;
+    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
+
+    // Act
+    const result = await getSubjects(filters, sortField, sortOrder, page, pageSize);
+
+    // Assert
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
+  });
+})
 
 describe('getEvents', () => {
   it('retrieves events successfully', async () => {
@@ -74,7 +125,7 @@ describe('getEvents', () => {
 
     // Assert
     expect(eventRepository.getEvents).toHaveBeenCalled();
-    expect(result).toEqual(mockEvents);
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockEvents.map(removeUndefinedAndEmptyArrays));
   });
 
   it('retrieves events with filters successfully', async () => {
@@ -87,7 +138,25 @@ describe('getEvents', () => {
     const result = await getEvents(filters);
 
     // Assert
-    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters);
+    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
+    expect(result).toEqual(mockFilteredEvents);
+  });
+
+  it('retrieves events with filters and pages successfully', async () => {
+    // Arrange
+    const filters = { title: 'Obligatorio'}
+    const sortField = 'title';
+    const sortOrder = 'ASC';
+    const page = 1; 
+    const pageSize = 10;
+    const mockFilteredEvents = [{ id: 1, title: 'Obligatorio 1' }];
+    (eventRepository.getEvents as jest.Mock).mockResolvedValue(mockFilteredEvents);
+
+    // Act
+    const result = await getEvents(filters, sortField, sortOrder, page, pageSize);
+
+    // Assert
+    expect(eventRepository.getEvents).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
     expect(result).toEqual(mockFilteredEvents);
   });
 

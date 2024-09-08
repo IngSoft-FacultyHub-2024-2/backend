@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('teacherSubjectGroups', {
+    await queryInterface.createTable('TeacherSubjectGroups', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -14,15 +14,25 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'subjects',
+          model: 'Subjects',
           key: 'id',
         },
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     })
 
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('teacherSubjectGroups');
+    await queryInterface.dropTable('TeacherSubjectGroups');
   }
 };

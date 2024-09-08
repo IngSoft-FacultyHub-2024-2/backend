@@ -9,6 +9,8 @@ import TeacherSubject from './TeacherSubject';
 import Benefit from './Benefit';
 import Category from './Category';
 import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
+import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
+import TeacherSubjectGroup from './TeacherSubjectGroup';
 
 class Teacher extends Model {
   public id!: number;
@@ -20,7 +22,6 @@ class Teacher extends Model {
   public how_they_found_us!: string | null;
   public id_photo!: string | null;
   public hiring_date!: Date | null;
-  public contact_hours!: string | null;
   public linkedin_link!: string | null;
   public graduated!: boolean;
   public notes!: string | null;
@@ -33,6 +34,7 @@ class Teacher extends Model {
   public benefits!: TeacherBenefit[];
   public subjects!: TeacherSubject[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
+  public teacher_subject_groups!: TeacherSubjectGroupMember[];
 
   public static associations: {
     prizes: HasMany<Teacher, Prize>;
@@ -42,6 +44,7 @@ class Teacher extends Model {
     benefits: BelongsToMany<Teacher, Benefit>;
     subjects: HasMany<Teacher, TeacherSubject>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
+    teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroupMember>;
   };
 }
 
@@ -82,10 +85,6 @@ Teacher.init({
   },
   hiring_date: {
     type: DataTypes.DATE,
-    allowNull: true,
-  },
-  contact_hours: {
-    type: DataTypes.STRING,
     allowNull: true,
   },
   linkedin_link: {
@@ -209,6 +208,40 @@ TeacherSubjectOfInterest.belongsTo(Teacher, {
   foreignKey: 'teacher_id',
   as: 'teacher',
 });
+
+
+// Teacher.belongsToMany(Benefit, {
+//   through: TeacherBenefit,
+//   as: 'benefits',
+//   foreignKey: 'teacher_id',
+//   otherKey: 'benefit_id'
+// })
+// Benefit.belongsToMany(Teacher, {
+//   through: TeacherBenefit,
+//   as: 'teachers',
+//   foreignKey: 'benefit_id',
+//   otherKey: 'teacher_id'
+// })
+// Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
+// TeacherBenefit.belongsTo(Teacher);
+// Benefit.hasMany(TeacherBenefit);
+// TeacherBenefit.belongsTo(Benefit);
+Teacher.belongsToMany(TeacherSubjectGroupMember, {
+  through: TeacherSubjectGroupMember,
+  as: 'teacher_subject_groups',
+  foreignKey: 'teacher_id',
+  otherKey: 'teacher_subject_group_id'
+});
+TeacherSubjectGroup.belongsToMany(Teacher, {
+  through: TeacherSubjectGroupMember,
+  as: 'teachers',
+  foreignKey: 'teacher_subject_group_id',
+  otherKey: 'teacher_id'
+});
+// Teacher.hasMany(TeacherSubjectGroupMember, {as: 'teacher_subject_group_members'});
+// TeacherSubjectGroupMember.belongsTo(Teacher);
+// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember);
+// TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup);
 
 
 export default Teacher;

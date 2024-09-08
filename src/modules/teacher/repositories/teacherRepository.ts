@@ -8,6 +8,8 @@ import Teacher from "./models/Teacher";
 import TeacherBenefit from "./models/TeacherBenefit";
 import TeacherCategory from "./models/TeacherCategory";
 import TeacherSubject from "./models/TeacherSubject";
+import TeacherSubjectGroup from "./models/TeacherSubjectGroup";
+import TeacherSubjectGroupMember from "./models/TeacherSubjectGroupMember";
 import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
 
 class TeacherRepository {
@@ -15,7 +17,7 @@ class TeacherRepository {
         const transaction = await sequelize.transaction();
         try {
             // Extraer subjects_of_interest y otros datos del teacherData
-            const { subjects_of_interest = [], categories = [], benefits = [] } = teacher;
+            const { subjects_of_interest = [], teacher_subject_groups = [] } = teacher;
 
             // Crear el Teacher y sus asociaciones directas
             const newTeacher = await Teacher.create(teacher, {
@@ -33,6 +35,10 @@ class TeacherRepository {
             // Asociar subjects_of_interest
             if (subjects_of_interest.length > 0) {
                 await this.associateSubjectsOfInterest(newTeacher.id, subjects_of_interest, transaction);
+            }
+
+            if (teacher_subject_groups.length > 0) {
+                await this.associateTeacherSubjectGroups(newTeacher.id, teacher_subject_groups, transaction);
             }
 
             // Confirmar la transacción
@@ -54,6 +60,36 @@ class TeacherRepository {
             teacher_id: teacherId,
         }));
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
+    }
+
+    private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any ) {
+        for (const teacherSubjectGroup of teacherSubjectGroups) {
+            const { subject_id, teachers, own_role } = teacherSubjectGroup;
+            const newTeacherSubjectGroup = await TeacherSubjectGroup.create(
+                { subject_id },
+                { transaction }
+            );
+
+            const newTeacherAssociation = {
+                teacher_id: teacherId,
+                teacher_subject_group_id: newTeacherSubjectGroup.id,
+                role: own_role,
+            };
+
+            await TeacherSubjectGroupMember.create(
+                newTeacherAssociation,
+                { transaction }
+            );
+
+            const teacherRoles = teachers.map((teacher: any) => ({
+                teacher_id: teacher.teacher_id,
+                teacher_subject_group_id: newTeacherSubjectGroup.id,
+                role: teacher.role,
+            }));
+            console.log('llega aqui', teacherRoles);
+
+            await TeacherSubjectGroupMember.bulkCreate(teacherRoles, { transaction });
+        }
     }
 }
 

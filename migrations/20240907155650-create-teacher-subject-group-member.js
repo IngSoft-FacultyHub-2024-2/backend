@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('teacherSubjectGroupMembers', {
+    await queryInterface.createTable('TeacherSubjectGroupMembers', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -14,15 +14,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'teachers',
+          model: 'Teachers',
           key: 'id',
         },
       },
-      subject_group_id: {
+      teacher_subject_group_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'subject_groups',
+          model: 'TeacherSubjectGroups',
           key: 'id',
         },
       },
@@ -30,10 +30,20 @@ module.exports = {
         type: Sequelize.ENUM('Teórico', 'Tecnología'),
         allowNull: false,
       },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
     })
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('teacherSubjectGroupMembers');
+    await queryInterface.dropTable('TeacherSubjectGroupMembers');
   }
 };

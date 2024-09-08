@@ -5,6 +5,7 @@ import Category from "./models/Category";
 import Contact from "./models/Contact";
 import Prize from "./models/Prize";
 import Teacher from "./models/Teacher";
+import TeacherAvailableModule from "./models/TeacherAvailableModules";
 import TeacherBenefit from "./models/TeacherBenefit";
 import TeacherCategory from "./models/TeacherCategory";
 import TeacherSubject from "./models/TeacherSubject";
@@ -28,6 +29,7 @@ class TeacherRepository {
                     { model: TeacherSubject, as: 'subjects' },
                     { model: TeacherCategory, as: 'teacher_categories' },
                     { model: TeacherBenefit, as: 'teacher_benefits' },
+                    { model: TeacherAvailableModule, as: 'teacher_available_modules' },
                 ],
                 transaction,
             });

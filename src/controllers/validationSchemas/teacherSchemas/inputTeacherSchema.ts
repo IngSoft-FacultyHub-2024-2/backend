@@ -4,6 +4,7 @@ import inputCaesCourseSchema from './inputCaesCourseSchema';
 import inputContactSchema from './inputContactSchema';
 import inputSubjectSchema from './inputSubjectSchema';
 import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
+import inputTeacherAbaailableModuleSchema from './inputTeacherAbaailableModuleSchema';
 
 const inputTeacherSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -25,6 +26,7 @@ const inputTeacherSchema = yup.object().shape({
     subjects: yup.array().of(inputSubjectSchema).nullable(),
     subjects_of_interest: yup.array().of(yup.number()).nullable(),
     teacher_subject_groups: yup.array().of(inputTeacherSubjectGroupSchema).nullable(),
+    teacher_available_modules: yup.array().of(inputTeacherAbaailableModuleSchema).nullable(),
 });
 
 export default inputTeacherSchema;

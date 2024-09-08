@@ -1,4 +1,4 @@
-import { Model, DataTypes, BelongsTo } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../../../config/database';
 
 class Benefit extends Model {

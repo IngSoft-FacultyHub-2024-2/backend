@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
@@ -7,13 +7,13 @@ import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExcept
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
-  addSubject: jest.fn(), getSubjects: jest.fn(),
+  addSubject: jest.fn(), getSubjects: jest.fn(), getSubjectById: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
 
 // Jest mock for eventRepository
 jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
-  getEvents: jest.fn(), addEvent: jest.fn(),
+  getEvents: jest.fn(), addEvent: jest.fn(), 
 }));
 
 const removeUndefined = (obj: any) => {
@@ -39,7 +39,7 @@ describe('addSubject', () => {
     index: 1,
     frontal_hours: 30,
     valid: true,
-    events: [{ eventId: 1, description: 'Introduction to Mathematics' }],
+    events: [{ event_id: 1, description: 'Introduction to Mathematics' }],
   };
 
   const mockSubject = {
@@ -113,6 +113,31 @@ describe('getSubjects', () => {
     expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
   });
 })
+
+describe('getSubjectById', () => {
+  const mockSubject = { id: 1, name: 'Math' };
+  const mockSubjectDto = { id: 1, name: 'Math' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return subject DTO if subject exists', async () => {
+    (subjectRepository.getSubjectById as jest.Mock).mockResolvedValue(mockSubject);
+
+    const result = await getSubjectById(1);
+
+    expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(1);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubjectDto);
+  });
+
+  it('should throw ResourceNotFound if subject does not exist', async () => {
+    (subjectRepository.getSubjectById as jest.Mock).mockResolvedValue(null);
+
+    await expect(getSubjectById(1)).rejects.toThrow(ResourceNotFound);
+    await expect(getSubjectById(1)).rejects.toThrow('Subject with ID 1 not found');
+  });
+});
 
 describe('getEvents', () => {
   it('retrieves events successfully', async () => {

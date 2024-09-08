@@ -16,7 +16,7 @@ export interface SubjectResponseDto {
     subject_folder?: string | null;
     technologies?: string | null;
     notes?: string | null;
-    valid?: boolean;
+    valid: boolean;
     hourConfigs?: HourConfigResponseDto[];
     needs?: NeedResponseDto[];
     events?: SubjectEventResponseDto[];

@@ -1,4 +1,4 @@
-import { Model, DataTypes, HasMany } from 'sequelize';
+import { Model, DataTypes, HasMany, BelongsToMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
 import Event from './Event';
@@ -125,25 +125,12 @@ Need.belongsTo(Subject, {
 
 Subject.hasMany(SubjectEvent, {
   sourceKey: 'id',
-  foreignKey: 'subjectId',
-  as: 'events',
-});
-
-/*
-Subject.belongsToMany(Event, { 
-  through: SubjectEvent,
-  as: 'events',
   foreignKey: 'subject_id',
-  otherKey: 'event_id'
+  as: 'events',
 });
 
-Event.belongsToMany(Subject, { through: SubjectEvent });
-
-Subject.hasMany(SubjectEvent);
-Subject.belongsTo(Event);
-*/
 SubjectEvent.belongsTo(Subject, {
-  foreignKey: 'subjectId',
+  foreignKey: 'subject_id',
   as: 'subject',
 });
 

@@ -48,9 +48,9 @@ class TeacherRepository {
         }
     }
 
-    private async associateSubjectsOfInterest(teacherId: number, subjectIds: any[], transaction: any) {
-        const subjectAssociations = subjectIds.map(subjectId => ({
-            subject_id: subjectId,
+    private async associateSubjectsOfInterest(teacherId: number, subject_ids: any[], transaction: any) {
+        const subjectAssociations = subject_ids.map(subject_id => ({
+            subject_id: subject_id,
             teacher_id: teacherId,
         }));
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });

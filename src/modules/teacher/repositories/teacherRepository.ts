@@ -86,7 +86,6 @@ class TeacherRepository {
                 teacher_subject_group_id: newTeacherSubjectGroup.id,
                 role: teacher.role,
             }));
-            console.log('llega aqui', teacherRoles);
 
             await TeacherSubjectGroupMember.bulkCreate(teacherRoles, { transaction });
         }

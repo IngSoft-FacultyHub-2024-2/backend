@@ -8,13 +8,13 @@ import SubjectEvent from '../../repositories/models/SubjectEvent';
 
 export interface SubjectRequestDto {
     id?: number;
-    name: string | null;
-    subject_code: string | null;
-    study_plan_year: number | null;
-    associated_teacher: number | null;
-    associated_coordinator?: number | null;
-    index: number | null;
-    frontal_hours: number | null;
+    name: string;
+    subject_code: string;
+    study_plan_year: number;
+    associated_teacher: number;
+    associated_coordinator?: number;
+    index: number;
+    frontal_hours: number;
     intro_folder?: string | null;
     subject_folder?: string | null;
     technologies?: string | null;

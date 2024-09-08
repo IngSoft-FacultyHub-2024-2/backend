@@ -1,3 +1,3 @@
-import { addTeacher } from "./services/teacherService";
+import { addTeacher, getTeacherById } from "./services/teacherService";
 
-export { addTeacher };
+export { addTeacher, getTeacherById };

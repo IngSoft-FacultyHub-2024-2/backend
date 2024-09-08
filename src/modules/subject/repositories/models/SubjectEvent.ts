@@ -4,8 +4,9 @@ import Subject from './Subject';
 import Event from './Event';
 
 class SubjectEvent extends Model {
-  public subjectId!: number;
-  public eventId!: number;
+  public id!: number;
+  public subject_id!: number;
+  public event_id!: number;
   public description!: string;
 
   public static associations: {
@@ -15,7 +16,12 @@ class SubjectEvent extends Model {
 }
 
 SubjectEvent.init({
-  subjectId: {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  subject_id: {
     type: DataTypes.INTEGER,
     references: {
       model: Subject,
@@ -23,7 +29,7 @@ SubjectEvent.init({
     },
     primaryKey: true,
   },
-  eventId: {
+  event_id: {
     type: DataTypes.INTEGER,
     references: {
       model: Event,
@@ -42,5 +48,10 @@ SubjectEvent.init({
   timestamps: false,
 });
 
+
+SubjectEvent.belongsTo(Event, {
+  foreignKey: 'event_id',
+  as: 'event',
+});
 
 export default SubjectEvent;

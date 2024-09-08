@@ -165,4 +165,5 @@ describe('getSubject', () => {
     expect(getSubjectById).toHaveBeenCalledWith(1);
     expect(returnError).toHaveBeenCalledWith(res, error);
   });
+
 });

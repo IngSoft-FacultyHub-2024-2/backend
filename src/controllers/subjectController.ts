@@ -33,7 +33,6 @@ class SubjectController {
         let subject_with_coordinator = SubjectSummaryResponseControllerDtoHelper.fromModel(subject, associated_coordinator.name + " " + associated_coordinator.surname); 
         subjectsWithCoordinator.push(subject_with_coordinator)
       }
-      // TODO: convert to DTO
       res.status(200).json(subjectsWithCoordinator);
     } catch (error) {
       if (error instanceof Error) {

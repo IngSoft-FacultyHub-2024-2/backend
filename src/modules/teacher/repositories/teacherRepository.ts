@@ -1,3 +1,4 @@
+import { Order } from "sequelize";
 import sequelize from "../../../config/database";
 import Benefit from "./models/Benefit";
 import CaesCourse from "./models/CaesCourse";
@@ -64,6 +65,26 @@ class TeacherRepository {
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
     }
 
+    async getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
+        const offset = (page - 1) * pageSize;
+        const limit = pageSize;
+        const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
+    
+        return await Teacher.findAll({ 
+          where: filters, 
+          order: orderOption,
+          limit,
+          offset,
+          include: [
+            { model: CaesCourse, as: 'caes_courses' },
+            { model: Contact, as: 'contacts' },
+            { model: Prize, as: 'prizes' },
+            { model: TeacherSubject, as: 'subjects' },
+            { model: TeacherCategory, as: 'teacher_categories' },
+            { model: TeacherBenefit, as: 'teacher_benefits' },
+          ],
+        });
+      }
     private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any ) {
         for (const teacherSubjectGroup of teacherSubjectGroups) {
             const { subject_id, teachers, own_role } = teacherSubjectGroup;

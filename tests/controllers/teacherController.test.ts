@@ -1,8 +1,14 @@
 import { Request, Response } from 'express';
 
-jest.mock('../../src/modules/subject');
+import { getSubjectById } from '../../src/modules/subject';
+import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 import teacherController from '../../src/controllers/teacherController';
-import * as teacherModule from '../../src/modules/teacher';
+import {getTeachers, addTeacher} from '../../src/modules/teacher';
+
+
+jest.mock('../../src/modules/subject');
+jest.mock('../../src/modules/teacher');
+jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 
 describe('TeacherController', () => {
   let teacherBody: any = {
@@ -66,21 +72,80 @@ describe('TeacherController', () => {
   });
 
   it('should add a teacher successfully', async () => {
-    // Asegúrate de que jest.mock está interceptando correctamente addTeacher
-    jest.spyOn(teacherModule, 'addTeacher').mockImplementation(async (teacher: Partial<any>) => {
-      return { id: 1, ...teacherBody };
-    });
+    (addTeacher as jest.Mock).mockResolvedValue({ id: 1, ...teacherBody });
 
     await teacherController.addTeacher(mockReq, mockRes);
 
-    expect(teacherModule.addTeacher).toHaveBeenCalledWith(mockReq.body);
+    expect(addTeacher).toHaveBeenCalledWith(mockReq.body);
     expect(mockRes.status).toHaveBeenCalledWith(201);
     expect(mockRes.json).toHaveBeenCalledWith({ id: 1, ...teacherBody });
   });
 
   it('should handle errors when adding a teacher fails', async () => {
-    mockReq.body = {};
+    const error = new Error('Something went wrong');
+    (addTeacher as jest.Mock).mockImplementation(() => {
+      throw error;
+    });
+
     await teacherController.addTeacher(mockReq, mockRes);
-    expect(mockRes.status).toHaveBeenCalledWith(400);
+
+    expect(addTeacher).toHaveBeenCalledWith(mockReq.body);
+    expect(returnError).toHaveBeenCalledWith(mockRes, error);
+  });
+});
+
+describe('getTeachers', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let statusMock: jest.Mock;
+  let jsonMock: jest.Mock;
+
+  beforeEach(() => {
+    req = {
+      query: {}
+    };
+    statusMock = jest.fn().mockReturnThis();
+    jsonMock = jest.fn();
+    res = {
+      status: statusMock,
+      json: jsonMock
+    };
+    jest.clearAllMocks();
+  });
+
+  it('should return a list of teachers with associated subjects', async () => {
+    const mockTeachers = [
+      { id: 1, name: 'John', surname: 'Doe', subjects: [{ subject_id: 101 }] },
+      { id: 2, name: 'Jane', surname: 'Smith', subjects: [{ subject_id: 102 }] }
+    ];
+    const mockSubject1 = { id: 101, name: 'Math' };
+    const mockSubject2 = { id: 102, name: 'Science' };
+    const mockTeacherSummaryDto1 = { id: 1, name: 'John', surname: 'Doe', associated_subjects: ['Math'] };
+    const mockTeacherSummaryDto2 = { id: 2, name: 'Jane', surname: 'Smith', associated_subjects: ['Science'] };
+
+    (getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
+    (getSubjectById as jest.Mock)
+      .mockResolvedValueOnce(mockSubject1)
+      .mockResolvedValueOnce(mockSubject2);
+
+    await teacherController.getTeachers(req as Request, res as Response);
+
+    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, undefined, undefined);
+    expect(getSubjectById).toHaveBeenCalledWith(101);
+    expect(getSubjectById).toHaveBeenCalledWith(102);
+    expect(statusMock).toHaveBeenCalledWith(200);
+    expect(jsonMock).toHaveBeenCalledWith([mockTeacherSummaryDto1, mockTeacherSummaryDto2]);
+  });
+
+  it('should handle errors', async () => {
+    const error = new Error('Something went wrong');
+    (getTeachers as jest.Mock).mockImplementation(() => {
+      throw error;
+    });
+
+    await teacherController.getTeachers(req as Request, res as Response);
+
+    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, undefined, undefined);
+    expect(returnError).toHaveBeenCalledWith(res, error);
   });
 });

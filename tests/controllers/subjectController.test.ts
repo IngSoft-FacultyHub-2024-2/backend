@@ -166,4 +166,16 @@ describe('getSubject', () => {
     expect(returnError).toHaveBeenCalledWith(res, error);
   });
 
+  it('should handle errors', async () => {
+    const error = new Error('Something went wrong');
+    (getSubjectById as jest.Mock).mockImplementation(() => {
+      throw error;
+    });
+
+    await subjectController.getSubject(req as Request, res as Response);
+
+    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(returnError).toHaveBeenCalledWith(res, error);
+  });
+
 });

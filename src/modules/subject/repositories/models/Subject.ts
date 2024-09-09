@@ -129,6 +129,7 @@ Subject.hasMany(SubjectEvent, {
   as: 'events',
 });
 
+
 SubjectEvent.belongsTo(Subject, {
   foreignKey: 'subject_id',
   as: 'subject',

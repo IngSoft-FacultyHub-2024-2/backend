@@ -6,6 +6,11 @@ export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
 }
 
+export async function getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+  const teachers: Teacher[] = await teacherRepository.getTeachers(filters, sortField, sortOrder, page, pageSize);
+  return teachers;
+}
+
 export async function getTeacherById(id: number) {
   let teacher = await teacherRepository.getTeacherById(id)
   if (!teacher) {

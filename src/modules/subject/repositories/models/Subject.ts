@@ -10,6 +10,7 @@ class Subject extends Model {
   public id!: number;
   public name!: string;
   public subject_code!: string;
+  public acronym!: string; 
   public study_plan_year!: number;
   public associated_teacher!: number;
   public associated_coordinator!: number;
@@ -42,6 +43,10 @@ Subject.init({
     allowNull: false,
   },
   subject_code: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  acronym:{
     type: DataTypes.STRING,
     allowNull: false,
   },

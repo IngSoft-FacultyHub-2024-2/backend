@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getEvents, addEvent } from '../modules/subject';
 import inputEventSchema from './validationSchemas/subjectSchemas/inputEventSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
+import { extractParameters } from '../shared/utils/queryParamsHelper';
 
 class EventController {
   async addEvent(req: Request, res: Response) {
@@ -20,9 +21,8 @@ class EventController {
   async getEvents(req: Request, res: Response) {
     try{
       const queryParams = req.query;
-      console.log('Query Parameters:', queryParams);
-
-      const events = await getEvents(queryParams);
+      const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
+      const events = await getEvents(filters, sortField, sortOrder, page, pageSize);
       res.status(200).json(events);
     } catch (error) {
       console.log(error);

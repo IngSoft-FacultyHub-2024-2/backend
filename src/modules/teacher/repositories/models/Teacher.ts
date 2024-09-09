@@ -19,7 +19,7 @@ class Teacher extends Model {
   public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
-  public cv_file!: string | null;
+  public cv_file!: string | null; 
   public how_they_found_us!: string | null;
   public id_photo!: string | null;
   public hiring_date!: Date | null;
@@ -75,7 +75,7 @@ Teacher.init({
     unique: true,
   },
   cv_file: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   how_they_found_us: {
@@ -83,7 +83,7 @@ Teacher.init({
     allowNull: true,
   },
   id_photo: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   hiring_date: {
@@ -183,14 +183,6 @@ Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
 TeacherBenefit.belongsTo(Teacher);
 Benefit.hasMany(TeacherBenefit);
 TeacherBenefit.belongsTo(Benefit);
-
-// Teacher.hasMany(TeacherPair, {
-//   sourceKey: 'id',
-//   foreignKey: 'teacher_id',
-//   as: 'teacher_pairs',
-// });
-
-// Teacher.belongsToMany(Teacher, { through: TeacherPair, as: 'teacher_pairs', })
 
 Teacher.hasMany(TeacherSubject, {
   sourceKey: 'id',

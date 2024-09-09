@@ -56,9 +56,9 @@ class TeacherRepository {
         }
     }
 
-    private async associateSubjectsOfInterest(teacherId: number, subjectIds: any[], transaction: any) {
-        const subjectAssociations = subjectIds.map(subjectId => ({
-            subject_id: subjectId,
+    private async associateSubjectsOfInterest(teacherId: number, subject_ids: any[], transaction: any) {
+        const subjectAssociations = subject_ids.map(subject_id => ({
+            subject_id: subject_id,
             teacher_id: teacherId,
         }));
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
@@ -91,6 +91,20 @@ class TeacherRepository {
 
             await TeacherSubjectGroupMember.bulkCreate(teacherRoles, { transaction });
         }
+    }
+
+    async getTeacherById(id: number) {
+        return await Teacher.findByPk(id, {
+            include: [
+                { model: CaesCourse, as: 'caes_courses' },
+                { model: Contact, as: 'contacts' },
+                { model: Prize, as: 'prizes' },
+                { model: TeacherSubject, as: 'subjects' },
+                { model: TeacherCategory, as: 'teacher_categories' },
+                { model: TeacherBenefit, as: 'teacher_benefits' },
+                { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+            ],
+        });
     }
 }
 

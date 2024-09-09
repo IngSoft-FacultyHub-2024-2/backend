@@ -1,19 +1,20 @@
-import { Model, DataTypes, HasMany } from 'sequelize';
+import { Model, DataTypes, HasMany, BelongsToMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
+import Event from './Event';
 import Need from './Need';
 import SubjectEvent from './SubjectEvent';
 
 // TODO: UNCOMMENT THE REFERENCE FOR THE ASSOCIATED TEACHER AND COORDINATOR
 class Subject extends Model {
   public id!: number;
-  public name!: string | null;
-  public subject_code!: string | null;
-  public study_plan_year!: number | null;
-  public associated_teacher!: number | null;
-  public associated_coordinator!: number | null;
-  public index!: number | null;
-  public frontal_hours!: number | null;
+  public name!: string;
+  public subject_code!: string;
+  public study_plan_year!: number;
+  public associated_teacher!: number;
+  public associated_coordinator!: number;
+  public index!: number;
+  public frontal_hours!: number;
   public intro_folder!: string | null;
   public subject_folder!: string | null;
   public technologies!: string | null;
@@ -124,12 +125,12 @@ Need.belongsTo(Subject, {
 
 Subject.hasMany(SubjectEvent, {
   sourceKey: 'id',
-  foreignKey: 'subjectId',
+  foreignKey: 'subject_id',
   as: 'events',
 });
 
 SubjectEvent.belongsTo(Subject, {
-  foreignKey: 'subjectId',
+  foreignKey: 'subject_id',
   as: 'subject',
 });
 

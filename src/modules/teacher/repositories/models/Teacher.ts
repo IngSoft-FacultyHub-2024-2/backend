@@ -11,6 +11,7 @@ import Category from './Category';
 import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
 import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
 import TeacherSubjectGroup from './TeacherSubjectGroup';
+import TeacherAvailableModule from './TeacherAvailableModules';
 
 class Teacher extends Model {
   public id!: number;
@@ -35,6 +36,7 @@ class Teacher extends Model {
   public subjects!: TeacherSubject[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
   public teacher_subject_groups!: TeacherSubjectGroupMember[];
+  public teacher_available_modules!: number;
 
   public static associations: {
     prizes: HasMany<Teacher, Prize>;
@@ -45,6 +47,7 @@ class Teacher extends Model {
     subjects: HasMany<Teacher, TeacherSubject>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
     teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroupMember>;
+    teacher_available_modules: HasMany<Teacher, TeacherAvailableModule>;
   };
 }
 
@@ -201,23 +204,6 @@ TeacherSubjectOfInterest.belongsTo(Teacher, {
   as: 'teacher',
 });
 
-
-// Teacher.belongsToMany(Benefit, {
-//   through: TeacherBenefit,
-//   as: 'benefits',
-//   foreignKey: 'teacher_id',
-//   otherKey: 'benefit_id'
-// })
-// Benefit.belongsToMany(Teacher, {
-//   through: TeacherBenefit,
-//   as: 'teachers',
-//   foreignKey: 'benefit_id',
-//   otherKey: 'teacher_id'
-// })
-// Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
-// TeacherBenefit.belongsTo(Teacher);
-// Benefit.hasMany(TeacherBenefit);
-// TeacherBenefit.belongsTo(Benefit);
 Teacher.belongsToMany(TeacherSubjectGroupMember, {
   through: TeacherSubjectGroupMember,
   as: 'teacher_subject_groups',
@@ -234,6 +220,16 @@ TeacherSubjectGroup.belongsToMany(Teacher, {
 // TeacherSubjectGroupMember.belongsTo(Teacher);
 // TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember);
 // TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup);
+
+Teacher.hasMany(TeacherAvailableModule, {
+  sourceKey: 'id',
+  foreignKey: 'teacher_id',
+  as: 'teacher_available_modules',
+});
+TeacherAvailableModule.belongsTo(Teacher, {
+  foreignKey: 'teacher_id',
+  as: 'teacher',
+});
 
 
 export default Teacher;

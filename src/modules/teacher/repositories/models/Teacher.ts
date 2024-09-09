@@ -5,11 +5,13 @@ import CaesCourse from './CaesCourse';
 import Contact from './Contact';
 import TeacherCategory from './TeacherCategory';
 import TeacherBenefit from './TeacherBenefit';
-import TeacherPair from './TeacherPair';
 import TeacherSubject from './TeacherSubject';
 import Benefit from './Benefit';
 import Category from './Category';
 import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
+import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
+import TeacherSubjectGroup from './TeacherSubjectGroup';
+import TeacherAvailableModule from './TeacherAvailableModules';
 
 class Teacher extends Model {
   public id!: number;
@@ -17,11 +19,10 @@ class Teacher extends Model {
   public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
-  public cv_file!: string | null;
+  public cv_file!: string | null; 
   public how_they_found_us!: string | null;
   public id_photo!: string | null;
   public hiring_date!: Date | null;
-  public contact_hours!: string | null;
   public linkedin_link!: string | null;
   public graduated!: boolean;
   public notes!: string | null;
@@ -32,9 +33,10 @@ class Teacher extends Model {
   public contacts!: Contact[];
   public categories!: TeacherCategory[];
   public benefits!: TeacherBenefit[];
-  public teacher_pairs!: TeacherPair[];
   public subjects!: TeacherSubject[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
+  public teacher_subject_groups!: TeacherSubjectGroupMember[];
+  public teacher_available_modules!: number;
 
   public static associations: {
     prizes: HasMany<Teacher, Prize>;
@@ -42,9 +44,10 @@ class Teacher extends Model {
     contacts: HasMany<Teacher, Contact>;
     categories: BelongsToMany<Teacher, Category>;
     benefits: BelongsToMany<Teacher, Benefit>;
-    teacher_pairs: BelongsToMany<Teacher, TeacherPair>;
     subjects: HasMany<Teacher, TeacherSubject>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
+    teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroupMember>;
+    teacher_available_modules: HasMany<Teacher, TeacherAvailableModule>;
   };
 }
 
@@ -72,7 +75,7 @@ Teacher.init({
     unique: true,
   },
   cv_file: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   how_they_found_us: {
@@ -80,15 +83,11 @@ Teacher.init({
     allowNull: true,
   },
   id_photo: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   hiring_date: {
     type: DataTypes.DATE,
-    allowNull: true,
-  },
-  contact_hours: {
-    type: DataTypes.STRING,
     allowNull: true,
   },
   linkedin_link: {
@@ -201,6 +200,33 @@ Teacher.hasMany(TeacherSubjectOfInterest, {
   as: 'subjects_of_interest',
 });
 TeacherSubjectOfInterest.belongsTo(Teacher, {
+  foreignKey: 'teacher_id',
+  as: 'teacher',
+});
+
+Teacher.belongsToMany(TeacherSubjectGroupMember, {
+  through: TeacherSubjectGroupMember,
+  as: 'teacher_subject_groups',
+  foreignKey: 'teacher_id',
+  otherKey: 'teacher_subject_group_id'
+});
+TeacherSubjectGroup.belongsToMany(Teacher, {
+  through: TeacherSubjectGroupMember,
+  as: 'teachers',
+  foreignKey: 'teacher_subject_group_id',
+  otherKey: 'teacher_id'
+});
+// Teacher.hasMany(TeacherSubjectGroupMember, {as: 'teacher_subject_group_members'});
+// TeacherSubjectGroupMember.belongsTo(Teacher);
+// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember);
+// TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup);
+
+Teacher.hasMany(TeacherAvailableModule, {
+  sourceKey: 'id',
+  foreignKey: 'teacher_id',
+  as: 'teacher_available_modules',
+});
+TeacherAvailableModule.belongsTo(Teacher, {
   foreignKey: 'teacher_id',
   as: 'teacher',
 });

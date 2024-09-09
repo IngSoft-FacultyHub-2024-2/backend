@@ -41,10 +41,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      contact_hours: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       linkedin_link: {
         type: Sequelize.STRING,
         allowNull: true,

@@ -7,7 +7,7 @@ export async function addTeacher(teacher: Partial<Teacher>) {
 }
 
 export async function getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-  const teachers: Teacher[] = await teacherRepository.getSubjects(filters, sortField, sortOrder, page, pageSize);
+  const teachers: Teacher[] = await teacherRepository.getTeachers(filters, sortField, sortOrder, page, pageSize);
   return teachers;
 }
 

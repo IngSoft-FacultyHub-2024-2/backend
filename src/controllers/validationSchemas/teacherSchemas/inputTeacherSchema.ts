@@ -2,8 +2,9 @@ import * as yup from 'yup';
 import inputPrizeSchema from './inputPrizeSchema';
 import inputCaesCourseSchema from './inputCaesCourseSchema';
 import inputContactSchema from './inputContactSchema';
-import inputTeacherPairsSchema from './inputTeacherPairsSchema';
 import inputSubjectSchema from './inputSubjectSchema';
+import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
+import inputTeacherAvailableModuleSchema from './inputTeacherAvailableModuleSchema';
 
 const inputTeacherSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -14,7 +15,6 @@ const inputTeacherSchema = yup.object().shape({
     how_they_found_us: yup.string().nullable(),
     id_photo: yup.string().nullable(),
     hiring_date: yup.date().nullable(),
-    contact_hours: yup.string().nullable(),
     linkedin_link: yup.string().url("LinkedIn link must be a valid URL").nullable(),
     graduated: yup.boolean().nullable(),
     notes: yup.string().nullable(),
@@ -25,6 +25,8 @@ const inputTeacherSchema = yup.object().shape({
     benefits: yup.array().of(yup.number()).nullable(),
     subjects: yup.array().of(inputSubjectSchema).nullable(),
     subjects_of_interest: yup.array().of(yup.number()).nullable(),
+    teacher_subject_groups: yup.array().of(inputTeacherSubjectGroupSchema).nullable(),
+    teacher_available_modules: yup.array().of(inputTeacherAvailableModuleSchema).nullable(),
 });
 
 export default inputTeacherSchema;

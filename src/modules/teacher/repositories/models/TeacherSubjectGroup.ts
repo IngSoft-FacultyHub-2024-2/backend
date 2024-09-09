@@ -1,26 +1,28 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../../../config/database';
 
-class Benefit extends Model {
+'use strict';
+
+class TeacherSubjectGroup extends Model {
   public id!: number;
-  public name!: string;
+  public subject_id!: number;
 }
 
-Benefit.init({
+TeacherSubjectGroup.init({
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  name: {
-    type: DataTypes.STRING,
+  subject_id: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 }, {
   sequelize,
-  modelName: 'Benefit',
-  tableName: 'Benefits',
+  modelName: 'TeacherSubjectGroup',
+  tableName: 'TeacherSubjectGroups',
   timestamps: true,
 });
 
-export default Benefit;
+export default TeacherSubjectGroup;

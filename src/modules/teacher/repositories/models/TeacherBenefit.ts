@@ -1,4 +1,4 @@
-import { Model, DataTypes, BelongsTo, HasOne, BelongsToMany } from 'sequelize';
+import { Model, DataTypes, BelongsToMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 import Benefit from './Benefit';

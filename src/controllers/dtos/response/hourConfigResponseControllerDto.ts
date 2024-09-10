@@ -5,7 +5,6 @@ export interface HourConfigResponseControllerDto {
     subject_id: number;
     role: string;
     total_hours: number;
-    weekly_hours: number;
 }
 
 export class HourConfigResponseControllerDtoHelper {
@@ -16,7 +15,6 @@ export class HourConfigResponseControllerDtoHelper {
             subject_id: hourConfig.subject_id,
             role: hourConfig.role,
             total_hours: hourConfig.total_hours,
-            weekly_hours: hourConfig.weekly_hours,
         };
     }
 }

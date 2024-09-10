@@ -16,22 +16,26 @@ describe('SubjectController', () => {
     "study_plan_year": 2000,
     "associated_teacher": 15,
     "associated_coordinator": 16,
-    "index": 1.2,
+    "index": 1,
     "frontal_hours": 120,
     "intro_folder": "/src/",
     "subject_folder": "/src/r",
     "technologies": "ruby",
     "notes": "nueva materia",
     "hourConfigs": [{
-        "role": "Teorico",
+        "role": "Teórico",
         "total_hours": 100,
-        "weekly_hours": 10
-    }],
+      },
+      {
+        "role": "Tecnología",
+        "total_hours": 20,
+      }],
     "needs":[{
         "name": "laboratorio"
     },{
         "name": "salon de 25 personas"
     }],
+    "needs_notes": "",
     "events": []
   };
   const mockReq = { body: subjectBody } as Request;

@@ -5,7 +5,6 @@ import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/teacherRole
 const inputHourConfigSchema = yup.object().shape({
     role: yup.mixed<TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY>().oneOf(getTeacherRoles()).required(),
     total_hours: yup.number().positive().required(),
-    weekly_hours: yup.number().positive().required(),
 });
 
 export default inputHourConfigSchema;

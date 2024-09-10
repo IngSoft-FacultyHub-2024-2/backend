@@ -1,11 +1,12 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../../../config/database';
+import { WeekDays } from '../../../../shared/utils/WeekDays';
 
 class TeacherAvailableModule extends Model {
   public id!: number;
   public teacher_id!: number;
-  public day_of_week!: string; // 'Monday', 'Tuesday', etc.
-  public module!: number; // e.g., 1, 2, 3, ..., 14 (total 14 modules in a day)
+  public day_of_week!: string; 
+  public module!: number; 
 }
 
 TeacherAvailableModule.init({
@@ -19,12 +20,12 @@ TeacherAvailableModule.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Teachers', // Foreign key to Teacher model
+      model: 'Teachers', 
       key: 'id',
     },
   },
   day_of_week: {
-    type: DataTypes.ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
+    type: DataTypes.ENUM(WeekDays.MONDAY, WeekDays.TUESDAY, WeekDays.WEDNESDAY, WeekDays.THURSDAY, WeekDays.FRIDAY, WeekDays.SATURDAY, WeekDays.SUNDAY),
     allowNull: false,
   },
   module: {

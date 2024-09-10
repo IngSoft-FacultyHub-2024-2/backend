@@ -6,6 +6,7 @@ import inputSubjectEventSchema from './inputSubjectEventSchema';
 const inputSubjectSchema = yup.object().shape({
     name: yup.string().required(),
     subject_code: yup.string().required(),
+    acronym: yup.string().required(),
     study_plan_year: yup.number().integer().positive().required(),
     associated_teacher: yup.number().required(),
     associated_coordinator: yup.number().integer().positive().nullable(),

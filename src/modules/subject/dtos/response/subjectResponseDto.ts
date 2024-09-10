@@ -7,6 +7,7 @@ export interface SubjectResponseDto {
     id: number;
     name: string;
     subject_code: string;
+    acronym: string;
     study_plan_year: number;
     associated_teacher: number;
     associated_coordinator: number;
@@ -29,6 +30,7 @@ export class SubjectResponseDtoHelper {
       id: subject.id,
       name: subject.name,
       subject_code: subject.subject_code,
+      acronym: subject.acronym,
       study_plan_year: subject.study_plan_year,
       associated_teacher: subject.associated_teacher,
       associated_coordinator: subject.associated_coordinator,

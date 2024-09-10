@@ -9,8 +9,10 @@ jest.mock('../../src/modules/teacher');
 jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 
 describe('SubjectController', () => {
-  let subjectBody: any = {"name": "andy2",
+  let subjectBody: any = {
+    "name": "Diseño1",
     "subject_code": "code",
+    "acronym": "DA1",
     "study_plan_year": 2000,
     "associated_teacher": 15,
     "associated_coordinator": 16,

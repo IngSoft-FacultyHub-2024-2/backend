@@ -29,7 +29,7 @@ class TeacherController {
       let teachersSummary: TeacherSummaryResponseControllerDto[] = [];
       for (const teacher of teachers) {
         // add the associated subjects to the teacher
-        let associatedSubjects = await Promise.all(teacher.subjects.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id)).name));
+        let associatedSubjects = await Promise.all(teacher.subject_history.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id)).name));
         teachersSummary.push(TeacherSummaryResponseControllerDtoHelper.fromModel(teacher, associatedSubjects))
       }
       res.status(200).json(teachersSummary);

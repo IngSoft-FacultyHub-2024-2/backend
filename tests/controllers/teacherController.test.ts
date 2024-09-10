@@ -50,7 +50,7 @@ describe('TeacherController', () => {
     ],
     "categories": [1],
     "benefits": [1],
-    "subjects": [
+    "subject_history": [
       {
         "subject_id": 2,
         "role": "Tecnología",
@@ -115,8 +115,8 @@ describe('getTeachers', () => {
 
   it('should return a list of teachers with associated subjects', async () => {
     const mockTeachers = [
-      { id: 1, name: 'John', surname: 'Doe', subjects: [{ subject_id: 101 }] },
-      { id: 2, name: 'Jane', surname: 'Smith', subjects: [{ subject_id: 102 }] }
+      { id: 1, name: 'John', surname: 'Doe', subject_history: [{ subject_id: 101 }] },
+      { id: 2, name: 'Jane', surname: 'Smith', subject_history: [{ subject_id: 102 }] }
     ];
     const mockSubject1 = { id: 101, name: 'Math' };
     const mockSubject2 = { id: 102, name: 'Science' };

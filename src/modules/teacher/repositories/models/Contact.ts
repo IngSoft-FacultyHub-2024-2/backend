@@ -35,7 +35,10 @@ Contact.init({
   data: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: {
+      name: 'data',
+      msg: 'Contact data already exists',
+    }
   },
   prefered: {
     type: DataTypes.BOOLEAN,

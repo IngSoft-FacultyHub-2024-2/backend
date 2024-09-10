@@ -33,7 +33,7 @@ class Teacher extends Model {
   public contacts!: Contact[];
   public categories!: TeacherCategory[];
   public benefits!: TeacherBenefit[];
-  public subjects!: TeacherSubject[];
+  public subject_history!: TeacherSubject[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
   public teacher_subject_groups!: TeacherSubjectGroupMember[];
   public teacher_available_modules!: number;
@@ -44,7 +44,7 @@ class Teacher extends Model {
     contacts: HasMany<Teacher, Contact>;
     categories: BelongsToMany<Teacher, Category>;
     benefits: BelongsToMany<Teacher, Benefit>;
-    subjects: HasMany<Teacher, TeacherSubject>;
+    subject_history: HasMany<Teacher, TeacherSubject>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
     teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroupMember>;
     teacher_available_modules: HasMany<Teacher, TeacherAvailableModule>;
@@ -72,7 +72,11 @@ Teacher.init({
   employee_number: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    unique: true,
+    unique: {
+      name: 'employee_number',
+      msg: 'Employee number already exists',
+    }
+
   },
   cv_file: {
     type: DataTypes.TEXT,
@@ -187,7 +191,7 @@ TeacherBenefit.belongsTo(Benefit);
 Teacher.hasMany(TeacherSubject, {
   sourceKey: 'id',
   foreignKey: 'teacher_id',
-  as: 'subjects',
+  as: 'subject_history',
 });
 TeacherSubject.belongsTo(Teacher, {
   foreignKey: 'teacher_id',

@@ -23,7 +23,7 @@ const inputTeacherSchema = yup.object().shape({
     contacts: yup.array().of(inputContactSchema).nullable(),
     categories: yup.array().of(yup.number()).nullable(),
     benefits: yup.array().of(yup.number()).nullable(),
-    subjects: yup.array().of(inputSubjectSchema).nullable(),
+    subject_history: yup.array().of(inputSubjectSchema).nullable(),
     subjects_of_interest: yup.array().of(yup.number()).nullable(),
     teacher_subject_groups: yup.array().of(inputTeacherSubjectGroupSchema).nullable(),
     teacher_available_modules: yup.array().of(inputTeacherAvailableModuleSchema).nullable(),

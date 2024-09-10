@@ -10,7 +10,6 @@ class HourConfig extends Model {
   public subject_id!: number;
   public role!: TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY
   public total_hours!: number;
-  public weekly_hours!: number;
 
   public static associations: {
     subject: Association<HourConfig, Subject>;
@@ -38,11 +37,7 @@ HourConfig.init({
   total_hours: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  },
-  weekly_hours: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+  }
 }, {
   sequelize,
   modelName: 'HourConfig',

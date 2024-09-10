@@ -10,6 +10,7 @@ import { SubjectResponseControllerDtoHelper } from './dtos/response/subjectRespo
 class SubjectController {
   async addSubject(req: Request, res: Response) {
     try{
+      console.log(req.body.needs_notes)
       await inputSubjectSchema.validate(req.body)
       const subject = await addSubject(req.body);
       res.status(201).json(subject);

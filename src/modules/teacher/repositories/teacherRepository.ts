@@ -9,10 +9,10 @@ import Teacher from "./models/Teacher";
 import TeacherAvailableModule from "./models/TeacherAvailableModules";
 import TeacherBenefit from "./models/TeacherBenefit";
 import TeacherCategory from "./models/TeacherCategory";
-import TeacherSubject from "./models/TeacherSubject";
 import TeacherSubjectGroup from "./models/TeacherSubjectGroup";
 import TeacherSubjectGroupMember from "./models/TeacherSubjectGroupMember";
 import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
+import TeacherSubjectHistory from "./models/TeacherSubjectHistory";
 
 class TeacherRepository {
     async addTeacher(teacher: Partial<Teacher>) {
@@ -27,7 +27,7 @@ class TeacherRepository {
                     { model: CaesCourse, as: 'caes_courses' },
                     { model: Contact, as: 'contacts' },
                     { model: Prize, as: 'prizes' },
-                    { model: TeacherSubject, as: 'subject_history' },
+                    { model: TeacherSubjectHistory, as: 'subjects_history' },
                     { model: TeacherCategory, as: 'teacher_categories' },
                     { model: TeacherBenefit, as: 'teacher_benefits' },
                     { model: TeacherAvailableModule, as: 'teacher_available_modules' },
@@ -65,26 +65,6 @@ class TeacherRepository {
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
     }
 
-    async getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
-        const offset = (page - 1) * pageSize;
-        const limit = pageSize;
-        const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
-    
-        return await Teacher.findAll({ 
-          where: filters, 
-          order: orderOption,
-          limit,
-          offset,
-          include: [
-            { model: CaesCourse, as: 'caes_courses' },
-            { model: Contact, as: 'contacts' },
-            { model: Prize, as: 'prizes' },
-            { model: TeacherSubject, as: 'subjects' },
-            { model: TeacherCategory, as: 'teacher_categories' },
-            { model: TeacherBenefit, as: 'teacher_benefits' },
-          ],
-        });
-      }
     private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any ) {
         for (const teacherSubjectGroup of teacherSubjectGroups) {
             const { subject_id, teachers, own_role } = teacherSubjectGroup;
@@ -114,13 +94,35 @@ class TeacherRepository {
         }
     }
 
+    async getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
+        const offset = (page - 1) * pageSize;
+        const limit = pageSize;
+        const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
+    
+        const teachers = await Teacher.findAll({ 
+          where: filters, 
+          order: orderOption,
+          limit,
+          offset,
+          include: [
+            { model: CaesCourse, as: 'caes_courses' },
+            { model: Contact, as: 'contacts' },
+            { model: Prize, as: 'prizes' },
+            { model: TeacherSubjectHistory, as: 'subjects_history' },
+            { model: Category, as: 'categories' },
+            { model: Benefit, as: 'benefits' },
+          ],
+        });
+        return teachers;
+      }
+
     async getTeacherById(id: number) {
         return await Teacher.findByPk(id, {
             include: [
                 { model: CaesCourse, as: 'caes_courses' },
                 { model: Contact, as: 'contacts' },
                 { model: Prize, as: 'prizes' },
-                { model: TeacherSubject, as: 'subject_history' },
+                { model: TeacherSubjectHistory, as: 'subjects_history' },
                 { model: TeacherCategory, as: 'teacher_categories' },
                 { model: TeacherBenefit, as: 'teacher_benefits' },
                 { model: TeacherAvailableModule, as: 'teacher_available_modules' },

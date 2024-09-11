@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      acronym: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       study_plan_year: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -44,6 +48,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      total_hours: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       intro_folder: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -52,11 +60,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      tecnologies: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      notes: {
+      technologies: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -64,6 +68,14 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
+      },
+      notes: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      needs_notes: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

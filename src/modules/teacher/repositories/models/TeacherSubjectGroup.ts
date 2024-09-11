@@ -1,11 +1,17 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, BelongsTo } from 'sequelize';
 import sequelize from '../../../../config/database';
+import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
 
 'use strict';
 
 class TeacherSubjectGroup extends Model {
   public id!: number;
   public subject_id!: number;
+  public members!: TeacherSubjectGroupMember[];
+
+  public static associations: {
+    members: BelongsTo<TeacherSubjectGroup, TeacherSubjectGroupMember>;
+  };
 }
 
 TeacherSubjectGroup.init({

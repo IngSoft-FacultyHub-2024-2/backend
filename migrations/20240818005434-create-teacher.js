@@ -30,11 +30,11 @@ module.exports = {
         allowNull: true,
       },
       how_they_found_us: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       id_photo: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       hiring_date: {

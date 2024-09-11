@@ -99,7 +99,12 @@ class TeacherRepository {
         const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
 
         const teachers = await Teacher.findAll({
-            where: filters,
+            //ignore case in name and last_name
+            where: {
+                ...filters,
+                ...(filters?.name && { name: sequelize.where(sequelize.fn('LOWER', sequelize.col('name')), 'LIKE', `%${filters.name.toLowerCase()}%`) }),
+                ...(filters?.surname && { surname: sequelize.where(sequelize.fn('LOWER', sequelize.col('surname')), 'LIKE', `%${filters.surname.toLowerCase()}%`) }),
+            },
             order: orderOption,
             limit,
             offset,

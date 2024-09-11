@@ -117,7 +117,7 @@ Subject.init({
   validate: {
     totalHoursEqualHourConfigs(this: Subject) {
       const totalHours = this.getDataValue('index') * this.getDataValue('frontal_hours');
-      const hourConfigsTotal = this.hour_configs ? this.hour_configs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
+      const hourConfigsTotal = this.hour_configs ? this.hour_configs.reduce((sum, config) => sum + Number(config.total_hours), 0) : 0;
       console.log(totalHours, hourConfigsTotal);
       if (totalHours !== hourConfigsTotal) {
         throw new Error('total_hours must be equal to the sum of hour_configs.total_hours');

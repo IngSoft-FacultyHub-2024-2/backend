@@ -79,7 +79,7 @@ class TeacherRepository {
             { model: CaesCourse, as: 'caes_courses' },
             { model: Contact, as: 'contacts' },
             { model: Prize, as: 'prizes' },
-            { model: TeacherSubject, as: 'subjects' },
+            { model: TeacherSubject, as: 'subject_history' },
             { model: TeacherCategory, as: 'teacher_categories' },
             { model: TeacherBenefit, as: 'teacher_benefits' },
           ],

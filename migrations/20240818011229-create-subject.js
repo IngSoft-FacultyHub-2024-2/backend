@@ -41,7 +41,7 @@ module.exports = {
         },
       },
       index: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DOUBLE,
         allowNull: false,
       },
       frontal_hours: {
@@ -50,7 +50,7 @@ module.exports = {
       },
       total_hours: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       intro_folder: {
         type: Sequelize.STRING,

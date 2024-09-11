@@ -7,7 +7,7 @@ export interface SubjectSummaryResponseControllerDto {
     study_plan_year: number;
     associated_coordinator_name: string
     index: number;
-    hourConfigs?: HourConfigResponseDto[];
+    hour_configs?: HourConfigResponseDto[];
 }
 
 export class SubjectSummaryResponseControllerDtoHelper {
@@ -20,7 +20,7 @@ export class SubjectSummaryResponseControllerDtoHelper {
           study_plan_year: subject.study_plan_year,
           associated_coordinator_name: associated_coordinator_name,
           index: subject.index,
-          hourConfigs: subject.hourConfigs,
+          hour_configs: subject.hour_configs,
       };
   }
 }

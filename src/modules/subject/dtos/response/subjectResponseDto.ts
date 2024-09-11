@@ -19,7 +19,7 @@ export interface SubjectResponseDto {
     technologies?: string | null;
     notes?: string | null;
     valid: boolean;
-    hourConfigs?: HourConfigResponseDto[];
+    hour_configs?: HourConfigResponseDto[];
     needs?: NeedResponseDto[];
     needs_notes: string;
     events?: SubjectEventResponseDto[];
@@ -44,7 +44,7 @@ export class SubjectResponseDtoHelper {
       technologies: subject.technologies,
       notes: subject.notes,
       valid: subject.valid,
-      hourConfigs: subject.hourConfigs?.map((hc) => HourConfigResponseDtoHelper.fromModel(hc)) || [],
+      hour_configs: subject.hour_configs?.map((hc) => HourConfigResponseDtoHelper.fromModel(hc)) || [],
       needs: subject.needs?.map((n) => NeedResponseDtoHelper.fromModel(n)) || [],
       needs_notes: subject.needs_notes,
       events: subject.events?.map((e) => SubjectEventResponseDtoHelper.fromModel(e)) || [],

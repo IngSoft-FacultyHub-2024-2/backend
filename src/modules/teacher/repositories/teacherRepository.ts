@@ -28,14 +28,13 @@ class TeacherRepository {
                     { model: Contact, as: 'contacts' },
                     { model: Prize, as: 'prizes' },
                     { model: TeacherSubjectHistory, as: 'subjects_history' },
-                    { model: TeacherCategory, as: 'teacher_categories' },
-                    { model: TeacherBenefit, as: 'teacher_benefits' },
+                    { model: TeacherCategory, as: 'categories' },
+                    { model: TeacherBenefit, as: 'benefits' },
                     { model: TeacherAvailableModule, as: 'teacher_available_modules' },
                 ],
                 transaction,
             });
 
-            // Asociar subjects_of_interest
             if (subjects_of_interest.length > 0) {
                 await this.associateSubjectsOfInterest(newTeacher.id, subjects_of_interest, transaction);
             }
@@ -65,7 +64,7 @@ class TeacherRepository {
         await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
     }
 
-    private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any ) {
+    private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any) {
         for (const teacherSubjectGroup of teacherSubjectGroups) {
             const { subject_id, teachers, own_role } = teacherSubjectGroup;
             const newTeacherSubjectGroup = await TeacherSubjectGroup.create(
@@ -98,23 +97,25 @@ class TeacherRepository {
         const offset = (page - 1) * pageSize;
         const limit = pageSize;
         const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
-    
-        const teachers = await Teacher.findAll({ 
-          where: filters, 
-          order: orderOption,
-          limit,
-          offset,
-          include: [
-            { model: CaesCourse, as: 'caes_courses' },
-            { model: Contact, as: 'contacts' },
-            { model: Prize, as: 'prizes' },
-            { model: TeacherSubjectHistory, as: 'subjects_history' },
-            { model: Category, as: 'categories' },
-            { model: Benefit, as: 'benefits' },
-          ],
+
+        const teachers = await Teacher.findAll({
+            where: filters,
+            order: orderOption,
+            limit,
+            offset,
+            include: [
+                { model: CaesCourse, as: 'caes_courses' },
+                { model: Contact, as: 'contacts' },
+                { model: Prize, as: 'prizes' },
+                { model: TeacherSubjectHistory, as: 'subjects_history' },
+                { model: TeacherCategory, as: 'categories'},
+                { model: TeacherBenefit, as: 'benefits'},
+            ],
         });
+
+        console.log(teachers);
         return teachers;
-      }
+    }
 
     async getTeacherById(id: number) {
         return await Teacher.findByPk(id, {
@@ -123,8 +124,8 @@ class TeacherRepository {
                 { model: Contact, as: 'contacts' },
                 { model: Prize, as: 'prizes' },
                 { model: TeacherSubjectHistory, as: 'subjects_history' },
-                { model: TeacherCategory, as: 'teacher_categories' },
-                { model: TeacherBenefit, as: 'teacher_benefits' },
+                { model: TeacherCategory, as: 'categories' },
+                { model: TeacherBenefit, as: 'benefits' },
                 { model: TeacherAvailableModule, as: 'teacher_available_modules' },
             ],
         });

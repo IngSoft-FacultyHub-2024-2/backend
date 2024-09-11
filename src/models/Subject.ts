@@ -21,7 +21,7 @@ class Subject extends Model {
   public needs!: Need[];
 
   public static associations: {
-    hourConfigs: HasMany<Subject, HourConfig>;
+    hour_configs: HasMany<Subject, HourConfig>;
     needs: HasMany<Subject, Need>;
   };
 }
@@ -99,7 +99,7 @@ Subject.init({
 Subject.hasMany(HourConfig, {
   sourceKey: 'id',
   foreignKey: 'subject_id',
-  as: 'hourConfigs',
+  as: 'hour_configs',
 });
 
 Subject.hasMany(Need, {

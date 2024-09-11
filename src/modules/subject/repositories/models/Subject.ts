@@ -22,13 +22,13 @@ class Subject extends Model {
   public technologies!: string | null;
   public notes!: string | null;
   public valid!: boolean;
-  public hourConfigs!: HourConfig[];
+  public hour_configs!: HourConfig[];
   public needs!: Need[];
   public needs_notes!: string;
   public events!: SubjectEvent[];
 
   public static associations: {
-    hourConfigs: HasMany<Subject, HourConfig>;
+    hour_configs: HasMany<Subject, HourConfig>;
     needs: HasMany<Subject, Need>;
     events: HasMany<Subject, SubjectEvent>;
   };
@@ -82,9 +82,7 @@ Subject.init({
   },
   total_hours: {
     type: DataTypes.VIRTUAL,
-    get() {
-      return this.getDataValue('index') * this.getDataValue('frontal_hours');
-    },
+    allowNull: true,
   },
   intro_folder: {
     type: DataTypes.STRING,
@@ -119,19 +117,25 @@ Subject.init({
   validate: {
     totalHoursEqualHourConfigs(this: Subject) {
       const totalHours = this.getDataValue('index') * this.getDataValue('frontal_hours');
-      const hourConfigsTotal = this.hourConfigs ? this.hourConfigs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
+      const hourConfigsTotal = this.hour_configs ? this.hour_configs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
       console.log(totalHours, hourConfigsTotal);
       if (totalHours !== hourConfigsTotal) {
-        throw new Error('total_hours must be equal to the sum of hourConfigs.total_hours');
+        throw new Error('total_hours must be equal to the sum of hour_configs.total_hours');
       }
     }
+  },
+  hooks: {
+    beforeSave: (teacher) => {
+      // Calcular y setear total_hours antes de guardar en la base de datos
+      teacher.total_hours = teacher.index * teacher.frontal_hours;
+    }
   }
-});
+}, );
 
 Subject.hasMany(HourConfig, {
   sourceKey: 'id',
   foreignKey: 'subject_id',
-  as: 'hourConfigs',
+  as: 'hour_configs',
 });
 
 HourConfig.belongsTo(Subject, {

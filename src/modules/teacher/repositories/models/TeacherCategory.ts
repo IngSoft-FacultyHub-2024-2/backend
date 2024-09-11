@@ -1,4 +1,4 @@
-import { Model, DataTypes, BelongsToMany } from 'sequelize';
+import { Model, DataTypes, BelongsTo } from 'sequelize';
 import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 import Category from './Category';
@@ -9,8 +9,8 @@ class TeacherCategory extends Model {
   public category_id!: number;
 
   public static associations: {
-    teacher: BelongsToMany<TeacherCategory, Teacher>;
-    category: BelongsToMany<TeacherCategory, Category>;
+    teacher: BelongsTo<TeacherCategory, Teacher>;
+    category: BelongsTo<TeacherCategory, Category>;
   };
 }
 

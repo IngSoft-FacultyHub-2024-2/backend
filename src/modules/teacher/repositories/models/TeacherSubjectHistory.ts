@@ -3,7 +3,7 @@ import sequelize from '../../../../config/database';
 import Teacher from './Teacher';
 import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
-class TeacherSubject extends Model {
+class TeacherSubjectHistory extends Model {
   public id!: number;
   public teacher_id!: number;
   public subject_id!: number;
@@ -12,11 +12,11 @@ class TeacherSubject extends Model {
   public end_date!: Date | null;
 
   public static associations: {
-    teacher: BelongsTo<TeacherSubject, Teacher>;
+    teacher: BelongsTo<TeacherSubjectHistory, Teacher>;
   };
 }
 
-TeacherSubject.init({
+TeacherSubjectHistory.init({
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -57,4 +57,4 @@ TeacherSubject.init({
   timestamps: true,
 });
 
-export default TeacherSubject;
+export default TeacherSubjectHistory;

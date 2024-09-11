@@ -16,7 +16,7 @@ module.exports = {
           key: 'id',
         },
       },
-      mean: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },

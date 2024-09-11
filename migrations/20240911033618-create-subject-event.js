@@ -1,7 +1,9 @@
 'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('HourConfigs', {
+  async up (queryInterface, Sequelize) {
+    await queryInterface.createTable('SubjectEvents', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -16,12 +18,16 @@ module.exports = {
           key: 'id',
         },
       },
-      role: {
-        type: Sequelize.ENUM('Teórico', 'Tecnología'),
-        allowNull: false,
-      },
-      total_hours: {
+      event_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Events',
+          key: 'id',
+        },
+      },
+      description: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
       createdAt: {
@@ -36,7 +42,8 @@ module.exports = {
       },
     });
   },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('HourConfigs');
+
+  async down (queryInterface, Sequelize) {
+    await queryInterface.dropTable('SubjectEvents');
   }
 };

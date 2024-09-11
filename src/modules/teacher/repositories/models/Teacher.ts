@@ -5,7 +5,7 @@ import CaesCourse from './CaesCourse';
 import Contact from './Contact';
 import TeacherCategory from './TeacherCategory';
 import TeacherBenefit from './TeacherBenefit';
-import TeacherSubject from './TeacherSubject';
+import TeacherSubjectHistory from './TeacherSubjectHistory';
 import Benefit from './Benefit';
 import Category from './Category';
 import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
@@ -33,10 +33,10 @@ class Teacher extends Model {
   public contacts!: Contact[];
   public categories!: TeacherCategory[];
   public benefits!: TeacherBenefit[];
-  public subject_history!: TeacherSubject[];
+  public subjects_history!: TeacherSubjectHistory[];
   public subjects_of_interest!: TeacherSubjectOfInterest[];
-  public teacher_subject_groups!: TeacherSubjectGroupMember[];
-  public teacher_available_modules!: number;
+  public teacher_subject_groups!: TeacherSubjectGroup[];
+  public teacher_available_modules!: TeacherAvailableModule[];
 
   public static associations: {
     prizes: HasMany<Teacher, Prize>;
@@ -44,9 +44,9 @@ class Teacher extends Model {
     contacts: HasMany<Teacher, Contact>;
     categories: BelongsToMany<Teacher, Category>;
     benefits: BelongsToMany<Teacher, Benefit>;
-    subject_history: HasMany<Teacher, TeacherSubject>;
+    subjects_history: HasMany<Teacher, TeacherSubjectHistory>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
-    teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroupMember>;
+    teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroup>;
     teacher_available_modules: HasMany<Teacher, TeacherAvailableModule>;
   };
 }
@@ -166,10 +166,10 @@ Category.belongsToMany(Teacher, {
   foreignKey: 'category_id',
   otherKey: 'teacher_id'
 })
-Teacher.hasMany(TeacherCategory, {as: 'teacher_categories'});
-TeacherCategory.belongsTo(Teacher);
-Category.hasMany(TeacherCategory);
-TeacherCategory.belongsTo(Category);
+// Teacher.hasMany(TeacherCategory, {as: 'teacher_categories', foreignKey: 'teacher_id'});
+// TeacherCategory.belongsTo(Teacher);
+// Category.hasMany(TeacherCategory);
+// TeacherCategory.belongsTo(Category);
 
 Teacher.belongsToMany(Benefit, {
   through: TeacherBenefit,
@@ -183,17 +183,17 @@ Benefit.belongsToMany(Teacher, {
   foreignKey: 'benefit_id',
   otherKey: 'teacher_id'
 })
-Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
-TeacherBenefit.belongsTo(Teacher);
-Benefit.hasMany(TeacherBenefit);
-TeacherBenefit.belongsTo(Benefit);
+// Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
+// TeacherBenefit.belongsTo(Teacher);
+// Benefit.hasMany(TeacherBenefit);
+// TeacherBenefit.belongsTo(Benefit);
 
-Teacher.hasMany(TeacherSubject, {
+Teacher.hasMany(TeacherSubjectHistory, {
   sourceKey: 'id',
   foreignKey: 'teacher_id',
-  as: 'subject_history',
+  as: 'subjects_history',
 });
-TeacherSubject.belongsTo(Teacher, {
+TeacherSubjectHistory.belongsTo(Teacher, {
   foreignKey: 'teacher_id',
   as: 'teacher',
 });
@@ -208,7 +208,7 @@ TeacherSubjectOfInterest.belongsTo(Teacher, {
   as: 'teacher',
 });
 
-Teacher.belongsToMany(TeacherSubjectGroupMember, {
+Teacher.belongsToMany(TeacherSubjectGroup, {
   through: TeacherSubjectGroupMember,
   as: 'teacher_subject_groups',
   foreignKey: 'teacher_id',

@@ -41,7 +41,7 @@ module.exports = {
         },
       },
       index: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DOUBLE,
         allowNull: false,
       },
       frontal_hours: {

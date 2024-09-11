@@ -8,7 +8,7 @@ import { SubjectSummaryResponseControllerDto, SubjectSummaryResponseControllerDt
 import { SubjectResponseControllerDtoHelper } from './dtos/response/subjectResponseControllerDto';
 
 class SubjectController {
-  async addSubject(req: Request, res: Response) {
+  addSubject = async (req: Request, res: Response) => {
     try{
       console.log(req.body.needs_notes)
       await inputSubjectSchema.validate(req.body)
@@ -22,7 +22,7 @@ class SubjectController {
     }
   }
 
-  async getSubjects(req: Request, res: Response) {
+  getSubjects = async(req: Request, res: Response) => {
     try {
       const queryParams = req.query;
       const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
@@ -30,8 +30,9 @@ class SubjectController {
       
       let subjectsWithCoordinator: SubjectSummaryResponseControllerDto[] = [];
       for (const subject of subjects) {
-        let associated_coordinator = await getTeacherById(subject.associated_coordinator);
-        let subject_with_coordinator = SubjectSummaryResponseControllerDtoHelper.fromModel(subject, associated_coordinator.name + " " + associated_coordinator.surname); 
+        let associated_teacher_name = await this.getTeacherNames(subject.associated_teacher);
+        let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
+        let subject_with_coordinator = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_teacher_name, associated_coordinator_name}); 
         subjectsWithCoordinator.push(subject_with_coordinator)
       }
       res.status(200).json(subjectsWithCoordinator);
@@ -42,14 +43,11 @@ class SubjectController {
     }
   }
   
-  async getSubject(req: Request, res: Response) {
+  getSubject = async (req: Request, res: Response) => {
     try {
       const subject = await getSubjectById(parseInt(req.params.id));
-      let associated_teacher = await getTeacherById(subject.associated_teacher);
-      let associated_teacher_name = associated_teacher.name + " " + associated_teacher.surname;
-      let associated_coordinator = await getTeacherById(subject.associated_coordinator);
-      let associated_coordinator_name = associated_coordinator.name + " " + associated_coordinator.surname;
-      console.log(associated_teacher_name, associated_coordinator_name)
+      let associated_teacher_name = await this.getTeacherNames(subject.associated_teacher);
+      let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
       let subject_with_teachers_names = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_teacher_name, associated_coordinator_name});
       res.status(200).json(subject_with_teachers_names);
     } catch (error) {
@@ -58,6 +56,12 @@ class SubjectController {
       }
     }
   }
+
+  private async getTeacherNames(teacher_id: number){
+    let teacher = await getTeacherById(teacher_id);
+    return teacher.name + " " + teacher.surname;
+  }
+
 }
 
 export default new SubjectController();

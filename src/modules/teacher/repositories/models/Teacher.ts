@@ -42,8 +42,8 @@ class Teacher extends Model {
     prizes: HasMany<Teacher, Prize>;
     caes_courses: HasMany<Teacher, CaesCourse>;
     contacts: HasMany<Teacher, Contact>;
-    categories: BelongsToMany<Teacher, Category>;
-    benefits: BelongsToMany<Teacher, Benefit>;
+    categories: HasMany<Teacher, TeacherCategory>;
+    benefits: HasMany<Teacher, TeacherBenefit>;
     subjects_history: HasMany<Teacher, TeacherSubjectHistory>;
     subjects_of_interest: HasMany<Teacher, TeacherSubjectOfInterest>;
     teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroup>;
@@ -154,39 +154,39 @@ Contact.belongsTo(Teacher, {
   as: 'teacher',
 });
 
-Teacher.belongsToMany(Category, {
-  through: TeacherCategory,
-  as: 'categories',
-  foreignKey: 'teacher_id',
-  otherKey: 'category_id'
-})
-Category.belongsToMany(Teacher, {
-  through: TeacherCategory,
-  as: 'teachers',
-  foreignKey: 'category_id',
-  otherKey: 'teacher_id'
-})
-// Teacher.hasMany(TeacherCategory, {as: 'teacher_categories', foreignKey: 'teacher_id'});
-// TeacherCategory.belongsTo(Teacher);
-// Category.hasMany(TeacherCategory);
-// TeacherCategory.belongsTo(Category);
+// Teacher.belongsToMany(Category, {
+//   through: TeacherCategory,
+//   as: 'categorias',
+//   foreignKey: 'teacher_id',
+//   otherKey: 'category_id'
+// })
+// Category.belongsToMany(Teacher, {
+//   through: TeacherCategory,
+//   as: 'teachers',
+//   foreignKey: 'category_id',
+//   otherKey: 'teacher_id'
+// })
+Teacher.hasMany(TeacherCategory, {sourceKey: 'id', as: 'categories', foreignKey: 'teacher_id'});
+TeacherCategory.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
+// Category.hasMany(TeacherCategory, {as: 'categories', foreignKey: 'category_id'});
+// TeacherCategory.belongsTo(Category, {foreignKey: 'category_id', as: 'category'});
 
-Teacher.belongsToMany(Benefit, {
-  through: TeacherBenefit,
-  as: 'benefits',
-  foreignKey: 'teacher_id',
-  otherKey: 'benefit_id'
-})
-Benefit.belongsToMany(Teacher, {
-  through: TeacherBenefit,
-  as: 'teachers',
-  foreignKey: 'benefit_id',
-  otherKey: 'teacher_id'
-})
-// Teacher.hasMany(TeacherBenefit, {as: 'teacher_benefits'});
-// TeacherBenefit.belongsTo(Teacher);
-// Benefit.hasMany(TeacherBenefit);
-// TeacherBenefit.belongsTo(Benefit);
+// Teacher.belongsToMany(Benefit, {
+//   through: TeacherBenefit,
+//   as: 'benefits',
+//   foreignKey: 'teacher_id',
+//   otherKey: 'benefit_id'
+// })
+// Benefit.belongsToMany(Teacher, {
+//   through: TeacherBenefit,
+//   as: 'teachers',
+//   foreignKey: 'benefit_id',
+//   otherKey: 'teacher_id'
+// })
+Teacher.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'teacher_id'});
+TeacherBenefit.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
+Benefit.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'benefit_id'});
+TeacherBenefit.belongsTo(Benefit, {foreignKey: 'benefit_id', as: 'benefit'});
 
 Teacher.hasMany(TeacherSubjectHistory, {
   sourceKey: 'id',

@@ -17,7 +17,7 @@ const inputSubjectSchema = yup.object().shape({
     technologies: yup.string().nullable(),
     notes: yup.string().nullable(),
     valid: yup.boolean().required().default(true),
-    hourConfigs:  yup.array().of(inputHourConfigSchema).required(),
+    hour_configs:  yup.array().of(inputHourConfigSchema).required(),
     needs: yup.array().of(inputNeedSchema).nullable(),
     needs_notes: yup.string().nullable(),
     events: yup.array().of(inputSubjectEventSchema).nullable(),
@@ -25,8 +25,8 @@ const inputSubjectSchema = yup.object().shape({
     'is-total-hours-correct',
     'index * frontal_hours must equal the sum of hour_configs.total_hours',
     function (value) {
-        const { index, frontal_hours, hourConfigs } = value;
-        const sumOfHourConfigsTotalHours = hourConfigs ? hourConfigs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
+        const { index, frontal_hours, hour_configs } = value;
+        const sumOfHourConfigsTotalHours = hour_configs ? hour_configs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
         return (index * frontal_hours) === sumOfHourConfigsTotalHours;
     }
 );

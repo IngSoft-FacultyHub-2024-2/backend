@@ -9,7 +9,7 @@ class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
     return await Subject.create(subject, {
     include: [
-      { model: HourConfig, as: 'hourConfigs' }, 
+      { model: HourConfig, as: 'hour_configs' }, 
       { model: Need, as: 'needs' },
       { model: SubjectEvent, as: 'events' }
     ],
@@ -31,7 +31,7 @@ class SubjectRepository {
       limit,
       offset,
       include: [
-        { model: HourConfig, as: 'hourConfigs' }, 
+        { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
         {
           model: SubjectEvent,
@@ -44,7 +44,7 @@ class SubjectRepository {
   async getSubjectById(id: number) {
     return await Subject.findByPk(id, {
       include: [
-        { model: HourConfig, as: 'hourConfigs' }, 
+        { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
         {
           model: SubjectEvent,

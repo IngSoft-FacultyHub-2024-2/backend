@@ -50,7 +50,7 @@ module.exports = {
       },
       total_hours: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       intro_folder: {
         type: Sequelize.STRING,

@@ -21,8 +21,16 @@ const inputTeacherSchema = yup.object().shape({
     prizes: yup.array().of(inputPrizeSchema).nullable(),
     caes_courses: yup.array().of(inputCaesCourseSchema).nullable(),
     contacts: yup.array().of(inputContactSchema).nullable(),
-    categories: yup.array().of(yup.number()).nullable(),
-    benefits: yup.array().of(yup.number()).nullable(),
+    teacher_categories: yup.array().of(
+        yup.object().shape({
+            category_id: yup.number().required("Category ID is required"),
+        })
+    ).nullable(),
+    benefits: yup.array().of(
+        yup.object().shape({
+            benefit_id: yup.number().required("Benefit ID is required"),
+        })
+    ).nullable(),
     subjects_history: yup.array().of(inputSubjectSchema).nullable(),
     subjects_of_interest: yup.array().of(yup.number()).nullable(),
     teacher_subject_groups: yup.array().of(inputTeacherSubjectGroupSchema).nullable(),

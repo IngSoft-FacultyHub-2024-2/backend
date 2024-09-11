@@ -22,7 +22,7 @@ describe('SubjectController', () => {
     "subject_folder": "/src/r",
     "technologies": "ruby",
     "notes": "nueva materia",
-    "hourConfigs": [{
+    "hour_configs": [{
         "role": "Teórico",
         "total_hours": 100,
       },
@@ -89,8 +89,8 @@ describe('getSubjects', () => {
     const mockTeacher2 = { id: 2, name: 'Jane', surname: 'Smith' };
     const mockCoordinator = { id: 101, name: 'Adam', surname: 'Smith' };
 
-    const mockSubjectDto1 = { id: 1, associated_teacher_name: 'John Doe', associated_teacher: 1, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hourConfigs: undefined };
-    const mockSubjectDto2 = { id: 2, associated_teacher_name: 'Jane Smith', associated_teacher: 2, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hourConfigs: undefined };
+    const mockSubjectDto1 = { id: 1, associated_teacher_name: 'John Doe', associated_teacher: 1, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubjectDto2 = { id: 2, associated_teacher_name: 'Jane Smith', associated_teacher: 2, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
 
     (getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
     (getTeacherById as jest.Mock)

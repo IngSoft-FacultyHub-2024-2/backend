@@ -4,12 +4,16 @@ import eventRouter from "./routers/eventRouter";
 import teacherRouter  from "./routers/teacherRouter";
 import dotenv from 'dotenv';
 import { initializeDatabase } from "./initializingData";
+const cors = require('cors');
 
 dotenv.config();
 
 const express = require('express');
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173', 
+}));
 app.use(express.json());
 
 app.use("/api/subjects", subjectRouter);

@@ -6,7 +6,6 @@ export interface HourConfigRequestDto {
   subject_id?: number;
   role: TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY;
   total_hours: number;
-  weekly_hours: number;
 }
 
 export class HourConfigRequestDtoHelper {
@@ -16,7 +15,6 @@ export class HourConfigRequestDtoHelper {
     subject_id: dto.subject_id,
     role: dto.role,
     total_hours: dto.total_hours,
-    weekly_hours: dto.weekly_hours,
     };
   }
 }

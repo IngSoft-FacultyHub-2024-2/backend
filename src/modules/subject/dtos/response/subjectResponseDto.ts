@@ -13,6 +13,7 @@ export interface SubjectResponseDto {
     associated_coordinator: number;
     index: number;
     frontal_hours: number;
+    total_hours: number;
     intro_folder?: string | null;
     subject_folder?: string | null;
     technologies?: string | null;
@@ -20,6 +21,7 @@ export interface SubjectResponseDto {
     valid: boolean;
     hourConfigs?: HourConfigResponseDto[];
     needs?: NeedResponseDto[];
+    needs_notes: string;
     events?: SubjectEventResponseDto[];
 }
 
@@ -36,6 +38,7 @@ export class SubjectResponseDtoHelper {
       associated_coordinator: subject.associated_coordinator,
       index: subject.index,
       frontal_hours: subject.frontal_hours,
+      total_hours: subject.total_hours,
       intro_folder: subject.intro_folder,
       subject_folder: subject.subject_folder,
       technologies: subject.technologies,
@@ -43,6 +46,7 @@ export class SubjectResponseDtoHelper {
       valid: subject.valid,
       hourConfigs: subject.hourConfigs?.map((hc) => HourConfigResponseDtoHelper.fromModel(hc)) || [],
       needs: subject.needs?.map((n) => NeedResponseDtoHelper.fromModel(n)) || [],
+      needs_notes: subject.needs_notes,
       events: subject.events?.map((e) => SubjectEventResponseDtoHelper.fromModel(e)) || [],
     };
   }

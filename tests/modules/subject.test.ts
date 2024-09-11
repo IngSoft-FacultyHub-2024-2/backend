@@ -38,6 +38,7 @@ describe('addSubject', () => {
     study_plan_year: 1,
     associated_teacher: 1,
     index: 1,
+    needs_notes: "",
     frontal_hours: 30,
     valid: true,
     events: [{ event_id: 1, description: 'Introduction to Mathematics' }],

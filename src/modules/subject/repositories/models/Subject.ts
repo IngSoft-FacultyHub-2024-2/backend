@@ -16,6 +16,7 @@ class Subject extends Model {
   public associated_coordinator!: number;
   public index!: number;
   public frontal_hours!: number;
+  public total_hours!: number;
   public intro_folder!: string | null;
   public subject_folder!: string | null;
   public technologies!: string | null;
@@ -23,6 +24,7 @@ class Subject extends Model {
   public valid!: boolean;
   public hourConfigs!: HourConfig[];
   public needs!: Need[];
+  public needs_notes!: string;
   public events!: SubjectEvent[];
 
   public static associations: {
@@ -78,6 +80,12 @@ Subject.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  total_hours: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return this.getDataValue('index') * this.getDataValue('frontal_hours');
+    },
+  },
   intro_folder: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -94,6 +102,10 @@ Subject.init({
     type: DataTypes.STRING,
     allowNull: true,
   },
+  needs_notes: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   valid: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
@@ -104,6 +116,16 @@ Subject.init({
   modelName: 'Subject',
   tableName: 'Subjects',
   timestamps: true,
+  validate: {
+    totalHoursEqualHourConfigs(this: Subject) {
+      const totalHours = this.getDataValue('index') * this.getDataValue('frontal_hours');
+      const hourConfigsTotal = this.hourConfigs ? this.hourConfigs.reduce((sum, config) => sum + config.total_hours, 0) : 0;
+      console.log(totalHours, hourConfigsTotal);
+      if (totalHours !== hourConfigsTotal) {
+        throw new Error('total_hours must be equal to the sum of hourConfigs.total_hours');
+      }
+    }
+  }
 });
 
 Subject.hasMany(HourConfig, {

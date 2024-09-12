@@ -12,7 +12,6 @@ class Subject extends Model {
   public subject_code!: string;
   public acronym!: string; 
   public study_plan_year!: number;
-  public associated_teacher!: number;
   public associated_coordinator!: number;
   public index!: number;
   public frontal_hours!: number;
@@ -56,17 +55,9 @@ Subject.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  associated_teacher: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    // references: {
-    //   model: 'Teachers',
-    //   key: 'id',
-    // },
-  },
   associated_coordinator: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
     // references: {
     //   model: 'Teachers',
     //   key: 'id',
@@ -120,7 +111,7 @@ Subject.init({
       const hourConfigsTotal = this.hour_configs ? this.hour_configs.reduce((sum, config) => sum + Number(config.total_hours), 0) : 0;
       console.log(totalHours, hourConfigsTotal);
       if (totalHours !== hourConfigsTotal) {
-        throw new Error('total_hours must be equal to the sum of hour_configs.total_hours');
+        throw new Error('La suma de las horas totales docentes debe ser igual a la cantidad de horas totales configuradas que se van a dictar');
       }
     }
   },

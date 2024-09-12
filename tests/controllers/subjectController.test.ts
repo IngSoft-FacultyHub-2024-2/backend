@@ -97,7 +97,7 @@ describe('getSubjects', () => {
 
     await subjectController.getSubjects(req as Request, res as Response);
 
-    expect(getSubjects).toHaveBeenCalledWith({}, undefined, undefined, 1, 10);
+    expect(getSubjects).toHaveBeenCalledWith({}, undefined, undefined, undefined, 1, 10);
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(statusMock).toHaveBeenCalledWith(200);

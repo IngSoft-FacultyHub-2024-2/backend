@@ -93,7 +93,7 @@ describe('getSubjects', () => {
     const result = await getSubjects(filters);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined);
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined, undefined);
     expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
   });
 
@@ -102,16 +102,17 @@ describe('getSubjects', () => {
     const filters = { name: 'Mathematics' };
     const sortField = 'name';
     const sortOrder = 'ASC';
+    const search = undefined;
     const page = 1;
     const pageSize = 10;
     const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
     (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
 
     // Act
-    const result = await getSubjects(filters, sortField, sortOrder, page, pageSize);
+    const result = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, sortField, sortOrder, page, pageSize);
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, search, sortField, sortOrder, page, pageSize);
     expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
   });
 })

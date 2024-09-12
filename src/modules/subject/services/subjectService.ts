@@ -23,3 +23,7 @@ export async function getSubjectById(id: number) {
   return SubjectResponseDtoHelper.fromModel(subject);
 }
 
+export async function countSubjects(filters?: Partial<Subject>) {
+  return subjectRepository.countSubjects(filters);
+}
+

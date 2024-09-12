@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {addSubject, getSubjects, getSubjectById} from '../../src/modules/subject';
+import {addSubject, getSubjects, getSubjectById, countSubjects} from '../../src/modules/subject';
 import { getTeacherById } from '../../src/modules/teacher';
 import subjectController from '../../src/controllers/subjectController';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
@@ -93,14 +93,15 @@ describe('getSubjects', () => {
     (getTeacherById as jest.Mock)
       .mockResolvedValueOnce(mockCoordinator)
       .mockResolvedValueOnce(mockCoordinator);
+    (countSubjects as jest.Mock).mockResolvedValue(2);
 
     await subjectController.getSubjects(req as Request, res as Response);
 
-    expect(getSubjects).toHaveBeenCalledWith({}, undefined, undefined, undefined, undefined);
+    expect(getSubjects).toHaveBeenCalledWith({}, undefined, undefined, 1, 10);
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith([mockSubjectDto1, mockSubjectDto2]);
+    expect(jsonMock).toHaveBeenCalledWith({subjects: [mockSubjectDto1, mockSubjectDto2], totalPages: 1, currentPage: 1});
   });
 
 });

@@ -9,7 +9,6 @@ export interface SubjectResponseDto {
     subject_code: string;
     acronym: string;
     study_plan_year: number;
-    associated_teacher: number;
     associated_coordinator: number;
     index: number;
     frontal_hours: number;
@@ -34,7 +33,6 @@ export class SubjectResponseDtoHelper {
       subject_code: subject.subject_code,
       acronym: subject.acronym,
       study_plan_year: subject.study_plan_year,
-      associated_teacher: subject.associated_teacher,
       associated_coordinator: subject.associated_coordinator,
       index: subject.index,
       frontal_hours: subject.frontal_hours,

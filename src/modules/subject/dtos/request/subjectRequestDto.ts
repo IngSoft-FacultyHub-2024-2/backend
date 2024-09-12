@@ -12,8 +12,7 @@ export interface SubjectRequestDto {
     subject_code: string;
     acronym: string;
     study_plan_year: number;
-    associated_teacher: number;
-    associated_coordinator?: number;
+    associated_coordinator: number;
     index: number;
     frontal_hours: number;
     intro_folder?: string | null;
@@ -36,8 +35,7 @@ public static toModel(dto: SubjectRequestDto): Partial<Subject> {
     subject_code: dto.subject_code,
     acronym: dto.acronym,
     study_plan_year: dto.study_plan_year,
-    associated_teacher: dto.associated_teacher,
-    ...(dto.associated_coordinator !== undefined && { associated_coordinator: dto.associated_coordinator }),
+    associated_coordinator: dto.associated_coordinator,
     index: dto.index,
     frontal_hours: dto.frontal_hours,
     ...(dto.intro_folder !== undefined && { intro_folder: dto.intro_folder }),

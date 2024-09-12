@@ -30,9 +30,8 @@ class SubjectController {
       
       let subjectsWithCoordinator: SubjectSummaryResponseControllerDto[] = [];
       for (const subject of subjects) {
-        let associated_teacher_name = await this.getTeacherNames(subject.associated_teacher);
         let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
-        let subject_with_coordinator = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_teacher_name, associated_coordinator_name}); 
+        let subject_with_coordinator = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_coordinator_name}); 
         subjectsWithCoordinator.push(subject_with_coordinator)
       }
       res.status(200).json(subjectsWithCoordinator);
@@ -46,9 +45,8 @@ class SubjectController {
   getSubject = async (req: Request, res: Response) => {
     try {
       const subject = await getSubjectById(parseInt(req.params.id));
-      let associated_teacher_name = await this.getTeacherNames(subject.associated_teacher);
       let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
-      let subject_with_teachers_names = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_teacher_name, associated_coordinator_name});
+      let subject_with_teachers_names = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_coordinator_name});
       res.status(200).json(subject_with_teachers_names);
     } catch (error) {
       if (error instanceof Error) {

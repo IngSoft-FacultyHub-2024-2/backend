@@ -34,9 +34,9 @@ describe('addSubject', () => {
   const mockSubjectDto: SubjectRequestDto = {
     name: 'Mathematics',
     subject_code: 'MATH101',
+    associated_coordinator: 1,
     acronym: 'MATH',
     study_plan_year: 1,
-    associated_teacher: 1,
     index: 1,
     needs_notes: "",
     frontal_hours: 30,

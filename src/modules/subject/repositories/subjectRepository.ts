@@ -3,7 +3,7 @@ import HourConfig from './models/HourConfig';
 import Need from './models/Need';
 import SubjectEvent from './models/SubjectEvent';
 import Event from './models/Event'; 
-import { Order } from 'sequelize';
+import { Op, Order } from 'sequelize';
 
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
@@ -20,10 +20,24 @@ class SubjectRepository {
     return await SubjectEvent.create({ subject_id, event_id, description });
   }
 
-  async getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+  async getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+      const searchQuery = search
+      ? {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { acronym: { [Op.iLike]: `%${search}%` } },
+          ],
+        }
+      : {};
+
+    // Combine filters and search query
+    const whereClause = {
+      ...filters,
+      ...searchQuery,
+    };
     if (!page || !pageSize) {
       return await Subject.findAll({ 
-        where: filters, 
+        where: whereClause, 
         include: [
           { model: HourConfig, as: 'hour_configs' }, 
           { model: Need, as: 'needs' },
@@ -39,7 +53,7 @@ class SubjectRepository {
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
 
     return await Subject.findAll({ 
-      where: filters, 
+      where: whereClause, 
       order: orderOption,
       limit,
       offset,

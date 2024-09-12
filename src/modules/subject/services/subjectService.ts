@@ -10,8 +10,8 @@ export async function addSubject(subjectDto: SubjectRequestDto) {
   return SubjectResponseDtoHelper.fromModel(newSubject);
 }
 
-export async function getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-  const subjects: Subject[] = await subjectRepository.getSubjects(filters, sortField, sortOrder, page, pageSize);
+export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+  const subjects: Subject[] = await subjectRepository.getSubjects(filters, search, sortField, sortOrder, page, pageSize);
   return subjects.map((subject) => SubjectResponseDtoHelper.fromModel(subject));
 }
 

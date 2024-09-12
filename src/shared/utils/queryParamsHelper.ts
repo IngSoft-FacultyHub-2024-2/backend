@@ -9,8 +9,8 @@ interface QueryParams {
 export function extractParameters(queryParams: QueryParams) {
   const sortField: string | undefined = queryParams.sortField;
   const sortOrder: 'ASC' | 'DESC' | undefined  = (queryParams.sortOrder as 'ASC' | 'DESC') || undefined;
-  const page: number | undefined = parseInt(queryParams.page as string, 10) || undefined;
-  const pageSize: number | undefined = parseInt(queryParams.pageSize as string, 10) || undefined;
+  const page: number = parseInt(queryParams.page as string, 10) || 1;
+  const pageSize: number = parseInt(queryParams.pageSize as string, 10) || 10;
 
   // Extract filters by excluding known keys
   const filters: Record<string, any> = Object.keys(queryParams).reduce((acc, key) => {

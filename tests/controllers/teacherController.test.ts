@@ -130,7 +130,7 @@ describe('getTeachers', () => {
 
     await teacherController.getTeachers(req as Request, res as Response);
 
-    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, undefined, undefined);
+    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, 1, 10);
     expect(getSubjectById).toHaveBeenCalledWith(101);
     expect(getSubjectById).toHaveBeenCalledWith(102);
     expect(statusMock).toHaveBeenCalledWith(200);
@@ -145,7 +145,7 @@ describe('getTeachers', () => {
 
     await teacherController.getTeachers(req as Request, res as Response);
 
-    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, undefined, undefined);
+    expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, 1, 10);
     expect(returnError).toHaveBeenCalledWith(res, error);
   });
 });

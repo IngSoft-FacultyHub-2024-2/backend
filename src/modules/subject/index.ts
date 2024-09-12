@@ -1,4 +1,4 @@
-import { addSubject, getSubjects, getSubjectById } from './services/subjectService';
+import { addSubject, getSubjects, getSubjectById, countSubjects } from './services/subjectService';
 import { getEvents, addEvent } from './services/eventService';
 import { SubjectRequestDto } from './dtos/request/subjectRequestDto';
 import { SubjectEventRequestDto } from './dtos/request/subjectEventRequestDto';
@@ -10,4 +10,4 @@ import { SubjectEventResponseDto } from './dtos/response/subjectEventResponseDto
 export { addSubject, getEvents, addEvent, 
     SubjectRequestDto, SubjectEventRequestDto, getSubjects, 
     SubjectResponseDto, HourConfigResponseDto, getSubjectById,
-    NeedResponseDto, SubjectEventResponseDto};
+    NeedResponseDto, SubjectEventResponseDto, countSubjects};

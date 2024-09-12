@@ -20,7 +20,20 @@ class SubjectRepository {
     return await SubjectEvent.create({ subject_id, event_id, description });
   }
 
-  async getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
+  async getSubjects(filters?: Partial<Subject>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+    if (!page || !pageSize) {
+      return await Subject.findAll({ 
+        where: filters, 
+        include: [
+          { model: HourConfig, as: 'hour_configs' }, 
+          { model: Need, as: 'needs' },
+          {
+            model: SubjectEvent,
+            as: 'events',
+          },
+        ],
+      });
+    }
     const offset = (page - 1) * pageSize;
     const limit = pageSize;
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
@@ -55,6 +68,10 @@ class SubjectRepository {
         },
       ],
     });
+  }
+
+  async countSubjects(filters?: Partial<Subject>) {
+    return await Subject.count({ where: filters });
   }
 }
 

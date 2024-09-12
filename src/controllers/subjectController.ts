@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById, countSubjects } from '../modules/subject';
 import { getTeacherById } from '../modules/teacher';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
@@ -28,13 +28,21 @@ class SubjectController {
       const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
       const subjects = await getSubjects(filters, sortField, sortOrder, page, pageSize);
       
+      const totalSubjectsCount = await countSubjects(filters); 
+      const totalPages = Math.ceil(totalSubjectsCount / pageSize);
+      const currentPage = Number(page);
+    
       let subjectsWithCoordinator: SubjectSummaryResponseControllerDto[] = [];
       for (const subject of subjects) {
         let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
         let subject_with_coordinator = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_coordinator_name}); 
         subjectsWithCoordinator.push(subject_with_coordinator)
       }
-      res.status(200).json(subjectsWithCoordinator);
+      res.status(200).json({
+        subjects: subjectsWithCoordinator,
+        totalPages,
+        currentPage,
+      });
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

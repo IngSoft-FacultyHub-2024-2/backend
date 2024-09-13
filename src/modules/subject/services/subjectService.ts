@@ -14,7 +14,7 @@ export async function getSubjects(filters?: Partial<Subject>, search?: string, s
   const offset = (page - 1) * pageSize;
   const limit = pageSize;
 
-  const subjectRows = await subjectRepository.getSubjects(sortOrder, limit, offset, search, filters, sortField);
+  const subjectRows = await subjectRepository.getSubjects(limit, offset, sortOrder, search, filters, sortField);
 
   const totalPages = Math.ceil(subjectRows.count / pageSize);
   const subjects = subjectRows.rows;

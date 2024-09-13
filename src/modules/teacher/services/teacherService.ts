@@ -18,7 +18,7 @@ export async function getTeachers(
   const offset = (page - 1) * pageSize;
   const limit = pageSize;
 
-  const teacherRows = await teacherRepository.getTeachers(sortOrder, limit, offset, sortField);
+  const teacherRows = await teacherRepository.getTeachers(sortOrder, limit, offset, search, sortField);
 
   const totalPages = Math.ceil(teacherRows.count / pageSize);
   const teachers = teacherRows.rows;

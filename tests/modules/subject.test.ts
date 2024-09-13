@@ -4,6 +4,7 @@ import subjectRepository from '../../src/modules/subject/repositories/subjectRep
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
+import { count } from 'console';
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
@@ -72,48 +73,47 @@ describe('getSubjects', () => {
   it('retrieves subjects successfully', async () => {
     // Arrange
     const mockSubjects = [{ id: 1, name: 'Mathematics' }, { id: 2, name: 'Physics' }];
-    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue({rows: mockSubjects, count: 2});
 
     // Act
     const result = await getSubjects();
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalled();
-    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjects.map(removeUndefinedAndEmptyArrays));
+    expect(result.subjects?.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjects.map(removeUndefinedAndEmptyArrays));
 
   });
 
-  it('retrieves subjects with filters successfully', async () => {
+  it('retrieves subjects with search successfully', async () => {
     // Arrange
-    const filters = { name: 'Mathematics' };
-    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    const search = 'Mathematics';
+    const mockFilteredSubjects = {rows: [{ id: 1, name: 'Mathematics' }], count: 1};
     (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
 
     // Act
-    const result = await getSubjects(filters);
+    const result = await getSubjects({}, search);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, undefined, undefined, undefined, undefined, undefined);
-    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(10, 0, undefined, search, {}, undefined);
+    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.rows.map(removeUndefinedAndEmptyArrays));
   });
 
-  it('retrieves subjects with filters and pages successfully', async () => {
+  it('retrieves subjects with search and pages successfully', async () => {
     // Arrange
-    const filters = { name: 'Mathematics' };
+    const filters = {};
+    const search = 'Mathematics';
     const sortField = 'name';
     const sortOrder = 'ASC';
-    const search = undefined;
     const page = 1;
     const pageSize = 10;
-    const mockFilteredSubjects = [{ id: 1, name: 'Mathematics' }];
+    const mockFilteredSubjects = {rows: [{ id: 1, name: 'Mathematics' }], count: 1};
     (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
 
     // Act
     const result = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(filters, search, sortField, sortOrder, page, pageSize);
-    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.map(removeUndefinedAndEmptyArrays));
+    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.rows.map(removeUndefinedAndEmptyArrays));
   });
 })
 

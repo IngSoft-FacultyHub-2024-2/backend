@@ -21,8 +21,9 @@ class SubjectRepository {
   }
 
   async getSubjects(
+    limit: number,
+    offset: number,
     sortOrder: 'ASC' | 'DESC' = 'DESC',
-    limit: number, offset: number,
     search?: string,
     filters?: Partial<Subject>,
     sortField?: string

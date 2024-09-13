@@ -185,8 +185,8 @@ TeacherCategory.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
 // })
 Teacher.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'teacher_id'});
 TeacherBenefit.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
-Benefit.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'benefit_id'});
-TeacherBenefit.belongsTo(Benefit, {foreignKey: 'benefit_id', as: 'benefit'});
+// Benefit.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'benefit_id'});
+// TeacherBenefit.belongsTo(Benefit, {foreignKey: 'benefit_id', as: 'benefit'});
 
 Teacher.hasMany(TeacherSubjectHistory, {
   sourceKey: 'id',

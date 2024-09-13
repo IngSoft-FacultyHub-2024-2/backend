@@ -20,8 +20,8 @@ class SubjectRepository {
     return await SubjectEvent.create({ subject_id, event_id, description });
   }
 
-  async getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-      const searchQuery = search
+  private getSearchQuery(search?: string) {
+    return search
       ? {
           [Op.or]: [
             { name: { [Op.iLike]: `%${search}%` } },
@@ -29,6 +29,10 @@ class SubjectRepository {
           ],
         }
       : {};
+  }
+
+  async getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
+      const searchQuery = this.getSearchQuery(search);
 
     // Combine filters and search query
     const whereClause = {
@@ -84,8 +88,15 @@ class SubjectRepository {
     });
   }
 
-  async countSubjects(filters?: Partial<Subject>) {
-    return await Subject.count({ where: filters });
+  async countSubjects(filters?: Partial<Subject>, search?: string) {
+    const searchQuery = this.getSearchQuery(search);
+
+    // Combine filters and search query
+    const whereClause = {
+      ...filters,
+      ...searchQuery,
+    };
+    return await Subject.count({ where: whereClause });
   }
 }
 

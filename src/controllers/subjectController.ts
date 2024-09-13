@@ -27,7 +27,7 @@ class SubjectController {
       const queryParams = req.query;
       const { filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
       const subjects = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
-      const totalSubjectsCount = await countSubjects(filters); 
+      const totalSubjectsCount = await countSubjects(filters, search); 
       const totalPages = Math.ceil(totalSubjectsCount / pageSize);
       const currentPage = Number(page);
     

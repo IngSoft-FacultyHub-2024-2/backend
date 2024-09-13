@@ -20,8 +20,15 @@ class SubjectRepository {
     return await SubjectEvent.create({ subject_id, event_id, description });
   }
 
-  private getSearchQuery(search?: string) {
-    return search
+  async getSubjects(
+    sortOrder: 'ASC' | 'DESC' = 'DESC',
+    limit: number, offset: number,
+    search?: string,
+    filters?: Partial<Subject>,
+    sortField?: string
+  ) {
+      const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
+      const searchQuery = search
       ? {
           [Op.or]: [
             { name: { [Op.iLike]: `%${search}%` } },
@@ -29,34 +36,14 @@ class SubjectRepository {
           ],
         }
       : {};
-  }
-
-  async getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-      const searchQuery = this.getSearchQuery(search);
-
+ 
     // Combine filters and search query
     const whereClause = {
       ...filters,
       ...searchQuery,
     };
-    if (!page || !pageSize) {
-      return await Subject.findAll({ 
-        where: whereClause, 
-        include: [
-          { model: HourConfig, as: 'hour_configs' }, 
-          { model: Need, as: 'needs' },
-          {
-            model: SubjectEvent,
-            as: 'events',
-          },
-        ],
-      });
-    }
-    const offset = (page - 1) * pageSize;
-    const limit = pageSize;
-    const orderOption = sortField ? [[sortField, sortOrder]] as Order : undefined;
-
-    return await Subject.findAll({ 
+    
+    return await Subject.findAndCountAll({ 
       where: whereClause, 
       order: orderOption,
       limit,
@@ -86,17 +73,6 @@ class SubjectRepository {
         },
       ],
     });
-  }
-
-  async countSubjects(filters?: Partial<Subject>, search?: string) {
-    const searchQuery = this.getSearchQuery(search);
-
-    // Combine filters and search query
-    const whereClause = {
-      ...filters,
-      ...searchQuery,
-    };
-    return await Subject.count({ where: whereClause });
   }
 }
 

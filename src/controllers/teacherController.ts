@@ -4,8 +4,8 @@ import { addTeacher, getTeachers } from '../modules/teacher';
 import { getSubjectById } from '../modules/subject';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
-import { TeacherSummaryResponseControllerDto, TeacherSummaryResponseControllerDtoHelper } from './dtos/response/teacherSummaryResponseControllerDto';
 import { getBenefits, getCategories } from '../modules/teacher/services/teacherService';
+import { GetTeachersResponseDto, GetTeachersResponseDtoHelper } from './dtos/response/GetTeachersResponseDto';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
@@ -24,16 +24,16 @@ class TeacherController {
   async getTeachers(req: Request, res: Response) {
     try {
       const queryParams = req.query;
-      const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const teachers = await getTeachers(filters, sortField, sortOrder, page, pageSize);
-      let teachersSummary: TeacherSummaryResponseControllerDto[] = [];
+      const { search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
+      const {teachers, totalPages, currentPage} = await getTeachers(search, sortField, sortOrder, page, pageSize);
+
+      let teachersResponse: GetTeachersResponseDto = { teachers: [], totalPages, currentPage };
       for (const teacher of teachers) {
         // add the associated subjects to the teacher
         let associatedSubjects = await Promise.all(teacher.subjects_history.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id)).name));
-        console.log(associatedSubjects);
-        teachersSummary.push(TeacherSummaryResponseControllerDtoHelper.fromModel(teacher, associatedSubjects))
+        teachersResponse.teachers.push(GetTeachersResponseDtoHelper.fromModel(teacher, associatedSubjects))
       }
-      res.status(200).json(teachersSummary);
+      res.status(200).json(teachersResponse);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

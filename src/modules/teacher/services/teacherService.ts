@@ -8,9 +8,22 @@ export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
 }
 
-export async function getTeachers(filters?: Partial<Teacher>, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-  const teachers: Teacher[] = await teacherRepository.getTeachers(filters, sortField, sortOrder, page, pageSize);
-  return teachers;
+export async function getTeachers(
+  search: string | undefined,
+  sortField?: string,
+  sortOrder?: 'ASC' | 'DESC',
+  page: number = 1,
+  pageSize: number = 10
+) {
+  const offset = (page - 1) * pageSize;
+  const limit = pageSize;
+
+  const teacherRows = await teacherRepository.getTeachers(sortOrder, limit, offset, sortField);
+
+  const totalPages = Math.ceil(teacherRows.count / pageSize);
+  const teachers = teacherRows.rows;
+
+  return { teachers, totalPages, currentPage: page };
 }
 
 export async function getTeacherById(id: number) {

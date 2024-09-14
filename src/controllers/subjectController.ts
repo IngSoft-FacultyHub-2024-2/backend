@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById, countSubjects } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
 import { getTeacherById } from '../modules/teacher';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
-import { SubjectSummaryResponseControllerDto, SubjectSummaryResponseControllerDtoHelper } from './dtos/response/subjectSummaryResponseControllerDto';
+import { GetSubjectsResponseDto, GetSubjectsResponseDtoHelper } from './dtos/response/GetSubjectsResponseDto';
 import { SubjectResponseControllerDtoHelper } from './dtos/response/subjectResponseControllerDto';
 
 class SubjectController {
@@ -26,22 +26,16 @@ class SubjectController {
     try {
       const queryParams = req.query;
       const { filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const subjects = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
-      const totalSubjectsCount = await countSubjects(filters, search); 
-      const totalPages = Math.ceil(totalSubjectsCount / pageSize);
-      const currentPage = Number(page);
-    
-      let subjectsWithCoordinator: SubjectSummaryResponseControllerDto[] = [];
+      const {subjects, totalPages, currentPage} = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
+      
+      let subjectsWithCoordinator: GetSubjectsResponseDto = { subjects: [], totalPages, currentPage };
+      
       for (const subject of subjects) {
         let associated_coordinator_name = await this.getTeacherNames(subject.associated_coordinator);
-        let subject_with_coordinator = SubjectResponseControllerDtoHelper.fromModel(subject, {associated_coordinator_name}); 
-        subjectsWithCoordinator.push(subject_with_coordinator)
+        let subject_with_coordinator = GetSubjectsResponseDtoHelper.fromModel(subject, associated_coordinator_name); 
+        subjectsWithCoordinator.subjects.push(subject_with_coordinator)
       }
-      res.status(200).json({
-        subjects: subjectsWithCoordinator,
-        totalPages,
-        currentPage,
-      });
+      res.status(200).json(subjectsWithCoordinator);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

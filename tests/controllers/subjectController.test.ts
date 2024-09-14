@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {addSubject, getSubjects, getSubjectById, countSubjects} from '../../src/modules/subject';
+import { addSubject, getSubjects, getSubjectById } from '../../src/modules/subject';
 import { getTeacherById } from '../../src/modules/teacher';
 import subjectController from '../../src/controllers/subjectController';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
@@ -22,17 +22,17 @@ describe('SubjectController', () => {
     "technologies": "ruby",
     "notes": "nueva materia",
     "hour_configs": [{
-        "role": "Teórico",
-        "total_hours": 100,
-      },
-      {
-        "role": "Tecnología",
-        "total_hours": 20,
-      }],
-    "needs":[{
-        "name": "laboratorio"
-    },{
-        "name": "salon de 25 personas"
+      "role": "Teórico",
+      "total_hours": 100,
+    },
+    {
+      "role": "Tecnología",
+      "total_hours": 20,
+    }],
+    "needs": [{
+      "name": "laboratorio"
+    }, {
+      "name": "salon de 25 personas"
     }],
     "needs_notes": "",
     "events": []
@@ -80,20 +80,34 @@ describe('getSubjects', () => {
   });
 
   it('should return subjects with coordinators', async () => {
-    const mockSubjects = [
-      { id: 1, associated_coordinator: 101 },
-      { id: 2, associated_coordinator: 101 }
-    ];
-    const mockCoordinator = { id: 101, name: 'Adam', surname: 'Smith' };
+    const mockSubjectDto1 = { id: 1, associated_coordinator_name: 'Adam Smith', name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubjectDto2 = { id: 2, associated_coordinator_name: 'Adam Smith', name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubjectsRet = {
+      subjects: [
+        mockSubjectDto1,
+        mockSubjectDto2
+      ],
+      totalPages: 1,
+      currentPage: 1
+    }
 
-    const mockSubjectDto1 = { id: 1, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
-    const mockSubjectDto2 = { id: 2, associated_coordinator_name:  'Adam Smith', associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubject2Dto1 = { id: 1, associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubject2Dto2 = { id: 2, associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+    const mockSubjects = {
+      subjects: [
+        mockSubject2Dto1,
+        mockSubject2Dto2
+      ],
+      totalPages: 1,
+      currentPage: 1
+    }
+
+    const mockCoordinator = { id: 101, name: 'Adam', surname: 'Smith' };
 
     (getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
     (getTeacherById as jest.Mock)
       .mockResolvedValueOnce(mockCoordinator)
       .mockResolvedValueOnce(mockCoordinator);
-    (countSubjects as jest.Mock).mockResolvedValue(2);
 
     await subjectController.getSubjects(req as Request, res as Response);
 
@@ -101,7 +115,7 @@ describe('getSubjects', () => {
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith({subjects: [mockSubjectDto1, mockSubjectDto2], totalPages: 1, currentPage: 1});
+    expect(jsonMock).toHaveBeenCalledWith(mockSubjectsRet);
   });
 
 });
@@ -128,8 +142,8 @@ describe('getSubject', () => {
   it('should return subject with teacher names if found', async () => {
     const mockSubject = { id: 1, associated_coordinator: 102 };
     const mockTeacher1 = { id: 102, name: 'Jane', surname: 'Smith' };
-    const mockSubjectDto = { 
-      id: 1, 
+    const mockSubjectDto = {
+      id: 1,
       associated_coordinator_name: 'Jane Smith',
       // Add other properties as needed
     };

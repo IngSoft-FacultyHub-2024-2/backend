@@ -10,9 +10,17 @@ export async function addSubject(subjectDto: SubjectRequestDto) {
   return SubjectResponseDtoHelper.fromModel(newSubject);
 }
 
-export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page?: number, pageSize?: number) {
-  const subjects: Subject[] = await subjectRepository.getSubjects(filters, search, sortField, sortOrder, page, pageSize);
-  return subjects.map((subject) => SubjectResponseDtoHelper.fromModel(subject));
+export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
+  const offset = (page - 1) * pageSize;
+  const limit = pageSize;
+
+  const subjectRows = await subjectRepository.getSubjects(limit, offset, sortOrder, search, filters, sortField);
+
+  const totalPages = Math.ceil(subjectRows.count / pageSize);
+  const subjects = subjectRows.rows;
+
+  return { subjects, totalPages, currentPage: page };
+  // return await subjectRepository.getSubjects(filters, search, sortField, sortOrder, page, pageSize);
 }
 
 export async function getSubjectById(id: number) {
@@ -21,9 +29,5 @@ export async function getSubjectById(id: number) {
     throw new ResourceNotFound(`Subject with ID ${id} not found`);
   }
   return SubjectResponseDtoHelper.fromModel(subject);
-}
-
-export async function countSubjects(filters?: Partial<Subject>,  search?: string) {
-  return subjectRepository.countSubjects(filters, search);
 }
 

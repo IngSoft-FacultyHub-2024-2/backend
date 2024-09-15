@@ -5,6 +5,7 @@ import Benefit from "../repositories/models/Benefit";
 import Category from "../repositories/models/Category";
 import { TeacherResponseDto, TeacherResponseDtoHelper } from "../dtos/response/teacherResponseDto";
 import { getSubjectById } from "../../subject";
+import { TeacherSubjectHistoryResponseDto, TeacherSubjectHistoryResponseDtoHelper } from "../dtos/response/teacherSubjectHistoryResponseDto";
 
 export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
@@ -27,7 +28,7 @@ export async function getTeachers(
   let teachersDto: TeacherResponseDto[] = []
   for (const teacher of teachers) {
     // add the associated subjects to the teacher
-    let subjectsHistory = await Promise.all(teacher.subjects_history.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id))));
+    let subjectsHistory: TeacherSubjectHistoryResponseDto[] = await Promise.all(teacher.subjects_history.map(async subjectsHistory => (TeacherSubjectHistoryResponseDtoHelper.fromModel(subjectsHistory, await getSubjectById(subjectsHistory.subject_id)))));
     teachersDto.push(TeacherResponseDtoHelper.fromModel(teacher, subjectsHistory))
   }
 
@@ -41,7 +42,7 @@ export async function getTeacherById(id: number, includeOtherInfo: boolean = fal
   }
   let teacherDto: TeacherResponseDto;
   if (includeOtherInfo) {
-    let subjectsHistory = await Promise.all(teacher.subjects_history.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id))));
+    let subjectsHistory: TeacherSubjectHistoryResponseDto[] = await Promise.all(teacher.subjects_history.map(async subjectsHistory => (TeacherSubjectHistoryResponseDtoHelper.fromModel(subjectsHistory, await getSubjectById(subjectsHistory.subject_id)))));
     teacherDto = TeacherResponseDtoHelper.fromModel(teacher, subjectsHistory)
   }
   else{

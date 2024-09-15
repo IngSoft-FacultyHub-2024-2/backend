@@ -9,6 +9,7 @@ import TeacherCategory from '../../repositories/models/TeacherCategory';
 import TeacherBenefit from '../../repositories/models/TeacherBenefit';
 import TeacherSubjectGroup from '../../repositories/models/TeacherSubjectGroup';
 import TeacherAvailableModule from '../../repositories/models/TeacherAvailableModules';
+import { TeacherSubjectHistoryResponseDtoHelper } from './teacherSubjectHistoryResponseDto';
 
 export interface TeacherResponseDto {
     id: number;
@@ -25,7 +26,7 @@ export interface TeacherResponseDto {
     notes: string | null;
     state: 'activo' | 'baja temporal' | 'baja';
     unsubscribe_risk: number;
-    subjects_history: SubjectResponseDto[] | null;
+    subjects_history: TeacherSubjectHistoryResponseDtoHelper[] | null;
     subjects_of_interest: TeacherSubjectOfInterest[];
     prizes: Prize[];
     caes_courses: CaesCourse[];
@@ -37,7 +38,7 @@ export interface TeacherResponseDto {
 }
 
 export class TeacherResponseDtoHelper {
-    public static fromModel(teacher: Teacher, subjectsHistory: SubjectResponseDto[] | null = null): TeacherResponseDto {
+    public static fromModel(teacher: Teacher, subjectsHistory: TeacherSubjectHistoryResponseDtoHelper[] | null = null): TeacherResponseDto {
       return {
         id: teacher.id,
         name: teacher.name,

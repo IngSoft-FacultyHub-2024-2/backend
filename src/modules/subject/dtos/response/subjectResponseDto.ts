@@ -2,14 +2,14 @@ import { HourConfigResponseDto, HourConfigResponseDtoHelper } from './hourConfig
 import { NeedResponseDto, NeedResponseDtoHelper } from './needResponseDto';
 import Subject from "../../repositories/models/Subject";
 import { SubjectEventResponseDto, SubjectEventResponseDtoHelper } from './subjectEventResponseDto';
-
+import { TeacherResponseDto } from '../../../teacher';
 export interface SubjectResponseDto {
     id: number;
     name: string;
     subject_code: string;
     acronym: string;
     study_plan_year: number;
-    associated_coordinator: number;
+    associated_coordinator: TeacherResponseDto | null;
     index: number;
     frontal_hours: number;
     total_hours: number;
@@ -26,14 +26,14 @@ export interface SubjectResponseDto {
 
 export class SubjectResponseDtoHelper {
   // Method to convert Subject model instance to SubjectResponseDto
-  public static fromModel(subject: Subject): SubjectResponseDto {
+  public static fromModel(subject: Subject, teacherDto: TeacherResponseDto | null = null): SubjectResponseDto {
     return {
       id: subject.id,
       name: subject.name,
       subject_code: subject.subject_code,
       acronym: subject.acronym,
       study_plan_year: subject.study_plan_year,
-      associated_coordinator: subject.associated_coordinator,
+      associated_coordinator: teacherDto,
       index: subject.index,
       frontal_hours: subject.frontal_hours,
       total_hours: subject.total_hours,

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { addTeacher, getTeachers } from '../modules/teacher';
-import { getSubjectById } from '../modules/subject';
+//import { getSubjectById } from '../modules/subject';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
 import { getBenefits, getCategories } from '../modules/teacher/services/teacherService';
@@ -24,16 +24,9 @@ class TeacherController {
   async getTeachers(req: Request, res: Response) {
     try {
       const queryParams = req.query;
-      const { search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const {teachers, totalPages, currentPage} = await getTeachers(search, sortField, sortOrder, page, pageSize);
-
-      let teachersResponse: GetTeachersResponseDto = { teachers: [], totalPages, currentPage };
-      for (const teacher of teachers) {
-        // add the associated subjects to the teacher
-        let associatedSubjects = await Promise.all(teacher.subjects_history.map(async teacherSubject => (await getSubjectById(teacherSubject.subject_id)).name));
-        teachersResponse.teachers.push(GetTeachersResponseDtoHelper.fromModel(teacher, associatedSubjects))
-      }
-      res.status(200).json(teachersResponse);
+      const {filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
+      const teachers = await getTeachers(filters, search, sortField, sortOrder, page, pageSize);
+      res.status(200).json(teachers);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

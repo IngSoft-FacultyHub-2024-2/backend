@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import { addTeacher, getTeachers } from '../modules/teacher';
-//import { getSubjectById } from '../modules/subject';
+import { addTeacher, getTeachers, getBenefits, getCategories } from '../modules/teacher';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
-import { getBenefits, getCategories } from '../modules/teacher/services/teacherService';
-import { GetTeachersResponseDto, GetTeachersResponseDtoHelper } from './dtos/response/GetTeachersResponseDto';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {

@@ -1,12 +1,8 @@
 import { Request, Response } from 'express';
-// import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
 import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
-import { getTeacherById } from '../modules/teacher';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
-import { GetSubjectsResponseDto, GetSubjectsResponseDtoHelper } from './dtos/response/GetSubjectsResponseDto';
-import { SubjectResponseControllerDtoHelper } from './dtos/response/subjectResponseControllerDto';
 
 class SubjectController {
   addSubject = async (req: Request, res: Response) => {

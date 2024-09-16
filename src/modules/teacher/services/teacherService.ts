@@ -32,7 +32,7 @@ export async function getTeachers(
     teachersDto.push(TeacherResponseDtoHelper.fromModel(teacher, subjectsHistory))
   }
 
-  return { teachersDto, totalPages, currentPage: page };
+  return { "teachers": teachersDto, totalPages, currentPage: page };
 }
 
 export async function getTeacherById(id: number, includeOtherInfo: boolean = false) {

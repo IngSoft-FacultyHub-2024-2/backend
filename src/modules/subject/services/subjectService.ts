@@ -28,7 +28,7 @@ export async function getSubjects(filters?: Partial<Subject>, search?: string, s
     subjectsDto.push(SubjectResponseDtoHelper.fromModel(subject, coordinator));
   }
 
-  return { subjectsDto, totalPages, currentPage: page };
+  return { "subjects": subjectsDto, totalPages, currentPage: page };
 }
 
 export async function getSubjectById(id: number, includeOtherInfo: boolean = false) {

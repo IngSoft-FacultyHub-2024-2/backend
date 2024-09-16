@@ -3,11 +3,30 @@ import teacherRepository from '../../src/modules/teacher/repositories/teacherRep
 import Benefit from '../../src/modules/teacher/repositories/models/Benefit';
 import Category from '../../src/modules/teacher/repositories/models/Category';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
+import { getSubjectById } from '../../src/modules/subject';
 
 // Mocking the necessary modules
 jest.mock('../../src/modules/teacher/repositories/teacherRepository');
 jest.mock('../../src/modules/teacher/repositories/models/Benefit');
 jest.mock('../../src/modules/teacher/repositories/models/Category');
+jest.mock('../../src/modules/subject/', () => ({
+  getSubjectById: jest.fn(),
+}));
+
+const removeUndefinedAndEmptyArrays = (obj: any): any => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.filter(value => value !== undefined && !(Array.isArray(value) && value.length === 0))
+              .map(removeUndefinedAndEmptyArrays);
+  }
+  return Object.fromEntries(
+    Object.entries(obj)
+      .filter(([_, value]) => value !== undefined && !(Array.isArray(value) && value.length === 0))
+      .map(([key, value]) => [key, removeUndefinedAndEmptyArrays(value)])
+  );
+};
 
 describe('Teacher Service', () => {
 
@@ -37,18 +56,38 @@ describe('Teacher Service', () => {
 
   // Test for getTeachers function
   describe('getTeachers', () => {
-    it('should return a paginated list of teachers', async () => {
+    it('should return a paginated list of teachers with subject history', async () => {
+      // Arrange
       const mockTeachers = {
-        rows: [{ id: 1, name: "John", surname: 'Doe' }, { id: 2, name: "Jane", surname: 'Smith' }],
+        rows: [
+          { id: 1, name: "John", surname: 'Doe', subjects_history: [{ subject_id: 1 }] },
+          { id: 2, name: "Jane", surname: 'Smith', subjects_history: [{ subject_id: 2 }] }
+        ],
         count: 2
       };
-
+      
+      const mockSubjects = [
+        { id: 1, name: "Mathematics" },
+        { id: 2, name: "Physics" }
+      ];
+  
+      const mockTeacherDto = [
+        { id: 1, name: "John", surname: "Doe", subjects_history: [{subject_id: 1 , subject: { id: 1, name: 'Mathematics' }}] },
+        { id: 2, name: "Jane", surname: "Smith", subjects_history: [{subject_id: 2, subject:{ id: 2, name: 'Physics' }}] }
+      ];
+  
       (teacherRepository.getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
-
-      const result = await getTeachers(undefined, 'name', 'ASC', 1, 10);
-
-      expect(teacherRepository.getTeachers).toHaveBeenCalledWith('ASC', 10, 0, undefined, 'name');
-      expect(result.teachers).toEqual(mockTeachers.rows);
+      (getSubjectById as jest.Mock).mockImplementation((id) => {
+        return mockSubjects.find(subject => subject.id === id);
+      });
+  
+      // Act
+      const result = await getTeachers();
+  
+      // Assert
+      expect(teacherRepository.getTeachers).toHaveBeenCalledWith(10, 0, undefined, undefined, undefined, undefined);
+      expect(getSubjectById).toHaveBeenCalledTimes(2); // Once for each teacher's subjects_history
+      expect(result.teachers.map(removeUndefinedAndEmptyArrays)).toEqual(mockTeacherDto);
       expect(result.totalPages).toEqual(1);
       expect(result.currentPage).toEqual(1);
     });
@@ -58,7 +97,7 @@ describe('Teacher Service', () => {
 
       (teacherRepository.getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
 
-      const result = await getTeachers('NonExistentTeacher', 'name', 'ASC', 1, 10);
+      const result = await getTeachers({}, 'NonExistentTeacher', 'name', 'ASC', 1, 10);
 
       expect(result.teachers).toEqual([]);
       expect(result.totalPages).toEqual(0);
@@ -70,8 +109,8 @@ describe('Teacher Service', () => {
 
       (teacherRepository.getTeachers as jest.Mock).mockRejectedValue(mockError);
 
-      await expect(getTeachers(undefined, 'name', 'ASC', 1, 10)).rejects.toThrow('Failed to fetch teachers');
-      expect(teacherRepository.getTeachers).toHaveBeenCalledWith('ASC', 10, 0, undefined, 'name');
+      await expect(getTeachers({}, 'NonExistentTeacher', 'name', 'ASC', 1, 10)).rejects.toThrow('Failed to fetch teachers');
+      expect(teacherRepository.getTeachers).toHaveBeenCalledWith(10, 0, 'ASC', 'NonExistentTeacher', {}, 'name');
     });
   });
 
@@ -85,8 +124,26 @@ describe('Teacher Service', () => {
       const result = await getTeacherById(1);
 
       expect(teacherRepository.getTeacherById).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockTeacher);
+      expect(removeUndefinedAndEmptyArrays(result)).toEqual({...mockTeacher, subjects_history: null});
     });
+
+    it('should return teacher DTO with subjects info if includeOtherInfo is true', async () => {
+      // Arrange
+      const mockTeacher = { id: 1, name: "John", surname: 'Doe', subjects_history: [{subject_id: 1}] };
+      const mockSubjectHistory = { id: 1, name: "Math"};
+      (teacherRepository.getTeacherById as jest.Mock).mockResolvedValue(mockTeacher);
+      (getSubjectById as jest.Mock).mockResolvedValue(mockSubjectHistory);
+      const mockTeacherResponseDto =  { id: 1, name: "John", surname: 'Doe', subjects_history: [{subject_id: 1, subject: mockSubjectHistory}] };
+  
+      // Act
+      const result = await getTeacherById(1, true);
+  
+      // Assert
+      expect(teacherRepository.getTeacherById).toHaveBeenCalledWith(1);
+      expect(getSubjectById).toHaveBeenCalledWith(mockTeacher.subjects_history[0].subject_id);
+      expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockTeacherResponseDto);
+    });
+  
 
     it('should throw a ResourceNotFound error if teacher is not found', async () => {
       (teacherRepository.getTeacherById as jest.Mock).mockResolvedValue(null);

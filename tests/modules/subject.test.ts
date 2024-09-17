@@ -2,32 +2,36 @@
 import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
-import {SubjectRequestDtoHelper} from '../../src/modules/subject/dtos/request/subjectRequestDto';
+import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
-import { count } from 'console';
+import { getTeacherById } from '../../src/modules/teacher';
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
   addSubject: jest.fn(), getSubjects: jest.fn(), getSubjectById: jest.fn(),
 }));
-jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto')
+jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto');
+jest.mock('../../src/modules/teacher/', () => ({
+  getTeacherById: jest.fn(),
+}));
 
 // Jest mock for eventRepository
 jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
   getEvents: jest.fn(), addEvent: jest.fn(), 
 }));
 
-const removeUndefined = (obj: any) => {
+const removeUndefinedAndEmptyArrays = (obj: any): any => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.filter(value => value !== undefined && !(Array.isArray(value) && value.length === 0))
+              .map(removeUndefinedAndEmptyArrays);
+  }
   return Object.fromEntries(
-    Object.entries(obj).filter(([_, value]) => value !== undefined)
-  );
-};
-
-const removeUndefinedAndEmptyArrays = (obj: any) => {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([_, value]) => 
-      value !== undefined && !(Array.isArray(value) && value.length === 0)
-    )
+    Object.entries(obj)
+      .filter(([_, value]) => value !== undefined && !(Array.isArray(value) && value.length === 0))
+      .map(([key, value]) => [key, removeUndefinedAndEmptyArrays(value)])
   );
 };
 
@@ -50,6 +54,10 @@ describe('addSubject', () => {
     ...mockSubjectDto,
   };
 
+  const mockCoordinator = { id: 1, name: 'Dr. Smith' };
+
+  const mockSubjectResponseDto = { id:1, ...mockSubjectDto, associated_coordinator: mockCoordinator };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -58,6 +66,7 @@ describe('addSubject', () => {
     // Arrange
     (SubjectRequestDtoHelper.toModel as jest.Mock).mockReturnValue(mockSubject);
     (subjectRepository.addSubject as jest.Mock).mockResolvedValue(mockSubject);
+    (getTeacherById as jest.Mock).mockResolvedValue(mockCoordinator);
 
     // Act
     const result = await addSubject(mockSubjectDto);
@@ -65,37 +74,52 @@ describe('addSubject', () => {
     // Assert
     expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDto);
     expect(subjectRepository.addSubject).toHaveBeenCalledWith(mockSubject);
-    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubject);
+    expect(getTeacherById).toHaveBeenCalledWith(mockSubjectDto.associated_coordinator);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubjectResponseDto);
   });
 });
 
 describe('getSubjects', () => {
   it('retrieves subjects successfully', async () => {
     // Arrange
-    const mockSubjects = [{ id: 1, name: 'Mathematics' }, { id: 2, name: 'Physics' }];
-    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue({rows: mockSubjects, count: 2});
+    const mockSubjects = [{ id: 1, name: 'Mathematics', associated_coordinator: 1 }, { id: 2, name: 'Physics', associated_coordinator: 2 }];
+    const mockCoordinators = [{ id: 1, name: 'Dr. Smith' }, { id: 2, name: 'Dr. Brown' }];
+    const mockSubjectResponseDtos = [
+      { id: 1, name: 'Mathematics', associated_coordinator: mockCoordinators[0] },
+      { id: 2, name: 'Physics', associated_coordinator: mockCoordinators[1] },
+    ];
+    (subjectRepository.getSubjects as jest.Mock).mockResolvedValue({ rows: mockSubjects, count: 2 });
+    (getTeacherById as jest.Mock).mockImplementation(async (id: number) => mockCoordinators.find(c => c.id === id));
 
     // Act
     const result = await getSubjects();
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalled();
-    expect(result.subjects?.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjects.map(removeUndefinedAndEmptyArrays));
-
+    expect(getTeacherById).toHaveBeenCalledWith(1);
+    expect(getTeacherById).toHaveBeenCalledWith(2);
+    expect(result.subjects?.map(removeUndefinedAndEmptyArrays)).toEqual(mockSubjectResponseDtos);
+    expect(result.totalPages).toEqual(1); // Based on count and pageSize
+    expect(result.currentPage).toEqual(1);
   });
 
   it('retrieves subjects with search successfully', async () => {
     // Arrange
     const search = 'Mathematics';
-    const mockFilteredSubjects = {rows: [{ id: 1, name: 'Mathematics' }], count: 1};
+    const mockFilteredSubjects = { rows: [{ id: 1, name: 'Mathematics', associated_coordinator: 1 }], count: 1 };
+    const mockCoordinator = { id: 1, name: 'Dr. Smith' };
+    const mockFilteredSubjectDto = { id: 1, name: 'Mathematics', associated_coordinator: mockCoordinator };
     (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
+    (getTeacherById as jest.Mock).mockResolvedValue(mockCoordinator);
 
     // Act
     const result = await getSubjects({}, search);
 
     // Assert
     expect(subjectRepository.getSubjects).toHaveBeenCalledWith(10, 0, undefined, search, {}, undefined);
-    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.rows.map(removeUndefinedAndEmptyArrays));
+    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual([mockFilteredSubjectDto].map(removeUndefinedAndEmptyArrays));
+    expect(result.totalPages).toEqual(1); // Based on count and pageSize
+    expect(result.currentPage).toEqual(1);
   });
 
   it('retrieves subjects with search and pages successfully', async () => {
@@ -106,39 +130,62 @@ describe('getSubjects', () => {
     const sortOrder = 'ASC';
     const page = 1;
     const pageSize = 10;
-    const mockFilteredSubjects = {rows: [{ id: 1, name: 'Mathematics' }], count: 1};
+    const mockFilteredSubjects = { rows: [{ id: 1, name: 'Mathematics', associated_coordinator: 1 }], count: 1 };
+    const mockCoordinator = { id: 1, name: 'Dr. Smith' };
+    const mockFilteredSubjectDto = { id: 1, name: 'Mathematics', associated_coordinator: mockCoordinator };
     (subjectRepository.getSubjects as jest.Mock).mockResolvedValue(mockFilteredSubjects);
+    (getTeacherById as jest.Mock).mockResolvedValue(mockCoordinator);
 
     // Act
     const result = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
 
     // Assert
-    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual(mockFilteredSubjects.rows.map(removeUndefinedAndEmptyArrays));
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(pageSize, (page - 1) * pageSize, sortOrder, search, filters, sortField);
+    expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual([mockFilteredSubjectDto].map(removeUndefinedAndEmptyArrays));
+    expect(result.totalPages).toEqual(1); // Based on count and pageSize
+    expect(result.currentPage).toEqual(page);
   });
-})
+});
 
 describe('getSubjectById', () => {
-  const mockSubject = { id: 1, name: 'Math' };
-  const mockSubjectDto = { id: 1, name: 'Math' };
+  const mockSubject = { id: 1, name: 'Math', associated_coordinator: 1 };
+  const mockCoordinator = { id: 1, name: 'Dr. Smith' };
+  const mockSubjectResponseDto = { id: 1, name: 'Math', associated_coordinator: mockCoordinator };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should return subject DTO if subject exists', async () => {
+  it('should return subject, not include coordinators', async () => {
     (subjectRepository.getSubjectById as jest.Mock).mockResolvedValue(mockSubject);
 
     const result = await getSubjectById(1);
 
     expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(1);
-    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubjectDto);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual({...mockSubject, associated_coordinator: null});
   });
 
-  it('should throw ResourceNotFound if subject does not exist', async () => {
+  it('should return subject DTO with coordinator info if includeOtherInfo is true', async () => {
+    // Arrange
+    (subjectRepository.getSubjectById as jest.Mock).mockResolvedValue(mockSubject);
+    (getTeacherById as jest.Mock).mockResolvedValue(mockCoordinator);
+
+    // Act
+    const result = await getSubjectById(1, true);
+
+    // Assert
+    expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(1);
+    expect(getTeacherById).toHaveBeenCalledWith(mockSubject.associated_coordinator);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual(mockSubjectResponseDto);
+  });
+
+  it('should throw ResourceNotFound exception if subject does not exist', async () => {
+    // Arrange
     (subjectRepository.getSubjectById as jest.Mock).mockResolvedValue(null);
 
-    await expect(getSubjectById(1)).rejects.toThrow(ResourceNotFound);
-    await expect(getSubjectById(1)).rejects.toThrow('Subject with ID 1 not found');
+    // Act & Assert
+    await expect(getSubjectById(999)).rejects.toThrow(ResourceNotFound);
+    expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(999);
   });
 });
 

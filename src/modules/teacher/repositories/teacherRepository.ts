@@ -95,10 +95,11 @@ class TeacherRepository {
   }
 
   async getTeachers(
-    sortOrder: 'ASC' | 'DESC' = 'DESC',
     limit: number,
     offset: number,
+    sortOrder: 'ASC' | 'DESC' = 'DESC',
     search?: string,
+    filters?: Partial<Teacher>,
     sortField?: string
   ) {
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
@@ -112,8 +113,13 @@ class TeacherRepository {
       }
       : {};
 
+      const whereClause = {
+        ...filters,
+        ...searchQuery,
+      };
+
     return await Teacher.findAndCountAll({
-      where: searchQuery,
+      where: whereClause,
       order: orderOption,
       limit,
       offset,

@@ -79,45 +79,24 @@ describe('getSubjects', () => {
     };
   });
 
-  it('should return subjects with coordinators', async () => {
-    const mockSubjectDto1 = { id: 1, associated_coordinator_name: 'Adam Smith', name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
-    const mockSubjectDto2 = { id: 2, associated_coordinator_name: 'Adam Smith', name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
-    const mockSubjectsRet = {
-      subjects: [
-        mockSubjectDto1,
-        mockSubjectDto2
-      ],
-      totalPages: 1,
-      currentPage: 1
-    }
-
-    const mockSubject2Dto1 = { id: 1, associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
-    const mockSubject2Dto2 = { id: 2, associated_coordinator: 101, name: undefined, subject_code: undefined, study_plan_year: undefined, index: undefined, hour_configs: undefined };
+  it('should return subjects with correct query parameters', async () => {
     const mockSubjects = {
       subjects: [
-        mockSubject2Dto1,
-        mockSubject2Dto2
+        { id: 1, name: 'Math', associated_coordinator: 102 },
+        { id: 2, name: 'Physics', associated_coordinator: 103 }
       ],
       totalPages: 1,
-      currentPage: 1
-    }
-
-    const mockCoordinator = { id: 101, name: 'Adam', surname: 'Smith' };
-
+      currentPage: 1,
+    };
+  
     (getSubjects as jest.Mock).mockResolvedValue(mockSubjects);
-    (getTeacherById as jest.Mock)
-      .mockResolvedValueOnce(mockCoordinator)
-      .mockResolvedValueOnce(mockCoordinator);
-
+  
     await subjectController.getSubjects(req as Request, res as Response);
-
+  
     expect(getSubjects).toHaveBeenCalledWith({}, undefined, undefined, undefined, 1, 10);
-    expect(getTeacherById).toHaveBeenCalledWith(101);
-    expect(getTeacherById).toHaveBeenCalledWith(101);
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith(mockSubjectsRet);
+    expect(jsonMock).toHaveBeenCalledWith(mockSubjects);
   });
-
 });
 
 describe('getSubject', () => {
@@ -139,33 +118,16 @@ describe('getSubject', () => {
     jest.clearAllMocks();
   });
 
-  it('should return subject with teacher names if found', async () => {
+  it('should return subject if found', async () => {
     const mockSubject = { id: 1, associated_coordinator: 102 };
-    const mockTeacher1 = { id: 102, name: 'Jane', surname: 'Smith' };
-    const mockSubjectDto = {
-      id: 1,
-      associated_coordinator_name: 'Jane Smith',
-      // Add other properties as needed
-    };
-
+    
     (getSubjectById as jest.Mock).mockResolvedValue(mockSubject);
-    (getTeacherById as jest.Mock)
-      .mockResolvedValueOnce(mockTeacher1)
-
+  
     await subjectController.getSubject(req as Request, res as Response);
-
+  
     expect(getSubjectById).toHaveBeenCalledWith(1);
-    expect(getTeacherById).toHaveBeenCalledWith(102);
-
-    // Manually create the expected DTO
-    const expectedDto = {
-      id: mockSubject.id,
-      associated_coordinator_name: `${mockTeacher1.name} ${mockTeacher1.surname}`,
-      associated_coordinator: 102,
-    };
-
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith(expectedDto);
+    expect(jsonMock).toHaveBeenCalledWith(mockSubject);
   });
 
   it('should handle errors', async () => {

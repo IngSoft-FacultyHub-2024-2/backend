@@ -1,13 +1,16 @@
 import subjectRepository from '../repositories/subjectRepository';
 import Subject from '../repositories/models/Subject';
 import { SubjectRequestDto, SubjectRequestDtoHelper } from '../dtos/request/subjectRequestDto';
-import { SubjectResponseDtoHelper } from '../dtos/response/subjectResponseDto';
+import { SubjectResponseDto, SubjectResponseDtoHelper } from '../dtos/response/subjectResponseDto';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import { getTeacherRoles } from '../../../shared/utils/teacherRoles';
+import { getTeacherById } from '../../teacher';
 
 export async function addSubject(subjectDto: SubjectRequestDto) {
   const subject: Partial<Subject> = SubjectRequestDtoHelper.toModel(subjectDto);
+  let coordinator = await getTeacherById(subjectDto.associated_coordinator);
   const newSubject = await subjectRepository.addSubject(subject);
-  return SubjectResponseDtoHelper.fromModel(newSubject);
+  return SubjectResponseDtoHelper.fromModel(newSubject, coordinator);
 }
 
 export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
@@ -19,15 +22,24 @@ export async function getSubjects(filters?: Partial<Subject>, search?: string, s
   const totalPages = Math.ceil(subjectRows.count / pageSize);
   const subjects = subjectRows.rows;
 
-  return { subjects, totalPages, currentPage: page };
-  // return await subjectRepository.getSubjects(filters, search, sortField, sortOrder, page, pageSize);
+  let subjectsDto: SubjectResponseDto[] = []
+  for (const subject of subjects) {
+    let coordinator = await getTeacherById(subject.associated_coordinator);
+    subjectsDto.push(SubjectResponseDtoHelper.fromModel(subject, coordinator));
+  }
+
+  return { "subjects": subjectsDto, totalPages, currentPage: page };
 }
 
-export async function getSubjectById(id: number) {
+export async function getSubjectById(id: number, includeOtherInfo: boolean = false) {
   const subject = await subjectRepository.getSubjectById(id);
   if (!subject) {
     throw new ResourceNotFound(`Subject with ID ${id} not found`);
   }
-  return SubjectResponseDtoHelper.fromModel(subject);
+  if (!includeOtherInfo) {
+    return SubjectResponseDtoHelper.fromModel(subject);
+  }
+  let coordinator = await getTeacherById(subject.associated_coordinator);
+  return SubjectResponseDtoHelper.fromModel(subject, coordinator);
 }
 

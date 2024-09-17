@@ -1,9 +1,10 @@
-import { Model, DataTypes, HasMany, BelongsToMany } from 'sequelize';
+import { Model, DataTypes, HasMany, BelongsToMany, BelongsTo } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
 import Event from './Event';
 import Need from './Need';
 import SubjectEvent from './SubjectEvent';
+import StudyPlan from './StudyPlan';
 
 // TODO: UNCOMMENT THE REFERENCE FOR THE ASSOCIATED TEACHER AND COORDINATOR
 class Subject extends Model {
@@ -11,7 +12,7 @@ class Subject extends Model {
   public name!: string;
   public subject_code!: string;
   public acronym!: string; 
-  public study_plan_year!: number;
+  public study_plan_id!: number;
   public associated_coordinator!: number;
   public index!: number;
   public frontal_hours!: number;
@@ -26,10 +27,13 @@ class Subject extends Model {
   public needs_notes!: string;
   public events!: SubjectEvent[];
 
+  public study_plan!: StudyPlan;
+  
   public static associations: {
     hour_configs: HasMany<Subject, HourConfig>;
     needs: HasMany<Subject, Need>;
     events: HasMany<Subject, SubjectEvent>;
+    study_plan: BelongsTo<Subject, StudyPlan>;
   };
 }
 
@@ -51,10 +55,6 @@ Subject.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
-  study_plan_year: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   associated_coordinator: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -62,6 +62,14 @@ Subject.init({
     //   model: 'Teachers',
     //   key: 'id',
     // },
+  },
+  study_plan_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'StudyPlans',
+      key: 'id',
+    },
   },
   index: {
     type: DataTypes.DOUBLE,
@@ -156,5 +164,6 @@ SubjectEvent.belongsTo(Subject, {
   foreignKey: 'subject_id',
   as: 'subject',
 });
+
 
 export default Subject;

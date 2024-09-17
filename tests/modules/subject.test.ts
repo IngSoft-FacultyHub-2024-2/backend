@@ -41,7 +41,7 @@ describe('addSubject', () => {
     subject_code: 'MATH101',
     associated_coordinator: 1,
     acronym: 'MATH',
-    study_plan_year: 1,
+    study_plan_id: 1,
     index: 1,
     needs_notes: "",
     frontal_hours: 30,

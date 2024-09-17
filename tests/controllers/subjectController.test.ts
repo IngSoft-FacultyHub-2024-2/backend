@@ -13,7 +13,7 @@ describe('SubjectController', () => {
     "name": "Diseño1",
     "subject_code": "code",
     "acronym": "DA1",
-    "study_plan_year": 2000,
+    "study_plan_id": 1,
     "associated_coordinator": 16,
     "index": 1,
     "frontal_hours": 120,

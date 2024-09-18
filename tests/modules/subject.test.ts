@@ -1,10 +1,11 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
 import { getTeacherById } from '../../src/modules/teacher';
+import studyPlanRepository from '../../src/modules/subject/repositories/studyPlanRepository';
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
@@ -18,6 +19,11 @@ jest.mock('../../src/modules/teacher/', () => ({
 // Jest mock for eventRepository
 jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
   getEvents: jest.fn(), addEvent: jest.fn(), 
+}));
+
+// Jest mock for studyPlanRepository
+jest.mock('../../src/modules/subject/repositories/studyPlanRepository', () => ({
+  getStudyPlans: jest.fn(), addStudyPlan: jest.fn(), 
 }));
 
 const removeUndefinedAndEmptyArrays = (obj: any): any => {
@@ -249,5 +255,49 @@ describe('addEvent', () => {
     // Assert
     expect(eventRepository.addEvent).toHaveBeenCalledWith(mockEvent);
     expect(result).toEqual(mockEvent);
+  });
+});
+
+describe('getStudyPlans', () => {
+  it('retrieves studyPlans successfully', async () => {
+    // Arrange
+    const mockStudyPlans = [{ id: 1, year: 2024 }, { id: 2,  year: 2018 }];
+    (studyPlanRepository.getStudyPlans as jest.Mock).mockResolvedValue(mockStudyPlans);
+
+    // Act
+    const result = await getStudyPlans();
+
+    // Assert
+    expect(studyPlanRepository.getStudyPlans).toHaveBeenCalled();
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockStudyPlans.map(removeUndefinedAndEmptyArrays));
+  });
+
+  it('retrieves studyPlans with filters successfully', async () => {
+    // Arrange
+    const filters = {  year: 2024 };
+    const mockFilteredStudyPlans = [{ id: 1, year: 2024 }];
+    (studyPlanRepository.getStudyPlans as jest.Mock).mockResolvedValue(mockFilteredStudyPlans);
+
+    // Act
+    const result = await getStudyPlans(filters);
+
+    // Assert
+    expect(studyPlanRepository.getStudyPlans).toHaveBeenCalledWith(filters, undefined, undefined, undefined);
+    expect(result).toEqual(mockFilteredStudyPlans);
+  });
+});
+
+describe('addStudyPlan', () => {
+  it('adds an studyPlan successfully', async () => {
+    // Arrange
+    const mockStudyPlan = { id: 1, year: 2024 };
+    (studyPlanRepository.addStudyPlan as jest.Mock).mockResolvedValue(mockStudyPlan);
+
+    // Act
+    const result = await addStudyPlan(mockStudyPlan);
+
+    // Assert
+    expect(studyPlanRepository.addStudyPlan).toHaveBeenCalledWith(mockStudyPlan);
+    expect(result).toEqual(mockStudyPlan);
   });
 });

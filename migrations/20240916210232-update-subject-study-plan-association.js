@@ -49,11 +49,6 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     // Reverse the changes: Add back study_plan_year and remove study_plan_id
-    await queryInterface.addColumn('Subjects', 'study_plan_year', {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    });
-
     await queryInterface.removeColumn('Subjects', 'study_plan_id');
   }
 };

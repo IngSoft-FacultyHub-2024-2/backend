@@ -5,9 +5,15 @@ import SubjectEvent from './models/SubjectEvent';
 import Event from './models/Event'; 
 import { Op, Order } from 'sequelize';
 import StudyPlan from './models/StudyPlan';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
+    const studyPlan = await StudyPlan.findByPk(subject.study_plan_id);
+    if (!studyPlan) {
+      throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
+    }
+    subject.study_plan_year = studyPlan.year;
     return await Subject.create(subject, {
     include: [
       { model: HourConfig, as: 'hour_configs' }, 
@@ -30,7 +36,10 @@ class SubjectRepository {
     filters?: Partial<Subject>,
     sortField?: string
   ) {
-      const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
+      const orderOption = sortField 
+      ? [[sortField, sortOrder]] as Order 
+      : [['study_plan_year', 'DESC']] as Order;
+      
       const searchQuery = search
       ? {
           [Op.or]: [
@@ -57,6 +66,7 @@ class SubjectRepository {
         { model: SubjectEvent, as: 'events' },
         { model: StudyPlan, as: 'study_plan' }
       ],
+      distinct: true 
     });
   }
 

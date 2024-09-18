@@ -12,6 +12,7 @@ class Subject extends Model {
   public name!: string;
   public subject_code!: string;
   public acronym!: string; 
+  public study_plan_year!: number;
   public study_plan_id!: number;
   public associated_coordinator!: number;
   public index!: number;
@@ -53,6 +54,10 @@ Subject.init({
   },
   acronym:{
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  study_plan_year: {
+    type: DataTypes.NUMBER,
     allowNull: false,
   },
   associated_coordinator: {
@@ -124,10 +129,11 @@ Subject.init({
     }
   },
   hooks: {
-    beforeSave: (teacher) => {
-      // Calcular y setear total_hours antes de guardar en la base de datos
-      teacher.total_hours = teacher.index * teacher.frontal_hours;
+    beforeSave: (subject) => {
+      // Calculate and set total_hours before saving on the db
+      subject.total_hours = subject.index * subject.frontal_hours;      
     }
+
   }
 }, );
 

@@ -2,6 +2,7 @@ import sequelize from "./config/database";
 import subjectRouter  from "./routers/subjectRouter";
 import eventRouter from "./routers/eventRouter";
 import teacherRouter  from "./routers/teacherRouter";
+import studyPlanRouter from "./routers/studyPlanRouter";
 import dotenv from 'dotenv';
 import { initializeDatabase } from "./initializingData";
 const cors = require('cors');
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use("/api/subjects", subjectRouter);
 app.use("/api/events", eventRouter);
 app.use("/api/teachers", teacherRouter);
+app.use("/api/study-plans", studyPlanRouter);
 
 const PORT = process.env.PORT || 3000;
 

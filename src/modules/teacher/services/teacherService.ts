@@ -51,6 +51,11 @@ export async function getTeacherById(id: number, includeOtherInfo: boolean = fal
   return teacherDto;
 }
 
+export async function getAllTeachersNames() {
+    const teacherNames = await teacherRepository.getAllTeachersNames();
+    return teacherNames;
+  }
+
 export async function getBenefits() {
   return await Benefit.findAll();
 }

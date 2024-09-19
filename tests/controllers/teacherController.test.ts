@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 import teacherController from '../../src/controllers/teacherController';
-import { getTeachers, addTeacher, getBenefits, getCategories } from '../../src/modules/teacher';
+import { getTeachers, addTeacher, getBenefits, getCategories, getAllTeachersNames } from '../../src/modules/teacher';
 
 jest.mock('../../src/modules/teacher');
 jest.mock('../../src/modules/subject');
@@ -134,6 +134,29 @@ describe('TeacherController', () => {
       expect(getTeachers).toHaveBeenCalledWith({}, undefined, undefined, undefined, 1, 10);
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
+  });
+});
+
+describe('getAllTeachersNames', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {};
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it('should return all teachers names with status 200', async () => {
+    const teachers = [{ id: 1, name: 'John', surname: 'Doe' }, { id: 1, name: 'Jane', surname: 'Smith' }];
+    (getAllTeachersNames as jest.Mock).mockResolvedValue(teachers);
+
+    await teacherController.getAllTeachersNames(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(teachers);
   });
 });
 

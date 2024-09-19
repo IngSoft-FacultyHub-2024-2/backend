@@ -147,6 +147,11 @@ class TeacherRepository {
       ],
     });
   }
+
+  async getAllTeachersNames() {
+    return await Teacher.findAll({attributes: ['id', 'name', 'surname'],  order: [['surname', 'ASC']]});
+  }
+  
 }
 
 export default new TeacherRepository();

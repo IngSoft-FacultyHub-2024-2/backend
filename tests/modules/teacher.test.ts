@@ -1,4 +1,4 @@
-import { addTeacher, getTeachers, getTeacherById, getBenefits, getCategories } from '../../src/modules/teacher/services/teacherService';
+import { addTeacher, getTeachers, getTeacherById, getBenefits, getCategories, getAllTeachersNames } from '../../src/modules/teacher/services/teacherService';
 import teacherRepository from '../../src/modules/teacher/repositories/teacherRepository';
 import Benefit from '../../src/modules/teacher/repositories/models/Benefit';
 import Category from '../../src/modules/teacher/repositories/models/Category';
@@ -159,6 +159,18 @@ describe('Teacher Service', () => {
 
       await expect(getTeacherById(1)).rejects.toThrow('Failed to fetch teacher');
       expect(teacherRepository.getTeacherById).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('getAllTeachersNames', () => {
+    it('should return all teachers names', async () => {
+      const teachers = [{ id: 1, name: 'John', surname: 'Doe' }, { id: 1, name: 'Jane', surname: 'Smith' }];
+      (teacherRepository.getAllTeachersNames as jest.Mock).mockResolvedValue(teachers);
+  
+      const result = await getAllTeachersNames();
+  
+      expect(result).toEqual(teachers);
+      expect(teacherRepository.getAllTeachersNames).toHaveBeenCalled();
     });
   });
 

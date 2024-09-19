@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import { addTeacher, getTeachers, getBenefits, getCategories } from '../modules/teacher';
+import { addTeacher, getTeachers, getBenefits, getCategories, getAllTeachersNames } from '../modules/teacher';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
 
@@ -23,6 +23,17 @@ class TeacherController {
       const queryParams = req.query;
       const {filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
       const teachers = await getTeachers(filters, search, sortField, sortOrder, page, pageSize);
+      res.status(200).json(teachers);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getAllTeachersNames(req: Request, res: Response) {
+    try {
+      const teachers = await getAllTeachersNames();
       res.status(200).json(teachers);
     } catch (error) {
       if (error instanceof Error) {

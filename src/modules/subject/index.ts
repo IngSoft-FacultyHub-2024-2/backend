@@ -1,4 +1,4 @@
-import { addSubject, getSubjects, getSubjectById, updateSubject } from './services/subjectService';
+import { addSubject, getSubjects, getSubjectById, updateSubject, teacherIsCoordinator } from './services/subjectService';
 import { getEvents, addEvent } from './services/eventService';
 import { SubjectRequestDto } from './dtos/request/subjectRequestDto';
 import { SubjectEventRequestDto } from './dtos/request/subjectEventRequestDto';
@@ -8,7 +8,7 @@ import { NeedResponseDto } from "./dtos/response/needResponseDto";
 import { SubjectEventResponseDto } from './dtos/response/subjectEventResponseDto';
 import { getStudyPlans, addStudyPlan } from './services/studyPlanService';
 
-export { getEvents, addEvent, addSubject, getSubjectById, updateSubject,
+export { getEvents, addEvent, addSubject, getSubjectById, updateSubject, teacherIsCoordinator,
     SubjectRequestDto, SubjectEventRequestDto, getSubjects, 
     SubjectResponseDto, HourConfigResponseDto,
     NeedResponseDto, SubjectEventResponseDto,

@@ -97,7 +97,7 @@ describe('Teacher Service', () => {
 
       (teacherRepository.getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
 
-      const result = await getTeachers({}, 'NonExistentTeacher', 'name', 'ASC', 1, 10);
+      const result = await getTeachers('NonExistentTeacher', undefined, 'name', 'ASC', 1, 10);
 
       expect(result.teachers).toEqual([]);
       expect(result.totalPages).toEqual(0);
@@ -109,7 +109,7 @@ describe('Teacher Service', () => {
 
       (teacherRepository.getTeachers as jest.Mock).mockRejectedValue(mockError);
 
-      await expect(getTeachers({}, 'NonExistentTeacher', 'name', 'ASC', 1, 10)).rejects.toThrow('Failed to fetch teachers');
+      await expect(getTeachers('NonExistentTeacher', undefined,  'name', 'ASC', 1, 10)).rejects.toThrow('Failed to fetch teachers');
       expect(teacherRepository.getTeachers).toHaveBeenCalledWith(10, 0, 'ASC', 'NonExistentTeacher', {}, 'name');
     });
   });

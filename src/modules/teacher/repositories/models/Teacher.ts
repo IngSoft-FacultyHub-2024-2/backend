@@ -12,6 +12,7 @@ import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
 import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
 import TeacherSubjectGroup from './TeacherSubjectGroup';
 import TeacherAvailableModule from './TeacherAvailableModules';
+import { TeacherStates } from '../../../../shared/utils/teacherStates';
 
 class Teacher extends Model {
   public id!: number;
@@ -26,7 +27,8 @@ class Teacher extends Model {
   public linkedin_link!: string | null;
   public graduated!: boolean;
   public notes!: string | null;
-  public state!: 'activo' | 'baja temporal' | 'baja';
+  public state!: TeacherStates;
+  public retentionDate!: Date | null;
   public unsubscribe_risk!: number;
   public prizes!: Prize[];
   public caes_courses!: CaesCourse[];
@@ -108,9 +110,13 @@ Teacher.init({
     allowNull: true,
   },
   state: {
-    type: DataTypes.ENUM('activo', 'baja temporal', 'baja'),
+    type: DataTypes.ENUM(TeacherStates.ACTIVE, TeacherStates.TEMPORARY_LEAVE, TeacherStates.INACTIVE),
     allowNull: false,
     defaultValue: 'activo',
+  },
+  retentionDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
   unsusbribe_risk: {
     type: DataTypes.INTEGER,
@@ -122,6 +128,7 @@ Teacher.init({
   modelName: 'Teacher',
   tableName: 'Teachers',
   timestamps: true,
+  paranoid: true,
 });
 
 Teacher.hasMany(Prize, {

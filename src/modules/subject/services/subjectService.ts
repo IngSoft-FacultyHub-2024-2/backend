@@ -34,7 +34,7 @@ export async function getSubjects(filters?: Partial<Subject>, search?: string, s
 export async function getSubjectById(id: number, includeOtherInfo: boolean = false) {
   const subject = await subjectRepository.getSubjectById(id);
   if (!subject) {
-    throw new ResourceNotFound(`Subject with ID ${id} not found`);
+    throw new ResourceNotFound(`La Materia con ID ${id} no existe`);
   }
   if (!includeOtherInfo) {
     return SubjectResponseDtoHelper.fromModel(subject);
@@ -52,3 +52,9 @@ export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
   }
   return SubjectResponseDtoHelper.fromModel(updatedSubject, coordinator);
 }
+
+export async function teacherIsCoordinator(id: number) {
+  const isCoordinator = await Subject.findOne({ where: { associated_coordinator: id } });
+  return !!isCoordinator;
+}
+

@@ -14,6 +14,7 @@ import TeacherSubjectGroupMember from "./models/TeacherSubjectGroupMember";
 import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
 import TeacherSubjectHistory from "./models/TeacherSubjectHistory";
 import { Op } from "sequelize";
+import { TeacherStates } from "../../../shared/utils/teacherStates";
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -49,7 +50,7 @@ class TeacherRepository {
 
       return newTeacher;
     } catch (error) {
-      console.error('Error adding teacher:', error);
+      console.error('Ha ocurrido un error al agregar un docente:', error);
 
       // Realizar un rollback en caso de error
       await transaction.rollback();
@@ -97,10 +98,10 @@ class TeacherRepository {
   async getTeachers(
     limit: number,
     offset: number,
-    sortOrder: 'ASC' | 'DESC' = 'DESC',
+    sortOrder: string,
+    sortField?: string,
     search?: string,
-    filters?: Partial<Teacher>,
-    sortField?: string
+    state?: TeacherStates
   ) {
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
     const searchQuery = search
@@ -113,16 +114,20 @@ class TeacherRepository {
       }
       : {};
 
-      const whereClause = {
-        ...filters,
-        ...searchQuery,
-      };
+    const stateQuery = state ? { state } : {};
+
+    const whereClause = {
+      ...searchQuery,
+      ...stateQuery,
+    };
 
     return await Teacher.findAndCountAll({
       where: whereClause,
       order: orderOption,
       limit,
       offset,
+      paranoid: false,
+      distinct: true,
       include: [
         { model: CaesCourse, as: 'caes_courses' },
         { model: Contact, as: 'contacts' },
@@ -152,6 +157,26 @@ class TeacherRepository {
     return await Teacher.findAll({attributes: ['id', 'name', 'surname'],  order: [['surname', 'ASC']]});
   }
   
+  async dismissTeacher(id: number) {
+    Teacher.update({ state: TeacherStates.INACTIVE }, { where: { id } });
+
+    return await Teacher.destroy({ where: { id } });
+  }
+
+  async temporaryDismissTeacher(id: number, retentionDate: Date) {
+   Teacher.update({ state: TeacherStates.TEMPORARY_LEAVE, retentionDate }, { where: { id } });
+
+    return await Teacher.findByPk(id);
+  }
+
+  async deleteTeacherSubjectGroups(id: number) {
+    const groupsWhereIsMember = await TeacherSubjectGroupMember.findAll({ where: { teacher_id: id } });
+    const groupIds: number[] = groupsWhereIsMember.map(group => group.teacher_subject_group_id);
+
+    // Eliminar grupos donde el docente es miembro
+    await TeacherSubjectGroup.destroy({ where: { id: groupIds } });
+
+  }
 }
 
 export default new TeacherRepository();

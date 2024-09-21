@@ -44,7 +44,6 @@ export async function getSubjectById(id: number, includeOtherInfo: boolean = fal
 }
 
 export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
-  console.log('subjectDto', subjectDto);
   const subject: Partial<Subject> = SubjectRequestDtoHelper.toModel(subjectDto);
   let coordinator = await getTeacherById(subjectDto.associated_coordinator);
   const updatedSubject = await subjectRepository.updateSubject(id, subject);

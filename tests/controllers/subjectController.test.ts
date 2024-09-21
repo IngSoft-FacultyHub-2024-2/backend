@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById } from '../../src/modules/subject';
-import { getTeacherById } from '../../src/modules/teacher';
+import { addSubject, getSubjects, getSubjectById, updateSubject } from '../../src/modules/subject';
 import subjectController from '../../src/controllers/subjectController';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
@@ -125,7 +124,7 @@ describe('getSubject', () => {
   
     await subjectController.getSubject(req as Request, res as Response);
   
-    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(getSubjectById).toHaveBeenCalledWith(1, true);
     expect(statusMock).toHaveBeenCalledWith(200);
     expect(jsonMock).toHaveBeenCalledWith(mockSubject);
   });
@@ -138,7 +137,7 @@ describe('getSubject', () => {
 
     await subjectController.getSubject(req as Request, res as Response);
 
-    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(getSubjectById).toHaveBeenCalledWith(1, true);
     expect(returnError).toHaveBeenCalledWith(res, error);
   });
 
@@ -150,8 +149,64 @@ describe('getSubject', () => {
 
     await subjectController.getSubject(req as Request, res as Response);
 
-    expect(getSubjectById).toHaveBeenCalledWith(1);
+    expect(getSubjectById).toHaveBeenCalledWith(1, true);
     expect(returnError).toHaveBeenCalledWith(res, error);
+  });
+
+});
+
+describe('updateSubject', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    let body: any = {
+      "name": "Diseño1",
+      "subject_code": "code",
+      "acronym": "DA1",
+      "study_plan_id": 1,
+      "associated_coordinator": 16,
+      "index": 1,
+      "frontal_hours": 120,
+      "intro_folder": "/src/",
+      "subject_folder": "/src/r",
+      "technologies": "ruby",
+      "notes": "nueva materia",
+      "hour_configs": [{
+        "role": "Teórico",
+        "total_hours": 100,
+      },
+      {
+        "role": "Tecnología",
+        "total_hours": 20,
+      }],
+      "needs": [{
+        "name": "laboratorio"
+      }, {
+        "name": "salon de 25 personas"
+      }],
+      "needs_notes": "",
+      "events": []
+    };
+    req = {
+      params: { id: '1' },
+      body: { ...body },
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it('should update the subject and return status 200', async () => {
+    const updatedSubject = { ...req.body, id: 1, name: 'Math' };
+    (updateSubject as jest.Mock).mockResolvedValue(updatedSubject);
+
+    await subjectController.updateSubject(req as Request, res as Response);
+
+    expect(updateSubject).toHaveBeenCalledWith(1, req.body);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(updatedSubject);
   });
 
 });

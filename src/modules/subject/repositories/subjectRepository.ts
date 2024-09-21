@@ -3,9 +3,10 @@ import HourConfig from './models/HourConfig';
 import Need from './models/Need';
 import SubjectEvent from './models/SubjectEvent';
 import Event from './models/Event'; 
-import { Op, Order } from 'sequelize';
+import { Op, Order, Transaction } from 'sequelize';
 import StudyPlan from './models/StudyPlan';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import sequelize from "../../../config/database";
 
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
@@ -85,6 +86,67 @@ class SubjectRepository {
       ],
     });
   }
+
+  async updateSubject(id: number, subject: Partial<Subject>) {
+    const studyPlan = await StudyPlan.findByPk(subject.study_plan_id);
+    if (!studyPlan) {
+      throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
+    }
+    subject.study_plan_year = studyPlan.year;
+    const existingSubject = await Subject.findByPk(id, {
+      include: [{ model: HourConfig, as: 'hour_configs' }]
+    });
+    if (!existingSubject) {
+        throw new ResourceNotFound(`No existe la materia con id ${id}`);
+    }
+    const transaction = await sequelize.transaction();
+    try {
+        // First, update or replace the hour_configs
+        await this.updateHourConfigOfSubject(subject, id, transaction);
+        
+        // Update the subject itself (this will now pass validation because hour_configs are updated)
+        await existingSubject.update(subject, { transaction });
+        // Update the reminder associations
+        await this.updateSubjectEventOfSubject(subject, id, transaction);
+
+        await transaction.commit();
+        
+        return await this.getSubjectById(id);
+    } catch (error) {
+      console.log(error);
+      // Rollback the transaction in case of any failure
+      await transaction.rollback();
+      throw error;  // Re-throw the error to be handled elsewhere
+    }
+  }
+
+  private async updateHourConfigOfSubject(subject: Partial<Subject>, subject_id: number, transaction: Transaction){
+    if (subject.hour_configs) {
+      // Remove old hour configs related to this subject
+      await HourConfig.destroy({ where: { subject_id: subject_id } });
+      // Create new hour configs
+      const newHourConfigs = subject.hour_configs.map((hourConfig) => ({
+          ...hourConfig,
+          subject_id: subject_id
+      }));
+      await HourConfig.bulkCreate(newHourConfigs);
+    }
+  }
+
+  private async updateSubjectEventOfSubject(subject: Partial<Subject>, subject_id: number, transaction: Transaction){
+    if (subject.events) {
+      // Remove old events related to this subject
+      await SubjectEvent.destroy({ where: { subject_id: subject_id } });
+      // Create new events
+      const newEvents = subject.events.map((event) => ({
+          ...event,
+          subject_id: subject_id
+      }));
+      await SubjectEvent.bulkCreate(newEvents);
+    }
+  }
+
 }
+
 
 export default new SubjectRepository;

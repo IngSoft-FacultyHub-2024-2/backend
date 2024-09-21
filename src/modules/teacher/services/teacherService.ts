@@ -86,9 +86,9 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
 }
 
 export async function getBenefits() {
-  return await Benefit.findAll();
+  return await teacherRepository.getAllBenefits();
 }
 
 export async function getCategories() {
-  return await Category.findAll();
+  return await teacherRepository.getAllCategories();
 }

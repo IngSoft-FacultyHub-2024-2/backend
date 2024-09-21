@@ -177,6 +177,14 @@ class TeacherRepository {
     await TeacherSubjectGroup.destroy({ where: { id: groupIds } });
 
   }
+
+  async getAllCategories() {
+    return await Category.findAll();
+  }
+
+  async getAllBenefits() {
+    return await Benefit.findAll();
+  }
 }
 
 export default new TeacherRepository();

@@ -11,7 +11,6 @@ class TeacherController {
       const teacher = await addTeacher(req.body);
       res.status(201).json(teacher);
     } catch (error) {
-      console.log('error adding teacher:', error);
       if (error instanceof Error) {
         returnError(res, error);
       }

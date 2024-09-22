@@ -7,7 +7,7 @@ const inputSubjectSchema = yup.object().shape({
     name: yup.string().required(),
     subject_code: yup.string().required(),
     acronym: yup.string().required(),
-    study_plan_year: yup.number().integer().positive().required(),
+    study_plan_id: yup.number().integer().positive().required(),
     associated_coordinator: yup.number().integer().positive().required(),
     index: yup.number().positive().required(),
     frontal_hours: yup.number().positive().required(),

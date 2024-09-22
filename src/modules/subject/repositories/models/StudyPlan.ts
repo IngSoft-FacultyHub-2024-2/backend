@@ -30,7 +30,8 @@ StudyPlan.init({
   },
 }, {
   sequelize,
-  tableName: 'study_plans',
+  modelName: 'StudyPlan',
+  tableName: 'StudyPlans',
 });
 
 StudyPlan.hasMany(Subject, {

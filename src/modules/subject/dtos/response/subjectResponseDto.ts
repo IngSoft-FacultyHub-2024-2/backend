@@ -3,12 +3,15 @@ import { NeedResponseDto, NeedResponseDtoHelper } from './needResponseDto';
 import Subject from "../../repositories/models/Subject";
 import { SubjectEventResponseDto, SubjectEventResponseDtoHelper } from './subjectEventResponseDto';
 import { TeacherResponseDto } from '../../../teacher';
+import StudyPlan from '../../repositories/models/StudyPlan';
+
 export interface SubjectResponseDto {
     id: number;
     name: string;
     subject_code: string;
     acronym: string;
-    study_plan_year: number;
+    study_plan_id: number;
+    study_plan: StudyPlan | null;
     associated_coordinator: TeacherResponseDto | null;
     index: number;
     frontal_hours: number;
@@ -32,7 +35,8 @@ export class SubjectResponseDtoHelper {
       name: subject.name,
       subject_code: subject.subject_code,
       acronym: subject.acronym,
-      study_plan_year: subject.study_plan_year,
+      study_plan: subject.study_plan,
+      study_plan_id: subject.study_plan_id,
       associated_coordinator: teacherDto,
       index: subject.index,
       frontal_hours: subject.frontal_hours,

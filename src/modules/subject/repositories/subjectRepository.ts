@@ -4,14 +4,22 @@ import Need from './models/Need';
 import SubjectEvent from './models/SubjectEvent';
 import Event from './models/Event'; 
 import { Op, Order } from 'sequelize';
+import StudyPlan from './models/StudyPlan';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 
 class SubjectRepository {
   async addSubject(subject: Partial<Subject>) {
+    const studyPlan = await StudyPlan.findByPk(subject.study_plan_id);
+    if (!studyPlan) {
+      throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
+    }
+    subject.study_plan_year = studyPlan.year;
     return await Subject.create(subject, {
     include: [
       { model: HourConfig, as: 'hour_configs' }, 
       { model: Need, as: 'needs' },
-      { model: SubjectEvent, as: 'events' }
+      { model: SubjectEvent, as: 'events' },
+      { model: StudyPlan, as: 'study_plan' }
     ],
     });
   }
@@ -28,7 +36,10 @@ class SubjectRepository {
     filters?: Partial<Subject>,
     sortField?: string
   ) {
-      const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
+      const orderOption = sortField 
+      ? [[sortField, sortOrder]] as Order 
+      : [['study_plan_year', 'DESC']] as Order;
+      
       const searchQuery = search
       ? {
           [Op.or]: [
@@ -52,11 +63,10 @@ class SubjectRepository {
       include: [
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
-        {
-          model: SubjectEvent,
-          as: 'events',
-        },
+        { model: SubjectEvent, as: 'events' },
+        { model: StudyPlan, as: 'study_plan' }
       ],
+      distinct: true 
     });
   }
 
@@ -66,12 +76,12 @@ class SubjectRepository {
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
         {
-          model: SubjectEvent,
-          as: 'events',
+          model: SubjectEvent, as: 'events',
           include: [
             { model: Event, as: 'event' } // Include Event details through SubjectEvent
           ]
         },
+        { model: StudyPlan, as: 'study_plan' }
       ],
     });
   }

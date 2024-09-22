@@ -5,6 +5,7 @@ const router = Router();
 
 router.post('/', teacherController.addTeacher);
 router.get('/', teacherController.getTeachers);
+router.get('/names', teacherController.getAllTeachersNames);
 
 router.get('/benefits', teacherController.getBenefits);
 router.get('/categories', teacherController.getCategories);

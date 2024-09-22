@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan, updateSubject } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
@@ -10,6 +10,7 @@ import studyPlanRepository from '../../src/modules/subject/repositories/studyPla
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
   addSubject: jest.fn(), getSubjects: jest.fn(), getSubjectById: jest.fn(),
+  updateSubject: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto');
 jest.mock('../../src/modules/teacher/', () => ({
@@ -192,6 +193,39 @@ describe('getSubjectById', () => {
     // Act & Assert
     await expect(getSubjectById(999)).rejects.toThrow(ResourceNotFound);
     expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(999);
+  });
+});
+
+
+describe('updateSubject', () => {
+  const mockSubjectDtoToUpdate: SubjectRequestDto = {
+    id: 1,
+    name: 'Mathematics',
+    subject_code: 'MATH101',
+    associated_coordinator: 1,
+    acronym: 'MATH',
+    study_plan_id: 1,
+    index: 1,
+    needs_notes: "",
+    frontal_hours: 30,
+    valid: true,
+    events: [{ event_id: 1, description: 'Introduction to Mathematics' }],
+  };
+
+  const coordinator = { id: 1, name: 'John Doe' };
+
+  beforeEach(() => {
+    (subjectRepository.updateSubject as jest.Mock).mockResolvedValue(mockSubjectDtoToUpdate);
+    (getTeacherById as jest.Mock).mockResolvedValue(coordinator);
+  });
+
+  it('should update the subject and return the correct response', async () => {
+    const result = await updateSubject(1, mockSubjectDtoToUpdate);
+
+    expect(SubjectRequestDtoHelper.toModel).toHaveBeenCalledWith(mockSubjectDtoToUpdate);
+    expect(subjectRepository.updateSubject).toHaveBeenCalledWith(1, mockSubjectDtoToUpdate);
+    expect(getTeacherById).toHaveBeenCalledWith(mockSubjectDtoToUpdate.associated_coordinator);
+    expect(removeUndefinedAndEmptyArrays(result)).toEqual({...mockSubjectDtoToUpdate, associated_coordinator: coordinator});
   });
 });
 

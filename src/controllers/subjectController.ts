@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById, updateSubject } from '../modules/subject';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
@@ -34,7 +34,19 @@ class SubjectController {
 
   getSubject = async (req: Request, res: Response) => {
     try {
-      const subject = await getSubjectById(parseInt(req.params.id));
+      const subject = await getSubjectById(parseInt(req.params.id), true);
+      res.status(200).json(subject);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  updateSubject = async (req: Request, res: Response) => {
+    try {
+      await inputSubjectSchema.validate(req.body)
+      const subject = await updateSubject(parseInt(req.params.id), req.body);
       res.status(200).json(subject);
     } catch (error) {
       if (error instanceof Error) {

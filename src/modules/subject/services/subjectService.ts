@@ -43,3 +43,12 @@ export async function getSubjectById(id: number, includeOtherInfo: boolean = fal
   return SubjectResponseDtoHelper.fromModel(subject, coordinator);
 }
 
+export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
+  const subject: Partial<Subject> = SubjectRequestDtoHelper.toModel(subjectDto);
+  let coordinator = await getTeacherById(subjectDto.associated_coordinator);
+  const updatedSubject = await subjectRepository.updateSubject(id, subject);
+  if (!updatedSubject) {
+    throw new ResourceNotFound(`Materia con id ${id} no existe, por lo cual no se puede actualizar`);
+  }
+  return SubjectResponseDtoHelper.fromModel(updatedSubject, coordinator);
+}

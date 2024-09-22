@@ -67,8 +67,7 @@ class SubjectRepository {
         { model: Need, as: 'needs' },
         { model: SubjectEvent, as: 'events' },
         { model: StudyPlan, as: 'study_plan' }
-      ],
-      distinct: true 
+      ]
     });
   }
 

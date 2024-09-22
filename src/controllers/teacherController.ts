@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import { addTeacher, getTeachers, getBenefits, getCategories, getAllTeachersNames } from '../modules/teacher';
+import { addTeacher, dismissTeacher, getAllTeachersNames, getBenefits, getCategories, getTeacherById, getTeachers, temporaryDismissTeacher } from '../modules/teacher';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
-import { extractParameters } from '../shared/utils/queryParamsHelper';
+import inputTemporaryDismisssSchema from './validationSchemas/teacherSchemas/inputTemporaryDismisssSchema';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
@@ -11,19 +11,55 @@ class TeacherController {
       const teacher = await addTeacher(req.body);
       res.status(201).json(teacher);
     } catch (error) {
-      console.log('error adding teacher:', error);
       if (error instanceof Error) {
         returnError(res, error);
       }
     }
   }
 
-  async getTeachers(req: Request, res: Response) {
+  async getTeacherById(req: Request, res: Response) {
     try {
-      const queryParams = req.query;
-      const {filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const teachers = await getTeachers(filters, search, sortField, sortOrder, page, pageSize);
-      res.status(200).json(teachers);
+      const teacherId = parseInt(req.params.id);
+      const teacher = await getTeacherById(teacherId);
+      res.status(200).json(teacher);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async dismissTeacher(req: Request, res: Response) {
+    try {
+      const teacherId = parseInt(req.params.id);
+      await dismissTeacher(teacherId);
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async temporaryDismissTeacher(req: Request, res: Response) {
+    try {
+      await inputTemporaryDismisssSchema.validate(req.body);
+      const teacherId = parseInt(req.params.id);
+      const retentionDate = req.body.retentionDate;
+      temporaryDismissTeacher(teacherId, retentionDate);
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getTeachers(req: any, res: Response) { 
+    try {
+      const { search, state, sortField, sortOrder, page, pageSize } = req.query;
+      const teachersResponse = await getTeachers(search, state, sortField, sortOrder, page, pageSize);
+      res.status(200).json(teachersResponse); 
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

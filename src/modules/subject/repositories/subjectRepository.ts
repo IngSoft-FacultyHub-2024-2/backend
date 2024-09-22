@@ -61,13 +61,13 @@ class SubjectRepository {
       order: orderOption,
       limit,
       offset,
+      distinct: true,
       include: [
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
         { model: SubjectEvent, as: 'events' },
         { model: StudyPlan, as: 'study_plan' }
-      ],
-      distinct: true 
+      ]
     });
   }
 

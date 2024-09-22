@@ -12,6 +12,7 @@ import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
 import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
 import TeacherSubjectGroup from './TeacherSubjectGroup';
 import TeacherAvailableModule from './TeacherAvailableModules';
+import { TeacherStates } from '../../../../shared/utils/teacherStates';
 
 class Teacher extends Model {
   public id!: number;
@@ -26,7 +27,8 @@ class Teacher extends Model {
   public linkedin_link!: string | null;
   public graduated!: boolean;
   public notes!: string | null;
-  public state!: 'activo' | 'baja temporal' | 'baja';
+  public state!: TeacherStates;
+  public retentionDate!: Date | null;
   public unsubscribe_risk!: number;
   public prizes!: Prize[];
   public caes_courses!: CaesCourse[];
@@ -108,9 +110,13 @@ Teacher.init({
     allowNull: true,
   },
   state: {
-    type: DataTypes.ENUM('activo', 'baja temporal', 'baja'),
+    type: DataTypes.ENUM(TeacherStates.ACTIVE, TeacherStates.TEMPORARY_LEAVE, TeacherStates.INACTIVE),
     allowNull: false,
     defaultValue: 'activo',
+  },
+  retentionDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
   unsusbribe_risk: {
     type: DataTypes.INTEGER,
@@ -122,6 +128,7 @@ Teacher.init({
   modelName: 'Teacher',
   tableName: 'Teachers',
   timestamps: true,
+  paranoid: true,
 });
 
 Teacher.hasMany(Prize, {
@@ -183,6 +190,7 @@ TeacherCategory.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
 //   foreignKey: 'benefit_id',
 //   otherKey: 'teacher_id'
 // })
+
 Teacher.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'teacher_id'});
 TeacherBenefit.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
 // Benefit.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'benefit_id'});
@@ -222,7 +230,7 @@ TeacherSubjectGroup.belongsToMany(Teacher, {
 });
 // Teacher.hasMany(TeacherSubjectGroupMember, {as: 'teacher_subject_group_members'});
 // TeacherSubjectGroupMember.belongsTo(Teacher);
-// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember);
+// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember, {onDelete: 'CASCADE',foreignKey: 'teacher_subject_group_id'});
 // TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup);
 
 Teacher.hasMany(TeacherAvailableModule, {

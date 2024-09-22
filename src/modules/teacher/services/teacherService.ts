@@ -6,26 +6,31 @@ import Category from "../repositories/models/Category";
 import { TeacherResponseDto, TeacherResponseDtoHelper } from "../dtos/response/teacherResponseDto";
 import { getSubjectById } from "../../subject";
 import { TeacherSubjectHistoryResponseDto, TeacherSubjectHistoryResponseDtoHelper } from "../dtos/response/teacherSubjectHistoryResponseDto";
+import { TeacherStates } from "../../../shared/utils/teacherStates";
+import { teacherCoordinatorSubjects } from "../../subject";
 
 export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
 }
 
 export async function getTeachers(
-  filters?: Partial<Teacher>,
-  search?: string | undefined,
+  search?: string, 
+  state?: TeacherStates,
   sortField?: string,
-  sortOrder?: 'ASC' | 'DESC',
+  sortOrder: 'ASC' | 'DESC' = 'ASC',
   page: number = 1,
   pageSize: number = 10
 ) {
   const offset = (page - 1) * pageSize;
   const limit = pageSize;
-  const teacherRows = await teacherRepository.getTeachers(limit, offset, sortOrder, search, filters, sortField);
+
+  const teacherRows = await teacherRepository.getTeachers( limit, offset, sortOrder, sortField, search, state);
 
   const totalPages = Math.ceil(teacherRows.count / pageSize);
   const teachers = teacherRows.rows;
+  
   let teachersDto: TeacherResponseDto[] = []
+
   for (const teacher of teachers) {
     // add the associated subjects to the teacher
     let subjectsHistory: TeacherSubjectHistoryResponseDto[] = await Promise.all(teacher.subjects_history.map(async subjectsHistory => (TeacherSubjectHistoryResponseDtoHelper.fromModel(subjectsHistory, await getSubjectById(subjectsHistory.subject_id)))));
@@ -38,7 +43,7 @@ export async function getTeachers(
 export async function getTeacherById(id: number, includeOtherInfo: boolean = false) {
   let teacher = await teacherRepository.getTeacherById(id)
   if (!teacher) {
-    throw new ResourceNotFound(`Teacher with ID ${id} not found`);
+    throw new ResourceNotFound(`El docente con ID ${id} no existe`);
   }
   let teacherDto: TeacherResponseDto;
   if (includeOtherInfo) {
@@ -56,10 +61,35 @@ export async function getAllTeachersNames() {
     return teacherNames;
   }
 
+export async function dismissTeacher(id: number) {
+
+  const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
+
+  if (coordinatorSubjects.length > 0) {
+    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
+  }
+
+  await teacherRepository.deleteTeacherSubjectGroups(id); 
+
+  await teacherRepository.dismissTeacher(id);
+}
+
+export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
+  const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
+
+  if(coordinatorSubjects.length > 0){
+    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
+  }
+
+  await teacherRepository.deleteTeacherSubjectGroups(id);
+
+  await teacherRepository.temporaryDismissTeacher(id, retentionDate);
+}
+
 export async function getBenefits() {
-  return await Benefit.findAll();
+  return await teacherRepository.getAllBenefits();
 }
 
 export async function getCategories() {
-  return await Category.findAll();
+  return await teacherRepository.getAllCategories();
 }

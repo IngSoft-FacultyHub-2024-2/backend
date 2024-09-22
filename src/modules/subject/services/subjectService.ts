@@ -53,8 +53,8 @@ export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
   return SubjectResponseDtoHelper.fromModel(updatedSubject, coordinator);
 }
 
-export async function teacherIsCoordinator(id: number) {
-  const isCoordinator = await Subject.findOne({ where: { associated_coordinator: id } });
-  return !!isCoordinator;
+export async function teacherCoordinatorSubjects(id: number) {
+  const coordinatorSubjects = await Subject.findAll({ where: { associated_coordinator: id } });
+  return coordinatorSubjects;
 }
 

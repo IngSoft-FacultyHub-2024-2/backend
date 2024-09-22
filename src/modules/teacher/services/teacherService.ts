@@ -7,7 +7,7 @@ import { TeacherResponseDto, TeacherResponseDtoHelper } from "../dtos/response/t
 import { getSubjectById } from "../../subject";
 import { TeacherSubjectHistoryResponseDto, TeacherSubjectHistoryResponseDtoHelper } from "../dtos/response/teacherSubjectHistoryResponseDto";
 import { TeacherStates } from "../../../shared/utils/teacherStates";
-import { teacherIsCoordinator } from "../../subject";
+import { teacherCoordinatorSubjects } from "../../subject";
 
 export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)
@@ -62,22 +62,23 @@ export async function getAllTeachersNames() {
   }
 
 export async function dismissTeacher(id: number) {
-  const isCoordinator =  await teacherIsCoordinator(id);
 
-  if (isCoordinator) {
-    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja');
+  const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
+
+  if (!!coordinatorSubjects) {
+    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
   }
 
-  await teacherRepository.deleteTeacherSubjectGroups(id);
+  await teacherRepository.deleteTeacherSubjectGroups(id);  console.log('id', id);
 
   return await teacherRepository.dismissTeacher(id);
 }
 
 export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
-  const isCoordinator =  await teacherIsCoordinator(id);
+  const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
 
-  if (isCoordinator) {
-    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja');
+  if (!!coordinatorSubjects) {
+    throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);

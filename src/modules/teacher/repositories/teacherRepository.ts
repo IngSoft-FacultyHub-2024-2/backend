@@ -158,20 +158,47 @@ class TeacherRepository {
   }
   
   async dismissTeacher(id: number) {
-    Teacher.update({ state: TeacherStates.INACTIVE }, { where: { id } });
-
-    return await Teacher.destroy({ where: { id } });
+    const transaction = await sequelize.transaction();
+  
+    try {
+      // Actualizar el estado del profesor a 'INACTIVE'
+      await Teacher.update(
+        { state: TeacherStates.INACTIVE },
+        { where: { id }, transaction }
+      );
+      // Eliminar el registro del profesor
+      const deletedTeacherCount = await Teacher.destroy({
+        where: { id },
+        transaction,
+      });
+      console.log(`Se eliminaron ${deletedTeacherCount} registros de profesores`);
+  
+      // Confirmar la transacción
+      await transaction.commit();
+    } catch (error) {
+      // Si algo sale mal, revertir la transacción
+      await transaction.rollback();
+      throw error; // Propagar el error para que el controlador o el manejador de errores lo gestione
+    }
   }
 
-  async temporaryDismissTeacher(id: number, retentionDate: Date) {
-   Teacher.update({ state: TeacherStates.TEMPORARY_LEAVE, retentionDate }, { where: { id } });
-
-    return await Teacher.findByPk(id);
+  temporaryDismissTeacher(id: number, retentionDate: Date) {
+    Teacher.update({ state: TeacherStates.TEMPORARY_LEAVE, retentionDate }, { where: { id } });
   }
 
   async deleteTeacherSubjectGroups(id: number) {
+
     const groupsWhereIsMember = await TeacherSubjectGroupMember.findAll({ where: { teacher_id: id } });
+    if (groupsWhereIsMember.length === 0) {
+      return;
+    }
     const groupIds: number[] = groupsWhereIsMember.map(group => group.teacher_subject_group_id);
+    if (groupIds.length === 0) {
+      return;
+    }
+
+    // Eliminar asociaciones del docente con los grupos
+    await TeacherSubjectGroupMember.destroy({ where: { teacher_subject_group_id: groupIds } });
 
     // Eliminar grupos donde el docente es miembro
     await TeacherSubjectGroup.destroy({ where: { id: groupIds } });

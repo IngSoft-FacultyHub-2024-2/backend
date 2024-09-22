@@ -172,13 +172,12 @@ describe('Teacher Service', () => {
       const mockTeacher = { id: 1, name: "John", surname: 'Doe' };
       (teacherRepository.dismissTeacher as jest.Mock).mockResolvedValue(mockTeacher);
       (teacherRepository.deleteTeacherSubjectGroups as jest.Mock).mockResolvedValue(null);
-      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(null);
+      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
 
       const result = await dismissTeacher(1);
 
       expect(teacherRepository.dismissTeacher).toHaveBeenCalledWith(1);
       expect(teacherRepository.deleteTeacherSubjectGroups).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockTeacher);
     });
 
     it('should throw an error if teacher is a coordinator', async () => {
@@ -191,7 +190,7 @@ describe('Teacher Service', () => {
 
     it('should throw an error if repository fails', async () => {
       const mockError = new Error('Failed to dismiss teacher');
-      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(null);
+      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
       (teacherRepository.dismissTeacher as jest.Mock).mockRejectedValue(mockError);
 
       await expect(dismissTeacher(1)).rejects.toThrow('Failed to dismiss teacher');
@@ -208,13 +207,12 @@ describe('Teacher Service', () => {
       const mockTeacher = { id: 1, name: "John", surname: 'Doe' };
       (teacherRepository.temporaryDismissTeacher as jest.Mock).mockResolvedValue(mockTeacher);
       (teacherRepository.deleteTeacherSubjectGroups as jest.Mock).mockResolvedValue(null);
-      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(null);
+      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
 
       const result = await temporaryDismissTeacher(1, new Date());
 
       expect(teacherRepository.temporaryDismissTeacher).toHaveBeenCalledWith(1, expect.any(Date));
       expect(teacherRepository.deleteTeacherSubjectGroups).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockTeacher);
     });
 
     it('should throw an error if teacher is a coordinator', async () => {
@@ -227,7 +225,7 @@ describe('Teacher Service', () => {
 
     it('should throw an error if repository fails', async () => {
       const mockError = new Error('Failed to temporarily dismiss teacher');
-      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(null);
+      (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
       (teacherRepository.temporaryDismissTeacher as jest.Mock).mockRejectedValue(mockError);
 
       await expect(temporaryDismissTeacher(1, new Date())).rejects.toThrow('Failed to temporarily dismiss teacher');

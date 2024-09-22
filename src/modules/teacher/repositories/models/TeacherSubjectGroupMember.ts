@@ -39,7 +39,6 @@ TeacherSubjectGroupMember.init({
       key: 'id'
     },
     field: 'teacher_subject_group_id',
-    onDelete: 'CASCADE',
   },
   role: {
     type: DataTypes.ENUM(TeacherRoles.TECHNOLOGY, TeacherRoles.THEORY),

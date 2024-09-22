@@ -12,7 +12,7 @@ router.get('/categories', teacherController.getCategories);
 
 router.get('/:id', teacherController.getTeacherById);
 router.delete('/:id', teacherController.dismissTeacher);
-router.patch('/:id', teacherController.temporaryDismissTeacher);
+router.patch('/:id/temporary-dismiss', teacherController.temporaryDismissTeacher);
 
 
 export default router;

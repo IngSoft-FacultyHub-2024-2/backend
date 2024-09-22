@@ -204,7 +204,7 @@ describe('TeacherController', () => {
     });
 
     it('should dismiss a teacher successfully', async () => {
-      (dismissTeacher as jest.Mock).mockResolvedValue({ id: 1, ...teacherBody });
+      (dismissTeacher as jest.Mock).mockResolvedValue(undefined);
 
       await teacherController.dismissTeacher(req as Request, res as Response);
 

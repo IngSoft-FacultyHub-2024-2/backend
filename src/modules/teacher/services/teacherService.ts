@@ -65,25 +65,25 @@ export async function dismissTeacher(id: number) {
 
   const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
 
-  if (!!coordinatorSubjects) {
+  if (coordinatorSubjects.length > 0) {
     throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
   }
 
-  await teacherRepository.deleteTeacherSubjectGroups(id);  console.log('id', id);
+  await teacherRepository.deleteTeacherSubjectGroups(id); 
 
-  return await teacherRepository.dismissTeacher(id);
+  await teacherRepository.dismissTeacher(id);
 }
 
 export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   const coordinatorSubjects =  await teacherCoordinatorSubjects(id);
 
-  if (!!coordinatorSubjects) {
+  if(coordinatorSubjects.length > 0){
     throw new Error('Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' + coordinatorSubjects.map(subject => subject.name).join(', '));
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
-  return await teacherRepository.temporaryDismissTeacher(id, retentionDate);
+  await teacherRepository.temporaryDismissTeacher(id, retentionDate);
 }
 
 export async function getBenefits() {

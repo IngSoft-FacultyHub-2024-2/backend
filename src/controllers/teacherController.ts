@@ -32,8 +32,8 @@ class TeacherController {
   async dismissTeacher(req: Request, res: Response) {
     try {
       const teacherId = parseInt(req.params.id);
-      const teacher = await dismissTeacher(teacherId);
-      res.status(204).send(teacher);
+      await dismissTeacher(teacherId);
+      res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);
@@ -46,8 +46,8 @@ class TeacherController {
       await inputTemporaryDismisssSchema.validate(req.body);
       const teacherId = parseInt(req.params.id);
       const retentionDate = req.body.retentionDate;
-      const teacher = await temporaryDismissTeacher(teacherId, retentionDate);
-      res.status(200).send(teacher);
+      temporaryDismissTeacher(teacherId, retentionDate);
+      res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);
@@ -55,12 +55,11 @@ class TeacherController {
     }
   }
 
-  async getTeachers(req: any, res: Response) {
+  async getTeachers(req: any, res: Response) { 
     try {
       const { search, state, sortField, sortOrder, page, pageSize } = req.query;
       const teachersResponse = await getTeachers(search, state, sortField, sortOrder, page, pageSize);
-
-      res.status(200).json(teachersResponse);
+      res.status(200).json(teachersResponse); 
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

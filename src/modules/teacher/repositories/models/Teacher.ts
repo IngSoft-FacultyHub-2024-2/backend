@@ -230,7 +230,7 @@ TeacherSubjectGroup.belongsToMany(Teacher, {
 });
 // Teacher.hasMany(TeacherSubjectGroupMember, {as: 'teacher_subject_group_members'});
 // TeacherSubjectGroupMember.belongsTo(Teacher);
-// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember);
+// TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember, {onDelete: 'CASCADE',foreignKey: 'teacher_subject_group_id'});
 // TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup);
 
 Teacher.hasMany(TeacherAvailableModule, {

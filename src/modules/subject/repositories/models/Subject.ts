@@ -12,7 +12,6 @@ class Subject extends Model {
   public name!: string;
   public subject_code!: string;
   public acronym!: string; 
-  // Needed to add the field study_plan_year to the model for the sorting by study plan to work
   public study_plan_year!: number;
   public study_plan_id!: number;
   public associated_coordinator!: number;

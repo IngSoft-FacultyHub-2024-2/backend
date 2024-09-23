@@ -38,7 +38,7 @@ class SubjectRepository {
     sortField?: string
   ) {
       const orderOption = sortField 
-      ? [[sortField, sortOrder]] as Order 
+      ? [[sortField, sortOrder]] as Order
       : [['study_plan_year', 'DESC']] as Order;
       
       const searchQuery = search

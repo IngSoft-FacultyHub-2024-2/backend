@@ -86,6 +86,10 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
 }
 
+export async function updateTeacher(id: number, teacher: Partial<Teacher>) {
+  return await teacherRepository.updateTeacher(id, teacher);
+}
+
 export async function getBenefits() {
   return await teacherRepository.getAllBenefits();
 }

@@ -2,9 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Subjects', 'study_plan_year');
-    
+  async up (queryInterface, Sequelize) {    
     await queryInterface.addColumn('Subjects', 'study_plan_id', {
       type: Sequelize.INTEGER,
       allowNull: true, // Allow NULL initially
@@ -29,6 +27,10 @@ module.exports = {
       UPDATE "Subjects"
       SET "study_plan_id" = ${studyPlanId}
       WHERE "study_plan_id" IS NULL;
+
+      UPDATE "Subjects"
+      SET "study_plan_id" = 2024
+      WHERE "study_plan_id" IS NULL;
     `);
 
     // Step 4: Alter the column to NOT NULL after the update
@@ -42,13 +44,27 @@ module.exports = {
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT',
     });
-
-    // Step 5: Remove the old study_plan_year column
-    await queryInterface.removeColumn('Subjects', 'study_plan_year');
   },
 
   async down (queryInterface, Sequelize) {
-    // Reverse the changes: Add back study_plan_year and remove study_plan_id
+    // Step 1: Change the column to allow NULL again (reverse the NOT NULL constraint)
+    await queryInterface.changeColumn('Subjects', 'study_plan_id', {
+      type: Sequelize.INTEGER,
+      allowNull: true,  // Allow NULL again
+      references: {
+        model: 'StudyPlans',
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
+    });
+
+    // Step 2: Optionally, remove the study plan record that was inserted during the 'up' migration
+    await queryInterface.sequelize.query(`
+      DELETE FROM "StudyPlans" WHERE year = 2024;
+    `);
+
+    // Step 3: Remove the study_plan_id column from the Subjects table
     await queryInterface.removeColumn('Subjects', 'study_plan_id');
   }
 };

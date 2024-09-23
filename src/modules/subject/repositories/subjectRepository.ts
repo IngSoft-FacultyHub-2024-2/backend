@@ -63,7 +63,7 @@ class SubjectRepository {
       limit,
       offset,
       distinct: true,
-      paranoid: !withDeleted,
+      paranoid: withDeleted,
       include: [
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
@@ -150,12 +150,15 @@ class SubjectRepository {
   }
 
   async deleteSubject(id: number) {
-    const subject = await Subject.findByPk(id);    
+    const subject = await Subject.findByPk(id, {
+      include: [
+        { model: HourConfig, as: 'hour_configs' }, 
+      ]
+    });
     
     if (!subject) {
       throw new ResourceNotFound(`No existe la materia con id ${id}`);
     }
-    
     subject?.update({ valid: false });
 
     await subject.destroy();

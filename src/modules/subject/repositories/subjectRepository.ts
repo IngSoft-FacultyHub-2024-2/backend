@@ -37,10 +37,9 @@ class SubjectRepository {
     filters?: Partial<Subject>,
     sortField?: string
   ) {
-      // const orderOption = sortField 
-      // ? [[sortField, sortOrder]] as Order
-      // : [['study_plan_year', 'DESC']] as Order;
-      const orderOption = [[sortField, sortOrder]] as Order;
+      const orderOption = sortField 
+      ? [[sortField, sortOrder]] as Order
+      : [['study_plan_year', 'DESC']] as Order;
       
       const searchQuery = search
       ? {

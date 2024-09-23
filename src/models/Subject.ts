@@ -7,7 +7,7 @@ class Subject extends Model {
   public id!: number;
   public name!: string | null;
   public subject_code!: string | null;
-  public study_plan_year!: number | null;
+  // public study_plan_year!: number | null;
   public associated_coordinator!: number;
   public index!: number | null;
   public frontal_hours!: number | null;
@@ -39,10 +39,10 @@ Subject.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
-  study_plan_year: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+  // study_plan_year: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: false,
+  // },
   associated_coordinator: {
     type: DataTypes.INTEGER,
     allowNull: false,

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 import teacherController from '../../src/controllers/teacherController';
-import { getTeachers, addTeacher, getBenefits, getCategories, getAllTeachersNames, dismissTeacher } from '../../src/modules/teacher';
+import { getTeachers, addTeacher, getBenefits, getCategories, getAllTeachersNames, dismissTeacher, updateTeacher } from '../../src/modules/teacher';
 
 jest.mock('../../src/modules/teacher');
 jest.mock('../../src/modules/subject');
@@ -225,12 +225,49 @@ describe('TeacherController', () => {
     });
   });
 
-  describe('getBenefits', () => {
+  describe('updateTeacher', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;
 
+    beforeEach(() => {
+      req = { params: { id: "1" }, body: teacherBody };
+      statusMock = jest.fn().mockReturnThis();
+      jsonMock = jest.fn();
+      res = { status: statusMock, json: jsonMock };
+      jest.clearAllMocks(); // Limpia todos los mocks antes de cada prueba
+    });
+
+    it('should update a teacher successfully', async () => {
+      const updatedTeacher = { ...teacherBody };
+      (updateTeacher as jest.Mock).mockResolvedValue(updatedTeacher);
+
+      await teacherController.updateTeacher(req as Request, res as Response);
+
+      expect(updateTeacher).toHaveBeenCalledWith(1, updatedTeacher);
+      expect(statusMock).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith(updatedTeacher);
+    });
+
+    it('should handle errors when updating a teacher fails', async () => {
+      const error = new Error('Something went wrong');
+      (updateTeacher as jest.Mock).mockImplementation(() => {
+        throw error;
+      });
+
+      await teacherController.updateTeacher(req as Request, res as Response);
+
+      expect(updateTeacher).toHaveBeenCalledWith(1, teacherBody);
+      expect(returnError).toHaveBeenCalledWith(res, error);
+    });
+  });
+
+  describe('getBenefits', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let statusMock: jest.Mock;
+    let jsonMock: jest.Mock;
     beforeEach(() => {
       req = { query: {} };
       statusMock = jest.fn().mockReturnThis();

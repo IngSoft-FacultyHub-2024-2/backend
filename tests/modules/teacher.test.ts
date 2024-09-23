@@ -1,4 +1,4 @@
-import { addTeacher, getTeachers, getTeacherById, getBenefits, getCategories, getAllTeachersNames, dismissTeacher, temporaryDismissTeacher } from '../../src/modules/teacher/services/teacherService';
+import { addTeacher, getTeachers, getTeacherById, getBenefits, getCategories, getAllTeachersNames, dismissTeacher, temporaryDismissTeacher, updateTeacher } from '../../src/modules/teacher/services/teacherService';
 import teacherRepository from '../../src/modules/teacher/repositories/teacherRepository';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../src/modules/subject';
@@ -154,9 +154,9 @@ describe('Teacher Service', () => {
     it('should return all teachers names', async () => {
       const teachers = [{ id: 1, name: 'John', surname: 'Doe' }, { id: 1, name: 'Jane', surname: 'Smith' }];
       (teacherRepository.getAllTeachersNames as jest.Mock).mockResolvedValue(teachers);
-  
+
       const result = await getAllTeachersNames();
-  
+
       expect(result).toEqual(teachers);
       expect(teacherRepository.getAllTeachersNames).toHaveBeenCalled();
     });
@@ -233,11 +233,33 @@ describe('Teacher Service', () => {
     });
   });
 
+  describe('updateTeacher', () => {
+    const mockTeacher = { id: 1, name: "John", surname: 'Doe' };
+    const mockUpdatedTeacher = { id: 1, name: "Jane", surname: 'Smith' };
+    
+    it('should update a teacher', async () => {
+      (teacherRepository.updateTeacher as jest.Mock).mockResolvedValue(mockUpdatedTeacher);
+
+      const result = await updateTeacher(1, mockTeacher);
+
+      expect(teacherRepository.updateTeacher).toHaveBeenCalledWith(1, mockTeacher);
+      expect(result).toEqual(mockUpdatedTeacher);
+    });
+
+    it('should throw an error if repository fails', async () => {
+      const mockError = new Error('Failed to update teacher');
+      (teacherRepository.updateTeacher as jest.Mock).mockRejectedValue(mockError);
+
+      await expect(updateTeacher(1, mockUpdatedTeacher)).rejects.toThrow('Failed to update teacher');
+      expect(teacherRepository.updateTeacher).toHaveBeenCalledWith(1, expect.any(Object));
+    });
+  });
+
   // Test for getBenefits function
   describe('getBenefits', () => {
     it('should return a list of all benefits', async () => {
       const mockBenefits = [{ id: 1, name: 'Health Insurance' }, { id: 2, name: 'Pension Plan' }];
-      (teacherRepository.getAllBenefits  as jest.Mock).mockResolvedValue(mockBenefits);
+      (teacherRepository.getAllBenefits as jest.Mock).mockResolvedValue(mockBenefits);
 
       const result = await getBenefits();
 

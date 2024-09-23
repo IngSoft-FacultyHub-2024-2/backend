@@ -15,6 +15,7 @@ import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
 import TeacherSubjectHistory from "./models/TeacherSubjectHistory";
 import { Op } from "sequelize";
 import { TeacherStates } from "../../../shared/utils/teacherStates";
+import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -141,6 +142,7 @@ class TeacherRepository {
 
   async getTeacherById(id: number) {
     return await Teacher.findByPk(id, {
+      paranoid: false,
       include: [
         { model: CaesCourse, as: 'caes_courses' },
         { model: Contact, as: 'contacts' },
@@ -204,6 +206,44 @@ class TeacherRepository {
     await TeacherSubjectGroup.destroy({ where: { id: groupIds } });
 
   }
+
+  async updateTeacher(teacherId: number, teacherData: Partial<Teacher>) {
+    const transaction = await sequelize.transaction();
+    try {
+      // Extraer subjects_of_interest y otros datos del teacherData
+      const { subjects_of_interest = [], teacher_subject_groups = [] } = teacherData;
+  
+      // Actualizar el Teacher y sus asociaciones directas
+      const [updatedTeacher] = await Teacher.update(teacherData, {
+        where: { id: teacherId },
+        paranoid: false,
+        returning: true, // Para obtener el registro actualizado
+        transaction,
+      });
+  
+      // Si no se encontró el teacher, lanzar un error
+      if (!updatedTeacher) {
+        throw new ResourceNotFound(`Teacher with id ${teacherId} not found`);
+      }
+  
+      // Actualizar las asociaciones
+      // Suponiendo que tienes métodos para manejar las asociaciones
+      await this.associateSubjectsOfInterest(teacherId, subjects_of_interest, transaction);
+      await this.associateTeacherSubjectGroups(teacherId, teacher_subject_groups, transaction);
+  
+      // Confirmar la transacción
+      await transaction.commit();
+  
+      return this.getTeacherById(teacherId);
+    } catch (error) {
+      console.error('Ha ocurrido un error al actualizar un docente:', error);
+  
+      // Realizar un rollback en caso de error
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  
 
   async getAllCategories() {
     return await Category.findAll();

@@ -13,6 +13,7 @@ router.get('/categories', teacherController.getCategories);
 router.get('/:id', teacherController.getTeacherById);
 router.delete('/:id', teacherController.dismissTeacher);
 router.patch('/:id/temporary-dismiss', teacherController.temporaryDismissTeacher);
+router.put('/:id', teacherController.updateTeacher);
 
 
 export default router;

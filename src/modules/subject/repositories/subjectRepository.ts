@@ -97,6 +97,7 @@ class SubjectRepository {
     }
     subject.study_plan_year = studyPlan.year;
     const existingSubject = await Subject.findByPk(id, {
+      paranoid: false,
       include: [{ model: HourConfig, as: 'hour_configs' }]
     });
     if (!existingSubject) {

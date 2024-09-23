@@ -33,6 +33,7 @@ class SubjectRepository {
     limit: number,
     offset: number,
     sortOrder: 'ASC' | 'DESC' = 'DESC',
+    withDeleted: boolean = false,
     search?: string,
     filters?: Partial<Subject>,
     sortField?: string
@@ -62,6 +63,7 @@ class SubjectRepository {
       limit,
       offset,
       distinct: true,
+      paranoid: withDeleted,
       include: [
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
@@ -73,6 +75,7 @@ class SubjectRepository {
 
   async getSubjectById(id: number) {
     return await Subject.findByPk(id, {
+      paranoid: false,
       include: [
         { model: HourConfig, as: 'hour_configs' }, 
         { model: Need, as: 'needs' },
@@ -144,6 +147,23 @@ class SubjectRepository {
       }));
       await SubjectEvent.bulkCreate(newEvents);
     }
+  }
+
+  async deleteSubject(id: number) {
+    const subject = await Subject.findByPk(id, {
+      include: [
+        { model: HourConfig, as: 'hour_configs' }, 
+      ]
+    });
+    
+    if (!subject) {
+      throw new ResourceNotFound(`No existe la materia con id ${id}`);
+    }
+    subject?.update({ valid: false });
+
+    await subject.destroy();
+
+    return subject;
   }
 
 }

@@ -100,9 +100,10 @@ class TeacherRepository {
     limit: number,
     offset: number,
     sortOrder: string,
+    withDeleted: boolean = false,
     sortField?: string,
     search?: string,
-    state?: TeacherStates
+    state?: TeacherStates,
   ) {
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
     const searchQuery = search
@@ -127,7 +128,7 @@ class TeacherRepository {
       order: orderOption,
       limit,
       offset,
-      paranoid: false,
+      paranoid: withDeleted,
       distinct: true,
       include: [
         { model: CaesCourse, as: 'caes_courses' },

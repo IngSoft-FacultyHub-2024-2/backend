@@ -7,5 +7,6 @@ router.post('/', SubjectController.addSubject);
 router.get('/', SubjectController.getSubjects);
 router.get('/:id', SubjectController.getSubject);
 router.put('/:id', SubjectController.updateSubject);
+router.delete('/:id', SubjectController.deleteSubject);
 
 export default router;

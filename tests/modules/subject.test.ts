@@ -123,7 +123,7 @@ describe('getSubjects', () => {
     const result = await getSubjects({}, search);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(10, 0, undefined, search, {}, undefined);
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(10, 0, undefined, undefined, search, {}, undefined);
     expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual([mockFilteredSubjectDto].map(removeUndefinedAndEmptyArrays));
     expect(result.totalPages).toEqual(1); // Based on count and pageSize
     expect(result.currentPage).toEqual(1);
@@ -147,7 +147,7 @@ describe('getSubjects', () => {
     const result = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
 
     // Assert
-    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(pageSize, (page - 1) * pageSize, sortOrder, search, filters, sortField);
+    expect(subjectRepository.getSubjects).toHaveBeenCalledWith(pageSize, (page - 1) * pageSize, sortOrder, undefined, search, filters, sortField);
     expect(result.subjects.map(removeUndefinedAndEmptyArrays)).toEqual([mockFilteredSubjectDto].map(removeUndefinedAndEmptyArrays));
     expect(result.totalPages).toEqual(1); // Based on count and pageSize
     expect(result.currentPage).toEqual(page);

@@ -118,6 +118,7 @@ Subject.init({
   modelName: 'Subject',
   tableName: 'Subjects',
   timestamps: true,
+  paranoid: true,
   validate: {
     totalHoursEqualHourConfigs(this: Subject) {
       const totalHours = this.getDataValue('index') * this.getDataValue('frontal_hours');

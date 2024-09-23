@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById, updateSubject } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById, updateSubject, deleteSubject } from '../modules/subject';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
@@ -21,8 +21,8 @@ class SubjectController {
   getSubjects = async(req: Request, res: Response) => {
     try {
       const queryParams = req.query;
-      const { filters, search, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const subjects = await getSubjects(filters, search, sortField, sortOrder, page, pageSize);
+      const { filters, search, sortField, sortOrder, page, pageSize, withDeleted } = extractParameters(queryParams);
+      const subjects = await getSubjects(filters, search, sortField, sortOrder, page, pageSize, withDeleted);
       res.status(200).json(subjects);
     } catch (error) {
       if (error instanceof Error) {
@@ -47,6 +47,17 @@ class SubjectController {
       await inputSubjectSchema.validate(req.body)
       const subject = await updateSubject(parseInt(req.params.id), req.body);
       res.status(200).json(subject);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  deleteSubject = async (req: Request, res: Response) => {
+    try {
+      const subject = await deleteSubject(parseInt(req.params.id));
+      res.status(204).json(subject);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

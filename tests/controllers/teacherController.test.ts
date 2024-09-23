@@ -118,7 +118,7 @@ describe('TeacherController', () => {
 
       await teacherController.getTeachers(req as Request, res as Response);
 
-      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined);
+      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
@@ -148,7 +148,7 @@ describe('TeacherController', () => {
 
       await teacherController.getTeachers(req, res as Response);
 
-      expect(getTeachers).toHaveBeenCalledWith('John', 'active', 'name', 'ASC', 1, 10);
+      expect(getTeachers).toHaveBeenCalledWith('John', 'active', 'name', 'ASC', 1, 10, undefined);
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
@@ -161,7 +161,7 @@ describe('TeacherController', () => {
 
       await teacherController.getTeachers(req as Request, res as Response);
 
-      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined);
+      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });

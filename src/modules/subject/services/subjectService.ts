@@ -13,11 +13,11 @@ export async function addSubject(subjectDto: SubjectRequestDto) {
   return SubjectResponseDtoHelper.fromModel(newSubject, coordinator);
 }
 
-export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10) {
+export async function getSubjects(filters?: Partial<Subject>, search?: string, sortField?: string, sortOrder?: 'ASC' | 'DESC', page: number = 1, pageSize: number = 10, withDeleted?: boolean) {
   const offset = (page - 1) * pageSize;
   const limit = pageSize;
 
-  const subjectRows = await subjectRepository.getSubjects(limit, offset, sortOrder, search, filters, sortField);
+  const subjectRows = await subjectRepository.getSubjects(limit, offset, sortOrder, withDeleted, search, filters, sortField);
 
   const totalPages = Math.ceil(subjectRows.count / pageSize);
   const subjects = subjectRows.rows;
@@ -56,5 +56,13 @@ export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
 export async function teacherCoordinatorSubjects(id: number) {
   const coordinatorSubjects = await Subject.findAll({ where: { associated_coordinator: id } });
   return coordinatorSubjects;
+}
+
+export async function deleteSubject(id: number) {
+  const deletedSubject = await subjectRepository.deleteSubject(id);
+  if (!deletedSubject) {
+    throw new ResourceNotFound(`La Materia con ID ${id} no existe`);
+  }
+  return deletedSubject;
 }
 

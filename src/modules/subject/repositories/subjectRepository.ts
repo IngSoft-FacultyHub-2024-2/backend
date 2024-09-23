@@ -14,7 +14,7 @@ class SubjectRepository {
     if (!studyPlan) {
       throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
     }
-    subject.study_plan_id = studyPlan.id;
+    subject.study_plan_year = studyPlan.year;
     return await Subject.create(subject, {
     include: [
       { model: HourConfig, as: 'hour_configs' }, 
@@ -92,7 +92,7 @@ class SubjectRepository {
     if (!studyPlan) {
       throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
     }
-    subject.study_plan_id = studyPlan.id;
+    subject.study_plan_year = studyPlan.year;
     const existingSubject = await Subject.findByPk(id, {
       include: [{ model: HourConfig, as: 'hour_configs' }]
     });

@@ -57,7 +57,7 @@ Subject.init({
     allowNull: false,
   },
   study_plan_year: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   associated_coordinator: {

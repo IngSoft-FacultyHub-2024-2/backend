@@ -28,7 +28,7 @@ app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   try {
     await sequelize.authenticate();
-    sequelize.sync({ force: false }); // create the tables if they do not exist
+    await sequelize.sync({ force: false }); // create the tables if they do not exist
     console.log("Database connected!");
     await initializeDatabase();
   } catch (error) {

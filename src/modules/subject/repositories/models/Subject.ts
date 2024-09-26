@@ -1,4 +1,4 @@
-import { Model, DataTypes, HasMany, BelongsToMany, BelongsTo } from 'sequelize';
+import { Model, DataTypes, HasMany, BelongsToMany, BelongsTo, HasManySetAssociationsMixin } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
 import Event from './Event';
@@ -24,18 +24,21 @@ class Subject extends Model {
   public notes!: string | null;
   public valid!: boolean;
   public hour_configs!: HourConfig[];
-  public needs!: Need[];
   public needs_notes!: string;
   public events!: SubjectEvent[];
-
+  
+  public needs_ids!: number[];
+  public needs!: Need[];
   public study_plan!: StudyPlan;
   
   public static associations: {
     hour_configs: HasMany<Subject, HourConfig>;
-    needs: HasMany<Subject, Need>;
+    needs: BelongsToMany<Subject, Need>;
     events: HasMany<Subject, SubjectEvent>;
     study_plan: BelongsTo<Subject, StudyPlan>;
   };
+
+  public setNeeds!: HasManySetAssociationsMixin<Need, number>;
 }
 
 Subject.init({
@@ -149,16 +152,6 @@ HourConfig.belongsTo(Subject, {
   as: 'subject',
 });
 
-Subject.hasMany(Need, {
-  sourceKey: 'id',
-  foreignKey: 'subject_id',
-  as: 'needs',
-});
-
-Need.belongsTo(Subject, {
-  foreignKey: 'subject_id',
-  as: 'subject',
-});
 
 Subject.hasMany(SubjectEvent, {
   sourceKey: 'id',
@@ -172,5 +165,18 @@ SubjectEvent.belongsTo(Subject, {
   as: 'subject',
 });
 
+Subject.belongsToMany(Need, {
+  through: 'SubjectNeed',  // This is the join table
+  foreignKey: 'subject_id',
+  otherKey: 'need_id',
+  as: 'needs',
+});
+
+Need.belongsToMany(Subject, {
+  through: 'SubjectNeed',  // This is the join table
+  foreignKey: 'need_id',
+  otherKey: 'subject_id',
+  as: 'subjects',
+});
 
 export default Subject;

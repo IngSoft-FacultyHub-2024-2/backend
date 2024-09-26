@@ -17,7 +17,7 @@ const inputSubjectSchema = yup.object().shape({
     notes: yup.string().nullable(),
     valid: yup.boolean().required().default(true),
     hour_configs:  yup.array().of(inputHourConfigSchema).required('La configuración de horas es obligatoria.'),
-    needs: yup.array().of(inputNeedSchema).nullable(),
+    needs_ids: yup.array().of(yup.number()).nullable(), 
     needs_notes: yup.string().nullable(),
     events: yup.array().of(inputSubjectEventSchema).nullable('La materia debe tener al menos un evento'),
 }).test(

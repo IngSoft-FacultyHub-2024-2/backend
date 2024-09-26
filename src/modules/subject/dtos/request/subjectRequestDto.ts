@@ -21,7 +21,7 @@ export interface SubjectRequestDto {
     notes?: string | null;
     valid?: boolean;
     hour_configs?: HourConfigRequestDto[];
-    needs?: NeedRequestDto[];
+    needs_ids?: number[];
     needs_notes: string;
     events?: SubjectEventRequestDto[];
 }
@@ -44,7 +44,7 @@ public static toModel(dto: SubjectRequestDto): Partial<Subject> {
     ...(dto.notes !== undefined && { notes: dto.notes }),
     ...(dto.valid !== undefined && { valid: dto.valid }),
     hour_configs: dto.hour_configs?.map((hc) => HourConfigRequestDtoHelper.toModel(hc) as HourConfig) || [] as HourConfig[],    
-    needs: dto.needs?.map((n) => NeedRequestDtoHelper.toModel(n) as Need) || [] as Need[],
+    needs_ids: dto.needs_ids || [],
     needs_notes: dto.needs_notes,
     events: dto.events?.map((e) => SubjectEventRequestDtoHelper.toModel(e) as SubjectEvent)  || [] as SubjectEvent[],
     };

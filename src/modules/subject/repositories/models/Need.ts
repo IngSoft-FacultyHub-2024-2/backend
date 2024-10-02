@@ -1,14 +1,13 @@
-import { Model, DataTypes, BelongsTo } from 'sequelize';
+import { Model, DataTypes, BelongsToMany } from 'sequelize';
 import sequelize from '../../../../config/database';
 import Subject from './Subject';
 
 class Need extends Model {
   public id!: number;
-  public subject_id!: number;
   public name!: string;
 
   public static associations: {
-    subject: BelongsTo<Need, Subject>;
+    subjects: BelongsToMany<Need, Subject>;
   };
 }
 
@@ -17,14 +16,6 @@ Need.init({
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-  },
-  subject_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Subjects',
-      key: 'id',
-    },
   },
   name: {
     type: DataTypes.STRING,

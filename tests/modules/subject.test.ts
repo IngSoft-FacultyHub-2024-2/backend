@@ -1,11 +1,12 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan, updateSubject } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan, updateSubject, getNeeds, addNeed } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
 import { getTeacherById } from '../../src/modules/teacher';
 import studyPlanRepository from '../../src/modules/subject/repositories/studyPlanRepository';
+import needRepository from '../../src/modules/subject/repositories/needRepository';
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
@@ -25,6 +26,11 @@ jest.mock('../../src/modules/subject/repositories/eventRepository', () => ({
 // Jest mock for studyPlanRepository
 jest.mock('../../src/modules/subject/repositories/studyPlanRepository', () => ({
   getStudyPlans: jest.fn(), addStudyPlan: jest.fn(), 
+}));
+
+// Jest mock for needsRepository
+jest.mock('../../src/modules/subject/repositories/needRepository', () => ({
+  getNeeds: jest.fn(), addNeed: jest.fn(), 
 }));
 
 const removeUndefinedAndEmptyArrays = (obj: any): any => {
@@ -333,5 +339,49 @@ describe('addStudyPlan', () => {
     // Assert
     expect(studyPlanRepository.addStudyPlan).toHaveBeenCalledWith(mockStudyPlan);
     expect(result).toEqual(mockStudyPlan);
+  });
+});
+
+describe('getNeeds', () => {
+  it('retrieves needs successfully', async () => {
+    // Arrange
+    const mockNeeds = [{ id: 1, year: 2024 }, { id: 2,  year: 2018 }];
+    (needRepository.getNeeds as jest.Mock).mockResolvedValue(mockNeeds);
+
+    // Act
+    const result = await getNeeds();
+
+    // Assert
+    expect(needRepository.getNeeds).toHaveBeenCalled();
+    expect(result.map(removeUndefinedAndEmptyArrays)).toEqual(mockNeeds.map(removeUndefinedAndEmptyArrays));
+  });
+
+  it('retrieves needs with filters successfully', async () => {
+    // Arrange
+    const filters = {  name: "whiteboard" };
+    const mockFilteredNeeds = [{ id: 1, name: "whiteboard" }];
+    (needRepository.getNeeds as jest.Mock).mockResolvedValue(mockFilteredNeeds);
+
+    // Act
+    const result = await getNeeds(filters);
+
+    // Assert
+    expect(needRepository.getNeeds).toHaveBeenCalledWith(filters, undefined, undefined, undefined);
+    expect(result).toEqual(mockFilteredNeeds);
+  });
+});
+
+describe('addNeed', () => {
+  it('adds an need successfully', async () => {
+    // Arrange
+    const mockNeed = { id: 1, name: "whiteboard" };
+    (needRepository.addNeed as jest.Mock).mockResolvedValue(mockNeed);
+
+    // Act
+    const result = await addNeed(mockNeed);
+
+    // Assert
+    expect(needRepository.addNeed).toHaveBeenCalledWith(mockNeed);
+    expect(result).toEqual(mockNeed);
   });
 });

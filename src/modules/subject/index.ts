@@ -14,7 +14,7 @@ import { HourConfigResponseDto } from "./dtos/response/hourConfigResponseDto";
 import { NeedResponseDto } from "./dtos/response/needResponseDto";
 import { SubjectEventResponseDto } from './dtos/response/subjectEventResponseDto';
 import { getStudyPlans, addStudyPlan } from './services/studyPlanService';
-
+import { getNeeds, addNeed } from './services/needService';
 export {
     getEvents,
     addEvent,
@@ -31,5 +31,7 @@ export {
     getStudyPlans,
     addStudyPlan,
     updateSubject,
-    deleteSubject
+    deleteSubject,
+    getNeeds, 
+    addNeed
 };

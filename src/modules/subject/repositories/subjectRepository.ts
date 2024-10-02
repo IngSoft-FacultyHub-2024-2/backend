@@ -15,14 +15,20 @@ class SubjectRepository {
       throw new ResourceNotFound(`No existe el Plan de estudios con id ${subject.study_plan_id}`);
     }
     subject.study_plan_year = studyPlan.year;
-    return await Subject.create(subject, {
+    const newSubject = await Subject.create(subject, {
     include: [
       { model: HourConfig, as: 'hour_configs' }, 
-      { model: Need, as: 'needs' },
+      // { model: Need, as: 'needs' },
       { model: SubjectEvent, as: 'events' },
       { model: StudyPlan, as: 'study_plan' }
     ],
     });
+
+    if (newSubject && subject.needs_ids && subject.needs_ids.length > 0) {
+      await newSubject.setNeeds(subject.needs_ids);
+  }
+  const subjectWithNeeds = await newSubject.reload({ include: [{ model: Need, as: 'needs' }] });
+  return subjectWithNeeds;
   }
 
   async addEventToSubject(subject_id: number, event_id: number, description: string) {

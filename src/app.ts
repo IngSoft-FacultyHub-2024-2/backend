@@ -6,7 +6,7 @@ import studyPlanRouter from "./routers/studyPlanRouter";
 import needRouter from "./routers/needRouter";
 import dotenv from 'dotenv';
 import { initializeDatabase } from "./initializingData";
-
+const logger = require('morgan');
 const cors = require('cors');
 
 dotenv.config();
@@ -18,6 +18,7 @@ app.use(cors({
   origin: 'http://localhost:5173', 
 }));
 app.use(express.json());
+app.use(logger('dev'));
 
 app.use("/api/subjects", subjectRouter);
 app.use("/api/events", eventRouter);

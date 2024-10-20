@@ -3,12 +3,13 @@ import { processFile } from '../modules/file-processor/services/fileProcessorSer
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 
 class FileProcessorController {
-
   async processFile(req: any, res: Response) {
     try {
       await processFile(req.file.originalname, req.body.fileType);
 
-      return res.status(200).json({ message: 'File uploaded and processed successfully' });
+      return res
+        .status(200)
+        .json({ message: 'File uploaded and processed successfully' });
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

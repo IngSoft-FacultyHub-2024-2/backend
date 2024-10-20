@@ -1,12 +1,13 @@
-import sequelize from "./config/database";
-import subjectRouter  from "./routers/subjectRouter";
-import eventRouter from "./routers/eventRouter";
-import teacherRouter  from "./routers/teacherRouter";
-import studyPlanRouter from "./routers/studyPlanRouter";
-import needRouter from "./routers/needRouter";
-import moduleRouter from "./routers/moduleRouter";
 import dotenv from 'dotenv';
-import { initializeDatabase } from "./initializingData";
+import sequelize from './config/database';
+import { initializeDatabase } from './initializingData';
+import eventRouter from './routers/eventRouter';
+import fileProcessorRouter from './routers/fileProcessorRouter';
+import moduleRouter from './routers/moduleRouter';
+import needRouter from './routers/needRouter';
+import studyPlanRouter from './routers/studyPlanRouter';
+import subjectRouter from './routers/subjectRouter';
+import teacherRouter from './routers/teacherRouter';
 const logger = require('morgan');
 const cors = require('cors');
 
@@ -15,18 +16,21 @@ dotenv.config();
 const express = require('express');
 
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:5173', 
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 app.use(express.json());
 app.use(logger('dev'));
 
-app.use("/api/subjects", subjectRouter);
-app.use("/api/events", eventRouter);
-app.use("/api/teachers", teacherRouter);
-app.use("/api/study-plans", studyPlanRouter);
-app.use("/api/needs", needRouter);
-app.use ("/api/modules", moduleRouter);
+app.use('/api/subjects', subjectRouter);
+app.use('/api/events', eventRouter);
+app.use('/api/teachers', teacherRouter);
+app.use('/api/study-plans', studyPlanRouter);
+app.use('/api/needs', needRouter);
+app.use('/api/modules', moduleRouter);
+app.use('/api/file-processor', fileProcessorRouter);
 
 const PORT = process.env.PORT || 3000;
 
@@ -35,9 +39,9 @@ app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ force: false }); // create the tables if they do not exist
-    console.log("Database connected!");
+    console.log('Database connected!');
     await initializeDatabase();
   } catch (error) {
-    console.log("Failed to connect to the database: ", error);
+    console.log('Failed to connect to the database: ', error);
   }
 });

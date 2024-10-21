@@ -7,6 +7,7 @@ class TeacherBenefit extends Model {
   public id!: number;
   public teacher_id!: number;
   public benefit_id!: number;
+  public date!: Date;
 
   public static associations: {
     teacher: BelongsToMany<TeacherBenefit, Teacher>;
@@ -26,6 +27,10 @@ TeacherBenefit.init({
   },
   benefit_id: {
     type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  date: {
+    type: DataTypes.DATE,
     allowNull: false,
   },
 }, {

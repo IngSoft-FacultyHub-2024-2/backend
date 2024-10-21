@@ -29,6 +29,7 @@ const inputTeacherSchema = yup.object().shape({
     benefits: yup.array().of(
         yup.object().shape({
             benefit_id: yup.number().required("Benefit ID is required"),
+            date: yup.date().required("Date is required"),
         })
     ).nullable(),
     subjects_history: yup.array().of(inputSubjectSchema).nullable(),

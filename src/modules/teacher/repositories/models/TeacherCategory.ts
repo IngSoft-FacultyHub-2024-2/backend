@@ -7,6 +7,7 @@ class TeacherCategory extends Model {
   public id!: number;
   public teacher_id!: number;
   public category_id!: number;
+  public date!: Date;
 
   public static associations: {
     teacher: BelongsTo<TeacherCategory, Teacher>;
@@ -26,6 +27,10 @@ TeacherCategory.init({
   },
   category_id: {
     type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  date: {
+    type: DataTypes.DATE,
     allowNull: false,
   },
 }, {

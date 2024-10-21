@@ -36,31 +36,31 @@ module.exports = {
       },
       {
         'time': '18:30 - 19:25',
-        'turn': 'Vespertino',
+        'turn': 'Nocturno',
         'createdAt': new Date(),
         'updatedAt': new Date()
       },
       {
         'time': '19:30 - 20:25',
-        'turn': 'Vespertino',
+        'turn': 'Nocturno',
         'createdAt': new Date(),
         'updatedAt': new Date()
       },
       {
         'time': '20:30 - 21:25',
-        'turn': 'Vespertino',
+        'turn': 'Nocturno',
         'createdAt': new Date(),
         'updatedAt': new Date()
       },
       {
         'time': '21:35 - 22:30',
-        'turn': 'Vespertino',
+        'turn': 'Nocturno',
         'createdAt': new Date(),
         'updatedAt': new Date()
       },
       {
         'time': '22:35 - 23:30',
-        'turn': 'Vespertino',
+        'turn': 'Nocturno',
         'createdAt': new Date(),
         'updatedAt': new Date()
       }

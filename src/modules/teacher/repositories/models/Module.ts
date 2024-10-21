@@ -20,7 +20,7 @@ Module.init({
         defaultValue: '00:00',
     },
     turn: {
-        type: DataTypes.ENUM(ModuleTurn.MATUTINE, ModuleTurn.VESPERTINE),
+        type: DataTypes.ENUM(ModuleTurn.MATUTINE, ModuleTurn.NOCTURN),
         allowNull: false,
     },
 }, {

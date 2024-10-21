@@ -1,6 +1,6 @@
 enum ModuleTurn {
     MATUTINE = 'Matutino',
-    VESPERTINE = 'Vespertino',
+    NOCTURN = 'Nocturno',
   }
 
 function getModuleTurns() {

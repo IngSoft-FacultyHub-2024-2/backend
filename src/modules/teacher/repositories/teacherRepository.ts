@@ -137,6 +137,7 @@ class TeacherRepository {
         { model: TeacherSubjectHistory, as: 'subjects_history' },
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
+        { model: TeacherAvailableModule, as: 'teacher_available_modules' },
       ],
     });
   }

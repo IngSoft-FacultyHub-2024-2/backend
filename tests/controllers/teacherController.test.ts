@@ -45,8 +45,8 @@ describe('TeacherController', () => {
         "prefered": false
       }
     ],
-    "categories": [{ "category_id": 1 }],
-    "benefits": [{ "benefit_id": 1 }],
+    "categories": [{ "category_id": 1, "date": "2022-09-01" }],
+    "benefits": [{ "benefit_id": 1, "date": "2022-09-01" }],
     "subjects_history": [
       {
         "subject_id": 2,

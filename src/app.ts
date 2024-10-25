@@ -4,6 +4,7 @@ import eventRouter from "./routers/eventRouter";
 import teacherRouter  from "./routers/teacherRouter";
 import studyPlanRouter from "./routers/studyPlanRouter";
 import needRouter from "./routers/needRouter";
+import moduleRouter from "./routers/moduleRouter";
 import dotenv from 'dotenv';
 import { initializeDatabase } from "./initializingData";
 const logger = require('morgan');
@@ -25,6 +26,7 @@ app.use("/api/events", eventRouter);
 app.use("/api/teachers", teacherRouter);
 app.use("/api/study-plans", studyPlanRouter);
 app.use("/api/needs", needRouter);
+app.use ("/api/modules", moduleRouter);
 
 const PORT = process.env.PORT || 3000;
 

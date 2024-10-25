@@ -38,6 +38,10 @@ TeacherAvailableModule.init({
   module_id: {
     type: DataTypes.INTEGER, // Value between 1 and 14
     allowNull: false,
+    references: {
+      model: 'Modules',
+      key: 'id',
+    },
   },
 }, {
   sequelize,

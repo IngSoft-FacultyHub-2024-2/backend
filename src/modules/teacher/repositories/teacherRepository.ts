@@ -1,5 +1,7 @@
-import { Order } from "sequelize";
+import { Op, Order } from "sequelize";
 import sequelize from "../../../config/database";
+import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
+import { TeacherStates } from "../../../shared/utils/teacherStates";
 import Benefit from "./models/Benefit";
 import CaesCourse from "./models/CaesCourse";
 import Category from "./models/Category";
@@ -11,11 +13,8 @@ import TeacherBenefit from "./models/TeacherBenefit";
 import TeacherCategory from "./models/TeacherCategory";
 import TeacherSubjectGroup from "./models/TeacherSubjectGroup";
 import TeacherSubjectGroupMember from "./models/TeacherSubjectGroupMember";
-import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
 import TeacherSubjectHistory from "./models/TeacherSubjectHistory";
-import { Op } from "sequelize";
-import { TeacherStates } from "../../../shared/utils/teacherStates";
-import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
+import TeacherSubjectOfInterest from "./models/TeacherSubjectOfInterest";
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -138,6 +137,8 @@ class TeacherRepository {
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+        { model: TeacherSubjectGroup, as: 'teacher_subject_groups' },
+        { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });
   }
@@ -153,6 +154,8 @@ class TeacherRepository {
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+        { model: TeacherSubjectGroup, as: 'teacher_subject_groups' },
+        { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });
   }

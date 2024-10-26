@@ -1,7 +1,7 @@
-import { Model, DataTypes, BelongsToMany } from 'sequelize';
+import { BelongsTo, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import Teacher from './Teacher';
 import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
+import Teacher from './Teacher';
 import TeacherSubjectGroup from './TeacherSubjectGroup';
 
 class TeacherSubjectGroupMember extends Model {
@@ -11,8 +11,8 @@ class TeacherSubjectGroupMember extends Model {
   public role!: string;
 
   public static associations: {
-    teacher: BelongsToMany<TeacherSubjectGroupMember, Teacher>;
-    teacher_subject_group: BelongsToMany<TeacherSubjectGroupMember, TeacherSubjectGroup>;
+    teacher: BelongsTo<TeacherSubjectGroupMember, Teacher>;
+    teacher_subject_group: BelongsTo<TeacherSubjectGroupMember, TeacherSubjectGroup>;
   };
 }
 

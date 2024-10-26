@@ -1,18 +1,16 @@
-import { Model, DataTypes, HasMany, BelongsToMany } from 'sequelize';
+import { DataTypes, HasMany, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import Prize from './Prize';
+import { TeacherStates } from '../../../../shared/utils/teacherStates';
 import CaesCourse from './CaesCourse';
 import Contact from './Contact';
-import TeacherCategory from './TeacherCategory';
-import TeacherBenefit from './TeacherBenefit';
-import TeacherSubjectHistory from './TeacherSubjectHistory';
-import Benefit from './Benefit';
-import Category from './Category';
-import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
-import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
-import TeacherSubjectGroup from './TeacherSubjectGroup';
+import Prize from './Prize';
 import TeacherAvailableModule from './TeacherAvailableModules';
-import { TeacherStates } from '../../../../shared/utils/teacherStates';
+import TeacherBenefit from './TeacherBenefit';
+import TeacherCategory from './TeacherCategory';
+import TeacherSubjectGroup from './TeacherSubjectGroup';
+import TeacherSubjectGroupMember from './TeacherSubjectGroupMember';
+import TeacherSubjectHistory from './TeacherSubjectHistory';
+import TeacherSubjectOfInterest from './TeacherSubjectOfInterest';
 
 class Teacher extends Model {
   public id!: number;
@@ -241,6 +239,15 @@ Teacher.hasMany(TeacherAvailableModule, {
 TeacherAvailableModule.belongsTo(Teacher, {
   foreignKey: 'teacher_id',
   as: 'teacher',
+});
+TeacherSubjectGroup.hasMany(TeacherSubjectGroupMember, {
+  sourceKey: 'id',
+  foreignKey: 'teacher_subject_group_id',
+  as: 'members',
+});
+TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup, {
+  foreignKey: 'teacher_subject_group_id',
+  as: 'teacher_subject_group',
 });
 
 

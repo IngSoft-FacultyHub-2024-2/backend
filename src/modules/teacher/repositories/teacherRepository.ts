@@ -137,7 +137,7 @@ class TeacherRepository {
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },
-        { model: TeacherSubjectGroup, as: 'teacher_subject_groups' },
+        { model: TeacherSubjectGroup, as: 'teacher_subject_groups', include: [{ model: TeacherSubjectGroupMember, as: 'members' }] },
         { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });

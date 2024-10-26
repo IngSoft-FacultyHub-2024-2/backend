@@ -1,7 +1,7 @@
-import { Model, DataTypes, BelongsToMany } from 'sequelize';
+import { BelongsToMany, DataTypes, HasMany, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import Teacher from './Teacher';
 import Benefit from './Benefit';
+import Teacher from './Teacher';
 
 class TeacherBenefit extends Model {
   public id!: number;
@@ -11,7 +11,7 @@ class TeacherBenefit extends Model {
 
   public static associations: {
     teacher: BelongsToMany<TeacherBenefit, Teacher>;
-    benefit: BelongsToMany<TeacherBenefit, Benefit>;
+    benefit: HasMany<TeacherBenefit, Benefit>;
   };
 }
 

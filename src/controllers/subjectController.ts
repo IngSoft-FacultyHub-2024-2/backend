@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById, updateSubject, deleteSubject } from '../modules/subject';
+import { addSubject, getSubjects, getSubjectById, updateSubject, deleteSubject, getAllSubjectNames } from '../modules/subject';
 import inputSubjectSchema from './validationSchemas/subjectSchemas/inputSubjectSchema';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import { extractParameters } from '../shared/utils/queryParamsHelper';
@@ -41,6 +41,18 @@ class SubjectController {
       }
     }
   }
+
+  getAllSubjectNames = async (req: Request, res: Response) => {
+    try {
+      const subjects = await getAllSubjectNames();
+      res.status(200).json(subjects);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
 
   updateSubject = async (req: Request, res: Response) => {
     try {

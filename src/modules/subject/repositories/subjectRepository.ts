@@ -96,6 +96,10 @@ class SubjectRepository {
     });
   }
 
+  async getAllSubjectNames() {
+    return await Subject.findAll({attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],  order: [['study_plan_year', 'DESC']]});
+  }
+
   async updateSubject(id: number, subject: Partial<Subject>) {
     const studyPlan = await StudyPlan.findByPk(subject.study_plan_id);
     if (!studyPlan) {

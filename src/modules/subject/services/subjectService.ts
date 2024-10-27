@@ -43,6 +43,11 @@ export async function getSubjectById(id: number, includeOtherInfo: boolean = fal
   return SubjectResponseDtoHelper.fromModel(subject, coordinator);
 }
 
+export async function getAllSubjectNames() {
+  const subjects = await subjectRepository.getAllSubjectNames();
+  return subjects;
+}
+
 export async function updateSubject(id: number, subjectDto: SubjectRequestDto) {
   const subject: Partial<Subject> = SubjectRequestDtoHelper.toModel(subjectDto);
   let coordinator = await getTeacherById(subjectDto.associated_coordinator);

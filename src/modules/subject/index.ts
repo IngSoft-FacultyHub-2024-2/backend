@@ -3,6 +3,7 @@ import {
     getSubjects,
     getSubjectById,
     updateSubject,
+    getAllSubjectNames,
     teacherCoordinatorSubjects,
     deleteSubject
 } from './services/subjectService';
@@ -20,6 +21,7 @@ export {
     addEvent,
     addSubject,
     getSubjectById,
+    getAllSubjectNames,
     teacherCoordinatorSubjects,
     SubjectRequestDto,
     SubjectEventRequestDto,

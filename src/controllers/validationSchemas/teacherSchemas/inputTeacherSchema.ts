@@ -1,10 +1,10 @@
 import * as yup from 'yup';
-import inputPrizeSchema from './inputPrizeSchema';
 import inputCaesCourseSchema from './inputCaesCourseSchema';
 import inputContactSchema from './inputContactSchema';
+import inputPrizeSchema from './inputPrizeSchema';
 import inputSubjectSchema from './inputSubjectSchema';
-import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
 import inputTeacherAvailableModuleSchema from './inputTeacherAvailableModuleSchema';
+import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
 
 const inputTeacherSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -34,7 +34,11 @@ const inputTeacherSchema = yup.object().shape({
         })
     ).nullable(),
     subjects_history: yup.array().of(inputSubjectSchema).nullable(),
-    subjects_of_interest: yup.array().of(yup.number()).nullable(),
+    subjects_of_interest: yup.array().of(
+        yup.object().shape({
+            subject_id: yup.number().required("Subject of interest ID is required"),
+        })
+    ).nullable(),
     teacher_subject_groups: yup.array().of(inputTeacherSubjectGroupSchema).nullable(),
     teacher_available_modules: yup.array().of(inputTeacherAvailableModuleSchema).nullable(),
 });

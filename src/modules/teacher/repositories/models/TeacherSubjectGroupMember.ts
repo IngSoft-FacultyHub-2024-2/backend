@@ -26,7 +26,7 @@ TeacherSubjectGroupMember.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Teachers',
+      model: 'Teacher',
       key: 'id'
     },
     field: 'teacher_id',
@@ -35,7 +35,7 @@ TeacherSubjectGroupMember.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'TeacherSubjectGroups',
+      model: 'TeacherSubjectGroup',
       key: 'id'
     },
     field: 'teacher_subject_group_id',

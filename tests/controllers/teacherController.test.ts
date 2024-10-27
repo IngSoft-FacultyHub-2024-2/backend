@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 import teacherController from '../../src/controllers/teacherController';
-import { getTeachers, addTeacher, getBenefits, getCategories, getAllTeachersNames, dismissTeacher, updateTeacher } from '../../src/modules/teacher';
+import { addTeacher, dismissTeacher, getAllTeachersNames, getBenefits, getCategories, getTeachers, updateTeacher } from '../../src/modules/teacher';
+import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
 jest.mock('../../src/modules/teacher');
 jest.mock('../../src/modules/subject');
@@ -55,7 +55,9 @@ describe('TeacherController', () => {
         "end_date": null
       }
     ],
-    "subjects_of_interest": [1]
+    "subjects_of_interest": [
+      {"subject_id": 3}
+    ],
   };
 
   const mockReq = { body: teacherBody } as Request;

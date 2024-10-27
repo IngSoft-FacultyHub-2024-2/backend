@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addSubject, getSubjects, getSubjectById, updateSubject } from '../../src/modules/subject';
+import { addSubject, getSubjects, getSubjectById, getAllSubjectNames, updateSubject } from '../../src/modules/subject';
 import subjectController from '../../src/controllers/subjectController';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
@@ -154,6 +154,31 @@ describe('SubjectController', () => {
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
 
+  });
+
+  describe('getAllSubjectsNames', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+
+    beforeEach(() => {
+      req = {};
+      res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+    });
+
+    it('should return all subjects names with status 200', async () => {
+      const subjects = [{ id: 1, name: 'Diseño1', acronym: 'DA1', valid: true, study_plan_year: 2024 }, 
+        { id: 2, name: 'Diseño2', acronym: 'DA2', valid: true, study_plan_year: 2024 }
+      ];
+      (getAllSubjectNames as jest.Mock).mockResolvedValue(subjects);
+
+      await subjectController.getAllSubjectNames(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(subjects);
+    });
   });
 
   describe('updateSubject', () => {

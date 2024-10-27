@@ -1,5 +1,5 @@
 // Import statements for Jest and the function to be tested
-import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getSubjectById, getStudyPlans, addStudyPlan, updateSubject, getNeeds, addNeed } from '../../src/modules/subject';
+import { addSubject, getEvents, addEvent, SubjectRequestDto, getSubjects, getAllSubjectNames, getSubjectById, getStudyPlans, addStudyPlan, updateSubject, getNeeds, addNeed } from '../../src/modules/subject';
 import subjectRepository from '../../src/modules/subject/repositories/subjectRepository';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
 import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
@@ -10,8 +10,8 @@ import needRepository from '../../src/modules/subject/repositories/needRepositor
 
 // Jest mock for subjectRepository
 jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
-  addSubject: jest.fn(), getSubjects: jest.fn(), getSubjectById: jest.fn(),
-  updateSubject: jest.fn(),
+  addSubject: jest.fn(), getSubjects: jest.fn(), getAllSubjectNames: jest.fn(),
+  getSubjectById: jest.fn(), updateSubject: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto');
 jest.mock('../../src/modules/teacher/', () => ({
@@ -201,6 +201,21 @@ describe('getSubjectById', () => {
     expect(subjectRepository.getSubjectById).toHaveBeenCalledWith(999);
   });
 });
+
+describe('getAllSubjectNames', () => {
+  it('should return all subjects names', async () => {
+    const subjects = [{ id: 1, name: 'Diseño1', acronym: 'DA1', valid: true, study_plan_year: 2024 }, 
+      { id: 2, name: 'Diseño2', acronym: 'DA2', valid: true, study_plan_year: 2024 }
+    ];
+    (subjectRepository.getAllSubjectNames as jest.Mock).mockResolvedValue(subjects);
+
+    const result = await getAllSubjectNames();
+
+    expect(result).toEqual(subjects);
+    expect(subjectRepository.getAllSubjectNames).toHaveBeenCalled();
+  });
+});
+
 
 
 describe('updateSubject', () => {

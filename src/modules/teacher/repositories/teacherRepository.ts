@@ -1,4 +1,4 @@
-import { Op, Order } from "sequelize";
+import { Op, Order, Transaction } from "sequelize";
 import sequelize from "../../../config/database";
 import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
 import { TeacherStates } from "../../../shared/utils/teacherStates";
@@ -21,7 +21,7 @@ class TeacherRepository {
     const transaction = await sequelize.transaction();
     try {
       // Extraer subjects_of_interest y otros datos del teacherData
-      const { subjects_of_interest = [], teacher_subject_groups = [] } = teacher;
+      const { teacher_subject_groups = [] } = teacher;
 
       // Crear el Teacher y sus asociaciones directas
       const newTeacher = await Teacher.create(teacher, {
@@ -33,13 +33,10 @@ class TeacherRepository {
           { model: TeacherCategory, as: 'categories' },
           { model: TeacherBenefit, as: 'benefits' },
           { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+          { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
         ],
         transaction,
       });
-
-      if (subjects_of_interest.length > 0) {
-        await this.associateSubjectsOfInterest(newTeacher.id, subjects_of_interest, transaction);
-      }
 
       if (teacher_subject_groups.length > 0) {
         await this.associateTeacherSubjectGroups(newTeacher.id, teacher_subject_groups, transaction);
@@ -66,7 +63,8 @@ class TeacherRepository {
     await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, { transaction });
   }
 
-  private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: any) {
+
+  private async associateTeacherSubjectGroups(teacherId: number, teacherSubjectGroups: any[], transaction: Transaction) {
     for (const teacherSubjectGroup of teacherSubjectGroups) {
       const { subject_id, teachers, own_role } = teacherSubjectGroup;
       const newTeacherSubjectGroup = await TeacherSubjectGroup.create(
@@ -80,16 +78,13 @@ class TeacherRepository {
         role: own_role,
       };
 
-      await TeacherSubjectGroupMember.create(
-        newTeacherAssociation,
-        { transaction }
-      );
-
       const teacherRoles = teachers.map((teacher: any) => ({
         teacher_id: teacher.teacher_id,
         teacher_subject_group_id: newTeacherSubjectGroup.id,
         role: teacher.role,
       }));
+
+      teacherRoles.push(newTeacherAssociation);
 
       await TeacherSubjectGroupMember.bulkCreate(teacherRoles, { transaction });
     }
@@ -154,7 +149,7 @@ class TeacherRepository {
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },
-        { model: TeacherSubjectGroup, as: 'teacher_subject_groups' },
+        { model: TeacherSubjectGroup, as: 'teacher_subject_groups', include: [{ model: TeacherSubjectGroupMember, as: 'members' }] },
         { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });
@@ -215,40 +210,141 @@ class TeacherRepository {
   async updateTeacher(teacherId: number, teacherData: Partial<Teacher>) {
     const transaction = await sequelize.transaction();
     try {
-      // Extraer subjects_of_interest y otros datos del teacherData
-      const { subjects_of_interest = [], teacher_subject_groups = [] } = teacherData;
-  
-      // Actualizar el Teacher y sus asociaciones directas
       const [updatedTeacher] = await Teacher.update(teacherData, {
         where: { id: teacherId },
         paranoid: false,
-        returning: true, // Para obtener el registro actualizado
+        returning: true,
         transaction,
       });
   
-      // Si no se encontró el teacher, lanzar un error
       if (!updatedTeacher) {
         throw new ResourceNotFound(`Teacher with id ${teacherId} not found`);
       }
   
-      // Actualizar las asociaciones
-      // Suponiendo que tienes métodos para manejar las asociaciones
-      await this.associateSubjectsOfInterest(teacherId, subjects_of_interest, transaction);
-      await this.associateTeacherSubjectGroups(teacherId, teacher_subject_groups, transaction);
-  
-      // Confirmar la transacción
+      //update associations
+      await this.updateCaesCourse(teacherId, teacherData, transaction);
+      await this.updateContacts(teacherId, teacherData, transaction);
+      await this.updatePrizes(teacherId, teacherData, transaction);
+      await this.updateSubjectsHistory(teacherId, teacherData, transaction);
+      await this.updateCategories(teacherId, teacherData, transaction);
+      await this.updateBenefits(teacherId, teacherData, transaction);
+      await this.updateTeacherSubjectGroups(teacherId, teacherData, transaction);
+      await this.updateSubjectsOfInterest(teacherId, teacherData, transaction);
+
       await transaction.commit();
   
       return this.getTeacherById(teacherId);
     } catch (error) {
-      console.error('Ha ocurrido un error al actualizar un docente:', error);
-  
-      // Realizar un rollback en caso de error
       await transaction.rollback();
       throw error;
     }
   }
-  
+
+  private async updateCaesCourse(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { caes_courses = [] } = teacherData;
+    await CaesCourse.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (caes_courses.length > 0) {
+      const newCaesCourses = caes_courses.map((course) => ({
+        ...course,
+        teacher_id: teacherId
+      }));
+
+      await CaesCourse.bulkCreate(newCaesCourses, { transaction });
+    } 
+  }
+
+  private async updateContacts(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { contacts = [] } = teacherData;
+    await Contact.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (contacts.length > 0) {
+      const newContacts = contacts.map((contact) => ({
+        ...contact,
+        teacher_id: teacherId
+      }));
+
+      await Contact.bulkCreate(newContacts, { transaction });
+    }
+  }
+
+  private async updatePrizes(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { prizes = [] } = teacherData;
+    await Prize.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (prizes.length > 0) {
+      const newPrizes = prizes.map((prize) => ({
+        ...prize,
+        teacher_id: teacherId
+      }));
+
+      await Prize.bulkCreate(newPrizes, { transaction });
+    }
+  }
+
+  private async updateSubjectsHistory(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { subjects_history = [] } = teacherData;
+    await TeacherSubjectHistory.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (subjects_history.length > 0) {
+      const newSubjectsHistory = subjects_history.map((subjectHistory) => ({
+        ...subjectHistory,
+        teacher_id: teacherId
+      }));
+
+      await TeacherSubjectHistory.bulkCreate(newSubjectsHistory, { transaction });
+    }
+  }
+
+  private async updateCategories(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { categories = [] } = teacherData;
+    await TeacherCategory.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (categories.length > 0) {
+      const newCategories = categories.map((category) => ({
+        ...category,
+        teacher_id: teacherId
+      }));
+
+      await TeacherCategory.bulkCreate(newCategories, { transaction });
+    }
+  }
+
+  private async updateBenefits(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { benefits = [] } = teacherData;
+    await TeacherBenefit.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (benefits.length > 0) {
+      const newBenefits = benefits.map((benefit) => ({
+        ...benefit,
+        teacher_id: teacherId
+      }));
+
+      await TeacherBenefit.bulkCreate(newBenefits, { transaction });
+    }
+  }
+
+  private async updateTeacherSubjectGroups(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { teacher_subject_groups = [] } = teacherData;
+    if (teacher_subject_groups.length > 0) {
+      const groups = await TeacherSubjectGroupMember.findAll({ where: { teacher_id: teacherId }, transaction })
+      const groupIds = groups.map(group => group.teacher_subject_group_id);
+      groupIds.forEach(async groupId => {
+        await TeacherSubjectGroupMember.destroy({ where: { teacher_subject_group_id: groupId }, transaction });
+        await TeacherSubjectGroup.destroy({ where: { id: groupId }, transaction });
+      });
+
+      await this.associateTeacherSubjectGroups(teacherId, teacher_subject_groups, transaction);
+    }
+  }
+
+  private async updateSubjectsOfInterest(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    const { subjects_of_interest = [] } = teacherData;
+    await TeacherSubjectOfInterest.destroy({ where: { teacher_id: teacherId }, transaction });
+    if (subjects_of_interest.length > 0) {
+      const newSubjectsOfInterest = subjects_of_interest.map((subjectOfInterest) => ({
+        ...subjectOfInterest,
+        teacher_id: teacherId
+      }));
+
+      await TeacherSubjectOfInterest.bulkCreate(newSubjectsOfInterest, { transaction });
+    }
+  }
+
 
   async getAllCategories() {
     return await Category.findAll();

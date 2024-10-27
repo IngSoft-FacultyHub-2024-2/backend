@@ -1,14 +1,12 @@
-import { Request, Response } from 'express';
-import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import path from 'path';
-import xlsx from 'xlsx';
+import { Response } from 'express';
 import { processFile } from '../modules/file-processor/services/fileProcessorService';
+import { returnError } from '../shared/utils/exceptions/handleExceptions';
 
 class FileProcessorController {
 
   async processFile(req: any, res: Response) {
     try {
-      processFile(req.file.originalname);
+      await processFile(req.file.originalname, req.body.fileType);
 
       return res.status(200).json({ message: 'File uploaded and processed successfully' });
     } catch (error) {

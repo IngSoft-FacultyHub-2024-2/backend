@@ -13,10 +13,15 @@ import StudyPlan from '../../src/modules/subject/repositories/models/StudyPlan';
 describe('SubjectController Integration Tests', () => {
   // Run database migrations or setup before tests
   beforeAll(async () => {
+    console.log('Starting test...');
     await sequelize.sync({ force: true });
+    console.log('Sync');
+
     await Need.create({ name: 'Necesidad 1', id: 1 });
     await Event.create({ name: 'Evento 1', id: 1 });
     await StudyPlan.create({ name: 'Plan 1', year: 2021, id: 1 });
+    console.log('GOOD');
+
 });
   
 

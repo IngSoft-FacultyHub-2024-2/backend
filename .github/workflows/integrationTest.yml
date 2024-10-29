@@ -38,6 +38,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+    
+      - name: Start application
+        run: npm run start # Make sure your `package.json` has a script for starting the app
+        env:
+          NODE_ENV: test
+          HOST_DB: localhost
+          USER_DB: postgres
+          PASSWORD_DB: postgres
+          NAME_DB: faculty_hub_db
+          PORT_DB: 5432
+          PORT: 3000
+
 
       - name: Run integration tests
         run: npm run test:integration # Define a separate script for integration tests

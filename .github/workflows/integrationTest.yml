@@ -43,11 +43,12 @@ jobs:
         run: npm run test:integration # Define a separate script for integration tests
         env:
           NODE_ENV: test
-          DB_HOST: localhost
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: faculty_hub_db
+          HOST_DB: localhost
+          USER_DB: postgres
+          PASSWORD_DB: postgres
+          NAME_DB: faculty_hub_db
           PORT_DB: 5432
+          PORT: 3000
 
       - name: Stop and clean up
         if: always()

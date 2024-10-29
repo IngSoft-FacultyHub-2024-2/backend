@@ -41,3 +41,5 @@ app.listen(PORT, async () => {
     console.log("Failed to connect to the database: ", error);
   }
 });
+
+export default app;

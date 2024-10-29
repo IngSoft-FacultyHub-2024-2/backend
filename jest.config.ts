@@ -1,13 +1,11 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest', // Use ts-jest preset for TypeScript support
-  testEnvironment: 'node', // Set the test environment (node for server-side testing)
-  verbose: true, // Optional: Enable detailed test results in the output
-  testMatch: ['**/tests/**/*.test.ts'], // Pattern to find test files
-  moduleFileExtensions: ['js', 'ts'], // Recognizes JavaScript and TypeScript files
-  collectCoverage: true, // Optional: Collects test coverage information
-  coverageDirectory: 'coverage', // Output directory for coverage reports
+  preset: 'ts-jest', 
+  testEnvironment: 'node', 
+  verbose: true, 
+  testMatch: ['**/tests/**/*.test.ts'], 
+  moduleFileExtensions: ['js', 'ts'], 
 };
 
 export default config;

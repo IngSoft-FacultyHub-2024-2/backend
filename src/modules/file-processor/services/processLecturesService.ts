@@ -1,6 +1,6 @@
 import { getSubjects } from "../../subject";
 
-export async function processCourses(data: string[]) {
+export async function processLectures(data: string[]) {
     const result = [];
     let currentGroup = '';
     const subjectsResponse = await getSubjects(undefined, undefined, undefined, 'ASC', 1, 1000, false);

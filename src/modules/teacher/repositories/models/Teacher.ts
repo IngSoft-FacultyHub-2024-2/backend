@@ -1,6 +1,6 @@
 import { DataTypes, HasMany, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { TeacherStates } from '../../../../shared/utils/teacherStates';
+import { TeacherStates } from '../../../../shared/utils/enums/teacherStates';
 import CaesCourse from './CaesCourse';
 import Contact from './Contact';
 import Prize from './Prize';

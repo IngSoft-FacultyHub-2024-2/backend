@@ -1,5 +1,5 @@
+import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
 import HourConfig from "../../repositories/models/HourConfig";
-import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
 export interface HourConfigRequestDto {
   id?: number;

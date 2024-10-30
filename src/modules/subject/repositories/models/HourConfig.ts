@@ -1,7 +1,7 @@
-import { Model, DataTypes, BelongsTo, Association  } from 'sequelize';
+import { Association, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
+import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
 import Subject from './Subject';
-import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
 // TODO: change possible roles as a table
  

@@ -1,10 +1,9 @@
-import subjectRepository from '../repositories/subjectRepository';
-import Subject from '../repositories/models/Subject';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import { getTeacherById } from '../../teacher';
 import { SubjectRequestDto, SubjectRequestDtoHelper } from '../dtos/request/subjectRequestDto';
 import { SubjectResponseDto, SubjectResponseDtoHelper } from '../dtos/response/subjectResponseDto';
-import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
-import { getTeacherRoles } from '../../../shared/utils/teacherRoles';
-import { getTeacherById } from '../../teacher';
+import Subject from '../repositories/models/Subject';
+import subjectRepository from '../repositories/subjectRepository';
 
 export async function addSubject(subjectDto: SubjectRequestDto) {
   const subject: Partial<Subject> = SubjectRequestDtoHelper.toModel(subjectDto);

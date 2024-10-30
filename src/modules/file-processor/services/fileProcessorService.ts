@@ -1,18 +1,7 @@
 import path from 'path';
 import xlsx from 'xlsx';
-import { processCourses } from './processCoursesService';
-
-// const relevantSubjects = [
-//     'Fundamentos de ingeniería de software',
-//     'Diseño de aplicaciones 1',
-//     'Diseño de aplicaciones 2',
-//     'Ingeniería de software ágil 1',
-//     'Arquitectura de Software',
-//     'Ingeniería de Software Ágil 2',
-//     'Arquitectura de Software en la práctica',
-//     'Desarrollo de Productos de Base Tecnológica',
-//     'Interacción humano-computadora'
-// ];
+import { FileTypes } from '../../../shared/utils/enums/fileTypes';
+import { processLectures } from './processLecturesService';
 
 export async function processFile(filename: string, type: string) {
     const filePath = path.join(__dirname, '../../../uploads', filename);
@@ -35,7 +24,7 @@ export async function processFile(filename: string, type: string) {
         }
     });
 
-    if(type === 'COURSES') {
-        return processCourses(data);
+    if(type === FileTypes.LECTURES) {
+        return processLectures(data);
     }
 }

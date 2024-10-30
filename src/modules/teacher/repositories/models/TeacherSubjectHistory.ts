@@ -1,7 +1,7 @@
-import { Model, DataTypes, BelongsTo } from 'sequelize';
+import { BelongsTo, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
+import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
 import Teacher from './Teacher';
-import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
 
 class TeacherSubjectHistory extends Model {
   public id!: number;

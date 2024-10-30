@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/teacherRoles';
+import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/enums/teacherRoles';
 
 const inputSubjectSchema = yup.object().shape({
     subject_id: yup.number().required("Subject Id is required"),

@@ -1,8 +1,8 @@
-import { Model, DataTypes, BelongsToMany } from 'sequelize';
+import { BelongsToMany, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { WeekDays } from '../../../../shared/utils/WeekDays';
-import Teacher from './Teacher';
+import { WeekDays } from '../../../../shared/utils/enums/WeekDays';
 import Module from './Module';
+import Teacher from './Teacher';
 
 class TeacherAvailableModule extends Model {
   public id!: number;

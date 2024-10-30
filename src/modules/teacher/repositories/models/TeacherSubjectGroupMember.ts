@@ -1,6 +1,6 @@
 import { BelongsTo, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { TeacherRoles } from '../../../../shared/utils/teacherRoles';
+import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
 import Teacher from './Teacher';
 import TeacherSubjectGroup from './TeacherSubjectGroup';
 

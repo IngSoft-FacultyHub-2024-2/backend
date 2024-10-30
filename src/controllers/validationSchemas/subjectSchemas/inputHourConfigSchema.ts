@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/teacherRoles';
+import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/enums/teacherRoles';
 
 // TODO: role options should come from a table
 const inputHourConfigSchema = yup.object().shape({

@@ -12,44 +12,49 @@ class TeacherSubjectGroupMember extends Model {
 
   public static associations: {
     teacher: BelongsTo<TeacherSubjectGroupMember, Teacher>;
-    teacher_subject_group: BelongsTo<TeacherSubjectGroupMember, TeacherSubjectGroup>;
+    teacher_subject_group: BelongsTo<
+      TeacherSubjectGroupMember,
+      TeacherSubjectGroup
+    >;
   };
 }
 
-TeacherSubjectGroupMember.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  teacher_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Teacher',
-      key: 'id'
+TeacherSubjectGroupMember.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    field: 'teacher_id',
-  },
-  teacher_subject_group_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'TeacherSubjectGroup',
-      key: 'id'
+    teacher_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Teacher',
+        key: 'id',
+      },
+      field: 'teacher_id',
     },
-    field: 'teacher_subject_group_id',
+    teacher_subject_group_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'TeacherSubjectGroup',
+        key: 'id',
+      },
+      field: 'teacher_subject_group_id',
+    },
+    role: {
+      type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
+      allowNull: false,
+    },
   },
-  role: {
-    type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
-    allowNull: false
+  {
+    sequelize,
+    modelName: 'TeacherSubjectGroupMember',
+    tableName: 'TeacherSubjectGroupMembers',
+    timestamps: true,
   }
-
-}, {
-  sequelize,
-  modelName: 'TeacherSubjectGroupMember',
-  tableName: 'TeacherSubjectGroupMembers',
-  timestamps: true,
-});
+);
 
 export default TeacherSubjectGroupMember;

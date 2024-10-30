@@ -1,5 +1,5 @@
 import { SubjectRoles } from '../../../../shared/utils/enums/subjectRoles';
-import HourConfig from "../../repositories/models/HourConfig";
+import HourConfig from '../../repositories/models/HourConfig';
 
 export interface HourConfigResponseDto {
   id: number;

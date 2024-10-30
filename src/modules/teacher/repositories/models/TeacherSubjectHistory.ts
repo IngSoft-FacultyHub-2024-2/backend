@@ -16,45 +16,48 @@ class TeacherSubjectHistory extends Model {
   };
 }
 
-TeacherSubjectHistory.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  teacher_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-			model: 'Teachers',
-			key: 'id',
+TeacherSubjectHistory.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-	},
-  subject_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    // references: {
-    //   model: 'Subjects',
-    //   key: 'id',
-    // },
+    teacher_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Teachers',
+        key: 'id',
+      },
+    },
+    subject_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      // references: {
+      //   model: 'Subjects',
+      //   key: 'id',
+      // },
+    },
+    role: {
+      type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
+      allowNull: false,
+    },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    end_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
-  role: {
-    type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
-    allowNull: false,
-  },
-  start_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  end_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-}, {
-  sequelize,
-  modelName: 'TeacherSubject',
-  tableName: 'TeacherSubjects',
-  timestamps: true,
-});
+  {
+    sequelize,
+    modelName: 'TeacherSubject',
+    tableName: 'TeacherSubjects',
+    timestamps: true,
+  }
+);
 
 export default TeacherSubjectHistory;

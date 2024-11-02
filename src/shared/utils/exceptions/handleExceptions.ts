@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { Response } from 'express';
 import { DataBaseError, ResourceNotFound } from './customExceptions';
+import { UniqueConstraintError } from 'sequelize';
 
 export async function returnError(res: Response, error: Error) {
     // Verifica si las cabeceras ya fueron enviadas
@@ -16,6 +17,9 @@ export async function returnError(res: Response, error: Error) {
     } else if (error instanceof ResourceNotFound) {
         console.log("ResourceNotFound: ", error.message);
         res.status(404).json({ "error": error.message });
+    } else if  (error instanceof UniqueConstraintError) {
+        console.log("Unique violation: ", error.message);
+        res.status(409).json({ "error": error.message });
     } else {
         console.error("Unhandled error: ", error.message);
         res.status(500).json({ "error": error.message });

@@ -230,7 +230,8 @@ class TeacherRepository {
       await this.updateBenefits(teacherId, teacherData, transaction);
       await this.updateTeacherSubjectGroups(teacherId, teacherData, transaction);
       await this.updateSubjectsOfInterest(teacherId, teacherData, transaction);
-
+      await this.updateTeacherAvailableModules(teacherId, teacherData, transaction);
+      
       await transaction.commit();
   
       return this.getTeacherById(teacherId);
@@ -345,6 +346,19 @@ class TeacherRepository {
     }
   }
 
+  private async updateTeacherAvailableModules(teacherId: number, teacherData: Partial<Teacher>, transaction: Transaction) {
+    console.log('teacherData', teacherData);
+    const { teacher_available_modules = [] } = teacherData;
+    await TeacherAvailableModule.destroy({ where: { teacher_id: teacherId }, transaction })
+      if (teacher_available_modules.length > 0) {
+        const newTeacherAvailableModules = teacher_available_modules.map((module) => ({
+            ...module,
+            teacher_id: teacherId
+          }));
+
+          await TeacherAvailableModule.bulkCreate(newTeacherAvailableModules, { transaction });
+        }
+  }
 
   async getAllCategories() {
     return await Category.findAll();

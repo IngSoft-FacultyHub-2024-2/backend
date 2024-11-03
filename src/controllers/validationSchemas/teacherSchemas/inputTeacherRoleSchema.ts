@@ -1,9 +1,9 @@
 import * as yup from 'yup';
-import { getTeacherRoles, TeacherRoles } from '../../../shared/utils/enums/teacherRoles';
+import { getSubjectRoles, SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 
 const inputTeacherRoleSchema = yup.object().shape({
     teacher_id: yup.number().required(),
-    role: yup.mixed<TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY>().oneOf(getTeacherRoles()).required(),
+    role: yup.mixed<SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY>().oneOf(getSubjectRoles()).required(),
 });
 
 export default inputTeacherRoleSchema;

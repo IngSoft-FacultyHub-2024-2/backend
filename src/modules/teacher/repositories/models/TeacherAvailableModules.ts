@@ -7,7 +7,7 @@ import Teacher from './Teacher';
 class TeacherAvailableModule extends Model {
   public id!: number;
   public teacher_id!: number;
-  public day_of_week!: string; 
+  public day_of_week!: WeekDays; 
   public module_id!: number; 
 
   public static associations: {
@@ -32,7 +32,7 @@ TeacherAvailableModule.init({
     },
   },
   day_of_week: {
-    type: DataTypes.ENUM(WeekDays.MONDAY, WeekDays.TUESDAY, WeekDays.WEDNESDAY, WeekDays.THURSDAY, WeekDays.FRIDAY, WeekDays.SATURDAY, WeekDays.SUNDAY),
+    type: DataTypes.ENUM(WeekDays.MONDAY, WeekDays.TUESDAY, WeekDays.WEDNESDAY, WeekDays.THURSDAY, WeekDays.FRIDAY),
     allowNull: false,
   },
   module_id: {

@@ -1,13 +1,13 @@
-export enum WeekDays {
+enum WeekDays {
     MONDAY = 'Lunes',
     TUESDAY = 'Martes',
     WEDNESDAY = 'Miércoles',
     THURSDAY = 'Jueves',
-    FRIDAY = 'Viernes',
-    SATURDAY = 'Sábado',
-    SUNDAY = 'Domingo',
+    FRIDAY = 'Viernes'
 }
 
-export function getWeekDays(): WeekDays[] {
+function getWeekDays(): WeekDays[] {
     return Object.values(WeekDays) as WeekDays[];
 }
+
+export { WeekDays, getWeekDays };

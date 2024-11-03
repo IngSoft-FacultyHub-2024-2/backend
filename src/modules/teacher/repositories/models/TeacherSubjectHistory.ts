@@ -1,6 +1,6 @@
 import { BelongsTo, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
+import { SubjectRoles } from '../../../../shared/utils/enums/subjectRoles';
 import Teacher from './Teacher';
 
 class TeacherSubjectHistory extends Model {
@@ -39,7 +39,7 @@ TeacherSubjectHistory.init({
     // },
   },
   role: {
-    type: DataTypes.ENUM(TeacherRoles.TECHNOLOGY, TeacherRoles.THEORY),
+    type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
     allowNull: false,
   },
   start_date: {

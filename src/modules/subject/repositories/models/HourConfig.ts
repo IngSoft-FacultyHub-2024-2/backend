@@ -1,6 +1,6 @@
 import { Association, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
+import { SubjectRoles } from '../../../../shared/utils/enums/subjectRoles';
 import Subject from './Subject';
 
 // TODO: change possible roles as a table
@@ -8,7 +8,7 @@ import Subject from './Subject';
 class HourConfig extends Model {
   public id!: number;
   public subject_id!: number;
-  public role!: TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY
+  public role!: SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY
   public total_hours!: number;
 
   public static associations: {
@@ -31,7 +31,7 @@ HourConfig.init({
     },
   },
   role: {
-    type: DataTypes.ENUM(TeacherRoles.TECHNOLOGY, TeacherRoles.THEORY),
+    type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
     allowNull: false,
   },
   total_hours: {

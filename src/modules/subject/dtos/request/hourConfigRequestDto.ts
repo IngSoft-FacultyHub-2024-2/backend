@@ -1,10 +1,10 @@
-import { TeacherRoles } from '../../../../shared/utils/enums/teacherRoles';
+import { SubjectRoles } from '../../../../shared/utils/enums/subjectRoles';
 import HourConfig from "../../repositories/models/HourConfig";
 
 export interface HourConfigRequestDto {
   id?: number;
   subject_id?: number;
-  role: TeacherRoles.TECHNOLOGY | TeacherRoles.THEORY;
+  role: SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY;
   total_hours: number;
 }
 

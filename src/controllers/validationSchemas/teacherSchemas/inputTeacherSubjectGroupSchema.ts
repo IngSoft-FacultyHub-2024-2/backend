@@ -10,8 +10,11 @@ const inputTeacherSubjectGroupSchema = yup.object().shape({
   own_role: yup
     .mixed<SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY>()
     .oneOf(getSubjectRoles())
-    .required(),
-  teachers: yup.array().of(inputTeacherRoleSchema).required(),
+    .required('El rol del profesor es requerido'),
+  teachers: yup
+    .array()
+    .of(inputTeacherRoleSchema)
+    .required('Los profesores son requeridos'),
 });
 
 export default inputTeacherSubjectGroupSchema;

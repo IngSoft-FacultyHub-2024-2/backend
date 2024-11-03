@@ -9,8 +9,11 @@ const inputHourConfigSchema = yup.object().shape({
   role: yup
     .mixed<SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY>()
     .oneOf(getSubjectRoles())
-    .required(),
-  total_hours: yup.number().positive().required(),
+    .required('El formato de la configuración de horas es requerido'),
+  total_hours: yup
+    .number()
+    .positive()
+    .required('El total de horas es requerido'),
 });
 
 export default inputHourConfigSchema;

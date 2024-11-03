@@ -34,10 +34,6 @@ TeacherSubjectHistory.init(
     subject_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: 'Subjects',
-      //   key: 'id',
-      // },
     },
     role: {
       type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),

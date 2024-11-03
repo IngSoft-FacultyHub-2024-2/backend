@@ -5,12 +5,12 @@ import {
 } from '../../../shared/utils/enums/subjectRoles';
 
 const inputSubjectSchema = yup.object().shape({
-  subject_id: yup.number().required('Subject Id is required'),
+  subject_id: yup.number().required('El id de la materia es requerido'),
   role: yup
     .mixed<SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY>()
-    .oneOf(getSubjectRoles(), 'Role must be one of the allowed values')
+    .oneOf(getSubjectRoles(), 'El rol debe ser Teoría o Tecnología')
     .required('Role is required'),
-  start_date: yup.date().required('Start date is required'),
+  start_date: yup.date().required('La fecha de inicio es requerida'),
   end_date: yup
     .date()
     .nullable()

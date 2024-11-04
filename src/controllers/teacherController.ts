@@ -91,7 +91,7 @@ class TeacherController {
   async updateTeacher(req: Request, res: Response) {
     try {
       const teacherId = parseInt(req.params.id);
-      await inputTeacherSchema.validate(req.body);
+      req.body = await inputTeacherSchema.validate(req.body);
       const teacher = await updateTeacher(teacherId, req.body);
       res.status(200).json(teacher);
     } catch (error) {

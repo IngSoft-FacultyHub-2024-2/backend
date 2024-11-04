@@ -17,7 +17,7 @@ import inputTemporaryDismisssSchema from './validationSchemas/teacherSchemas/inp
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
     try {
-      await inputTeacherSchema.validate(req.body)
+      req.body = await inputTeacherSchema.validate(req.body)
       const teacher = await addTeacher(req.body);
       res.status(201).json(teacher);
     } catch (error) {

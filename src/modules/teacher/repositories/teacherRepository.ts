@@ -1,7 +1,7 @@
 import { Op, Order, Transaction } from "sequelize";
 import sequelize from "../../../config/database";
+import { TeacherStates } from "../../../shared/utils/enums/teacherStates";
 import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
-import { TeacherStates } from "../../../shared/utils/teacherStates";
 import Benefit from "./models/Benefit";
 import CaesCourse from "./models/CaesCourse";
 import Category from "./models/Category";

@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from '../../../../config/database';
-import { ModuleTurn } from "../../../../shared/utils/moduleTurn";
+import { ModuleTurn } from "../../../../shared/utils/enums/moduleTurn";
 
 class Module extends Model {
     public id!: number;

@@ -1,13 +1,10 @@
+import { TeacherStates } from "../../../shared/utils/enums/teacherStates";
+import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
+import { getSubjectById, teacherCoordinatorSubjects } from "../../subject";
+import { TeacherResponseDto, TeacherResponseDtoHelper } from "../dtos/response/teacherResponseDto";
+import { TeacherSubjectHistoryResponseDto, TeacherSubjectHistoryResponseDtoHelper } from "../dtos/response/teacherSubjectHistoryResponseDto";
 import Teacher from "../repositories/models/Teacher";
 import teacherRepository from "../repositories/teacherRepository";
-import { ResourceNotFound } from "../../../shared/utils/exceptions/customExceptions";
-import Benefit from "../repositories/models/Benefit";
-import Category from "../repositories/models/Category";
-import { TeacherResponseDto, TeacherResponseDtoHelper } from "../dtos/response/teacherResponseDto";
-import { getSubjectById } from "../../subject";
-import { TeacherSubjectHistoryResponseDto, TeacherSubjectHistoryResponseDtoHelper } from "../dtos/response/teacherSubjectHistoryResponseDto";
-import { TeacherStates } from "../../../shared/utils/teacherStates";
-import { teacherCoordinatorSubjects } from "../../subject";
 
 export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher)

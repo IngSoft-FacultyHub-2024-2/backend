@@ -1,13 +1,13 @@
-import { Model, DataTypes, BelongsToMany } from 'sequelize';
+import { BelongsToMany, DataTypes, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
-import { WeekDays } from '../../../../shared/utils/WeekDays';
-import Teacher from './Teacher';
+import { WeekDays } from '../../../../shared/utils/enums/WeekDays';
 import Module from './Module';
+import Teacher from './Teacher';
 
 class TeacherAvailableModule extends Model {
   public id!: number;
   public teacher_id!: number;
-  public day_of_week!: string; 
+  public day_of_week!: WeekDays; 
   public module_id!: number; 
 
   public static associations: {
@@ -32,7 +32,7 @@ TeacherAvailableModule.init({
     },
   },
   day_of_week: {
-    type: DataTypes.ENUM(WeekDays.MONDAY, WeekDays.TUESDAY, WeekDays.WEDNESDAY, WeekDays.THURSDAY, WeekDays.FRIDAY, WeekDays.SATURDAY, WeekDays.SUNDAY),
+    type: DataTypes.ENUM(WeekDays.MONDAY, WeekDays.TUESDAY, WeekDays.WEDNESDAY, WeekDays.THURSDAY, WeekDays.FRIDAY),
     allowNull: false,
   },
   module_id: {

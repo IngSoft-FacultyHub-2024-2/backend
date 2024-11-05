@@ -21,7 +21,6 @@ interface SemesterLectures {
 }
 
 export async function processLectures(fileData: FileDataDto, data: string[]) {
-  console.log(fileData);
   const result: SemesterLectures[] = [];
   let currentGroup = '';
 

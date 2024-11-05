@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import xlsx from 'xlsx';
 import { FileTypes } from '../../../shared/utils/enums/fileTypes';
@@ -25,6 +26,10 @@ export async function processFile(filename: string, fileData: FileDataDto) {
     }
   });
   if (fileData.fileType === FileTypes.LECTURES) {
-    return processLectures(fileData, data);
+    const message = await processLectures(fileData, data);
+
+    fs.unlinkSync(filePath);
+
+    return message;
   }
 }

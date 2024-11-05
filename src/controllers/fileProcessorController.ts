@@ -5,11 +5,17 @@ import { returnError } from '../shared/utils/exceptions/handleExceptions';
 class FileProcessorController {
   async processFile(req: any, res: Response) {
     try {
-      await processFile(req.file.originalname, req.body);
+      const processedFileMessage = await processFile(
+        req.file.originalname,
+        req.body
+      );
 
       return res
         .status(200)
-        .json({ message: 'File uploaded and processed successfully' });
+        .json({
+          message:
+            processedFileMessage || 'El archivo fue procesado correctamente',
+        });
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

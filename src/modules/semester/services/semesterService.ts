@@ -88,6 +88,5 @@ export async function getSemesterLectures(
 }
 
 export async function addLecture(lecture: Partial<Lecture>) {
-  //   console.log(lecture);
   return await semesterRepository.addLecture(lecture);
 }

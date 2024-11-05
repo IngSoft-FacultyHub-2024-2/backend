@@ -1,26 +1,31 @@
-import { 
-    addTeacher,
-    getBenefits,
-    getCategories,
-    getTeacherById,
-    getTeachers,
-    getAllTeachersNames,
-    dismissTeacher,
-    temporaryDismissTeacher,
-    updateTeacher
-} from "./services/teacherService";
-import { TeacherResponseDto, TeacherResponseDtoHelper } from "./dtos/response/teacherResponseDto";
+import {
+  TeacherResponseDto,
+  TeacherResponseDtoHelper,
+} from './dtos/response/teacherResponseDto';
+import { getModules } from './services/moduleService';
+import {
+  addTeacher,
+  dismissTeacher,
+  getAllTeachersNames,
+  getBenefits,
+  getCategories,
+  getTeacherById,
+  getTeachers,
+  temporaryDismissTeacher,
+  updateTeacher,
+} from './services/teacherService';
 
-export { 
-    addTeacher,
-    getTeacherById,
-    getTeachers, 
-    TeacherResponseDto,
-    TeacherResponseDtoHelper, 
-    getBenefits,
-    getCategories,
-    getAllTeachersNames,
-    dismissTeacher,
-    temporaryDismissTeacher,
-    updateTeacher
+export {
+  addTeacher,
+  dismissTeacher,
+  getAllTeachersNames,
+  getBenefits,
+  getCategories,
+  getModules,
+  getTeacherById,
+  getTeachers,
+  TeacherResponseDto,
+  TeacherResponseDtoHelper,
+  temporaryDismissTeacher,
+  updateTeacher,
 };

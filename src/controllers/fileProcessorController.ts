@@ -5,7 +5,7 @@ import { returnError } from '../shared/utils/exceptions/handleExceptions';
 class FileProcessorController {
   async processFile(req: any, res: Response) {
     try {
-      await processFile(req.file.originalname, req.body.fileType);
+      await processFile(req.file.originalname, req.body);
 
       return res
         .status(200)

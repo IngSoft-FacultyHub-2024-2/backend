@@ -1,9 +1,10 @@
 import path from 'path';
 import xlsx from 'xlsx';
 import { FileTypes } from '../../../shared/utils/enums/fileTypes';
+import { FileDataDto } from '../dtos/FileDataDto';
 import { processLectures } from './processLecturesService';
 
-export async function processFile(filename: string, type: string) {
+export async function processFile(filename: string, fileData: FileDataDto) {
   const filePath = path.join(__dirname, '../../../uploads', filename);
   const workbook = xlsx.readFile(filePath);
   const sheetName = workbook.SheetNames[3];
@@ -23,8 +24,7 @@ export async function processFile(filename: string, type: string) {
       }
     }
   });
-
-  if (type === FileTypes.LECTURES) {
-    return processLectures(data);
+  if (fileData.fileType === FileTypes.LECTURES) {
+    return processLectures(fileData, data);
   }
 }

@@ -2,8 +2,8 @@ import { ResourceNotFound } from '../../../shared/utils/exceptions/customExcepti
 import { getDegreeById } from '../../degree';
 import { getSubjectById } from '../../subject';
 import { getTeacherById } from '../../teacher';
-import { LectureResponseDtoHelper } from '../dtos/out/lectureResponseDto';
-import { SemesterResponseDtoHelper } from '../dtos/out/semesterResponseDto';
+import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
+import { SemesterResponseDtoHelper } from '../dtos/response/semesterResponseDto';
 import Lecture from '../repositories/models/Lecture';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';

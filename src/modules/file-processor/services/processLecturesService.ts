@@ -199,9 +199,9 @@ function generateResultMessage(
     const subjectLectures = result.filter(
       (res) => res.subject_id === subject.id
     );
-    returnMessage += `- Materia ${subject.name}: ${subjectLectures.length} dictados\n`;
+    returnMessage += `- ${subject.name}: ${subjectLectures.length} dictados\n`;
   });
-  return returnMessage;
+  return returnMessage + '\n';
 }
 
 function normalizeString(str: string): string {

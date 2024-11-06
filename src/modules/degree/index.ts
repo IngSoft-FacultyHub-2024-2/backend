@@ -1,6 +1,8 @@
-import { addDegree, getDegreeById, getDegrees } from "./services/degreeService";
+import {
+  addDegree,
+  getDegreeByAcronym,
+  getDegreeById,
+  getDegrees,
+} from './services/degreeService';
 
-export {
-    addDegree, getDegreeById, getDegrees
-};
-
+export { addDegree, getDegreeByAcronym, getDegreeById, getDegrees };

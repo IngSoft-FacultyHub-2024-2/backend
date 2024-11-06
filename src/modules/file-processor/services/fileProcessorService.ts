@@ -8,28 +8,35 @@ import { processLectures } from './processLecturesService';
 export async function processFile(filename: string, fileData: FileDataDto) {
   const filePath = path.join(__dirname, '../../../uploads', filename);
   const workbook = xlsx.readFile(filePath);
-  const sheetName = workbook.SheetNames[3];
-  const worksheet = workbook.Sheets[sheetName];
+  let message = '';
+  for (let i = 0; i < workbook.SheetNames.length; i++) {
+    const sheetName = workbook.SheetNames[i];
+    const worksheet = workbook.Sheets[sheetName];
 
-  const merges = worksheet['!merges'] || [];
-  let data: any[] = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+    const merges = worksheet['!merges'] || [];
+    let data: any[] = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
-  merges.forEach((merge) => {
-    const { s, e } = merge;
-    const mergedValue = data[s.r][s.c];
-    for (let row = s.r; row <= e.r; row++) {
-      for (let col = s.c; col <= e.c; col++) {
-        if (!data[row][col]) {
-          data[row][col] = mergedValue;
+    merges.forEach((merge) => {
+      const { s, e } = merge;
+      const mergedValue = data[s.r][s.c];
+      for (let row = s.r; row <= e.r; row++) {
+        for (let col = s.c; col <= e.c; col++) {
+          if (!data[row][col]) {
+            data[row][col] = mergedValue;
+          }
         }
       }
+    });
+    if (fileData.fileType === FileTypes.LECTURES) {
+      const returnMessage = await processLectures(fileData, data, sheetName);
+
+      if (returnMessage) {
+        message += returnMessage;
+      }
     }
-  });
-  if (fileData.fileType === FileTypes.LECTURES) {
-    const message = await processLectures(fileData, data);
-
-    fs.unlinkSync(filePath);
-
-    return message;
   }
+  console.log(message);
+  fs.unlinkSync(filePath);
+
+  return message;
 }

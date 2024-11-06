@@ -1,4 +1,5 @@
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
+import { getDegreeByAcronym } from '../../degree';
 import { addLecture } from '../../semester';
 import { getSubjects } from '../../subject';
 import { getModules } from '../../teacher';
@@ -20,7 +21,32 @@ interface SemesterLectures {
   }[];
 }
 
-export async function processLectures(fileData: FileDataDto, data: string[]) {
+export async function processLectures(
+  fileData: FileDataDto,
+  data: string[],
+  sheetName: string
+) {
+  let degreeAcronym;
+
+  if (sheetName.includes('-')) {
+    degreeAcronym = sheetName.split('-')[0];
+  } else if (sheetName.includes('.')) {
+    degreeAcronym = sheetName.split('.')[0];
+  } else {
+    degreeAcronym = sheetName.split(' ')[0];
+  }
+
+  if (!degreeAcronym) {
+    return;
+  }
+
+  const degree = await getDegreeByAcronym(degreeAcronym);
+  console.log(degree);
+
+  if (!degree) {
+    return;
+  }
+
   const result: SemesterLectures[] = [];
   let currentGroup = '';
 
@@ -59,19 +85,19 @@ export async function processLectures(fileData: FileDataDto, data: string[]) {
             currentGroup,
             days[j - 1],
             module.id,
-            subject
+            subject,
+            degree.id
           );
         }
       }
     }
   }
 
-  // Guardar en la base de datos (descomentar para uso en producción)
   for (const lecture of result) {
     await addLecture(lecture as any);
   }
 
-  return generateResultMessage(result, relevantSubjects);
+  return generateResultMessage(result, relevantSubjects, degree.name);
 }
 
 function isGroupRow(value: any): boolean {
@@ -95,7 +121,8 @@ function updateLecture(
   group: string,
   day: string,
   moduleId: number,
-  subject: string
+  subject: string,
+  degreeId: number
 ) {
   const existingLecture = result.find(
     (res) =>
@@ -103,7 +130,7 @@ function updateLecture(
       res.subject_id === subjectId &&
       res.lecture_groups.some(
         (groupData) =>
-          groupData.degree_id === fileData.degreeId && groupData.group === group
+          groupData.degree_id === degreeId && groupData.group === group
       )
   );
 
@@ -121,7 +148,9 @@ function updateLecture(
       existingLecture.lecture_roles.push(createHourConfig(role, day, moduleId));
     }
   } else {
-    result.push(createLecture(fileData, subjectId, group, role, day, moduleId));
+    result.push(
+      createLecture(fileData, subjectId, group, role, day, moduleId, degreeId)
+    );
   }
 }
 
@@ -142,12 +171,13 @@ function createLecture(
   group: string,
   role: string,
   day: string,
-  moduleId: number
+  moduleId: number,
+  degreeId: number
 ): SemesterLectures {
   return {
     semester_id: fileData.semesterId!,
     subject_id: subjectId,
-    lecture_groups: [{ degree_id: fileData.degreeId!, group }],
+    lecture_groups: [{ degree_id: degreeId, group }],
     lecture_roles: [createHourConfig(role, day, moduleId)],
   };
 }
@@ -159,15 +189,18 @@ function createHourConfig(role: string, day: string, moduleId: number) {
   };
 }
 
-function generateResultMessage(result: SemesterLectures[], subjects: any[]) {
-  let returnMessage = `Las siguientes materias se han procesado correctamente: \n`;
+function generateResultMessage(
+  result: SemesterLectures[],
+  subjects: any[],
+  degreeName: string
+) {
+  let returnMessage = `Las siguientes materias se han procesado correctamente para la carrera ${degreeName}:\n`;
   subjects.forEach((subject) => {
     const subjectLectures = result.filter(
       (res) => res.subject_id === subject.id
     );
     returnMessage += `- Materia ${subject.name}: ${subjectLectures.length} dictados\n`;
   });
-  console.log(returnMessage);
   return returnMessage;
 }
 

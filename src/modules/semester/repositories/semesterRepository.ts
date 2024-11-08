@@ -10,6 +10,10 @@ class SemesterRepository {
     return await Semester.create(semester);
   }
 
+  async getSemesters() {
+    return await Semester.findAll();
+  }
+
   async addLecture(lecture: Partial<Lecture>) {
     const newLecture = await Lecture.create(lecture, {
       include: [

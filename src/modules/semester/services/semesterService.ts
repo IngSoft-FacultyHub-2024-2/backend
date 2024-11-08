@@ -3,7 +3,6 @@ import { getDegreeById } from '../../degree';
 import { getSubjectById } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
-import { SemesterResponseDtoHelper } from '../dtos/response/semesterResponseDto';
 import Lecture from '../repositories/models/Lecture';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
@@ -12,12 +11,31 @@ export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
 }
 
+export async function getSemesters() {
+  return await semesterRepository.getSemesters();
+}
+
 export async function getSemesterLectures(
   semesterId: number,
   degreeId?: number,
   subjectId?: number,
   group?: string
 ) {
+  const existsDegree = degreeId ? await getDegreeById(degreeId) : true;
+  if (!existsDegree) {
+    throw new ResourceNotFound(
+      'No se encontró la carrera por la que se filtró'
+    );
+  }
+
+  const existsSubject = subjectId ? await getSubjectById(subjectId) : true;
+
+  if (!existsSubject) {
+    throw new ResourceNotFound(
+      'No se encontró la materia por la que se filtró'
+    );
+  }
+
   const semester = await semesterRepository.getSemesterLectures(
     semesterId,
     degreeId,
@@ -80,11 +98,8 @@ export async function getSemesterLectures(
       lecture_roles: lectureRoles,
     });
   });
-  console.log(lecturesPromises);
 
-  const lectures = await Promise.all(lecturesPromises);
-
-  return SemesterResponseDtoHelper.fromModel(semester, lectures);
+  return await Promise.all(lecturesPromises);
 }
 
 export async function addLecture(lecture: Partial<Lecture>) {

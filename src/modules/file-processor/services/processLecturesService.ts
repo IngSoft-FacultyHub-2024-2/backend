@@ -23,7 +23,7 @@ interface SemesterLectures {
 
 export async function processLectures(
   fileData: FileDataDto,
-  data: string[],
+  data: string[][],
   sheetName: string
 ) {
   let degreeAcronym;

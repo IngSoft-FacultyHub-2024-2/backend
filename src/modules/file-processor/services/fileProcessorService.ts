@@ -35,7 +35,6 @@ export async function processFile(filename: string, fileData: FileDataDto) {
       }
     }
   }
-  console.log(message);
   fs.unlinkSync(filePath);
 
   return message;

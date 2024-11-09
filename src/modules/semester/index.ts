@@ -1,6 +1,8 @@
-import { addLecture, addSemester, getSemesterLectures } from "./services/semesterService";
+import {
+  addLecture,
+  addSemester,
+  getSemesterLectures,
+  getSemesters,
+} from './services/semesterService';
 
-export {
-    addLecture, addSemester, getSemesterLectures
-};
-
+export { addLecture, addSemester, getSemesterLectures, getSemesters };

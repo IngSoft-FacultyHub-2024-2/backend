@@ -34,7 +34,7 @@ interface LectureRole {
 export class LectureResponseDtoHelper {
   public static fromModel(lecture: any): LectureResponseDto {
     return {
-      id: lecture.id,
+      id: lecture.dataValues.id,
       subject: {
         id: lecture.subject.id,
         name: lecture.subject.name,

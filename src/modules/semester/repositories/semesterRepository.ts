@@ -56,13 +56,12 @@ class SemesterRepository {
     const groupWhere = group ? { group } : {};
     const degreeWhere = degreeId ? { degree_id: degreeId } : {};
     const subjectWhere = subjectId ? { subject_id: subjectId } : {};
-
     const semester = await Semester.findByPk(semesterId, {
       include: [
         {
           model: Lecture,
           as: 'lectures',
-          required: true,
+          required: false,
           where: {
             ...subjectWhere,
           },

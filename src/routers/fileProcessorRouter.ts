@@ -2,12 +2,18 @@ import { Router } from "express";
 import fileProcessorController from "../controllers/fileProcessorController";
 import multer from "multer";
 import path from "path";
+import fs from 'fs';
 
 const router = Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadPath = path.resolve(__dirname, '../uploads');
+
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+
         cb(null, uploadPath); // Carpeta donde se guardarán los archivos
     },
     filename: (req, file, cb) => {

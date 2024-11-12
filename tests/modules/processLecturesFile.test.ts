@@ -4,7 +4,7 @@ import { getDegreeByAcronym } from '../../src/modules/degree';
 import { FileDataDto } from '../../src/modules/file-processor/dtos/FileDataDto';
 import { processLectures } from '../../src/modules/file-processor/services/processLecturesService';
 import { addLecture } from '../../src/modules/semester';
-import { getSubjects } from '../../src/modules/subject';
+import { getAllSubjectNames } from '../../src/modules/subject';
 import { getModules } from '../../src/modules/teacher';
 import { SubjectRoles } from '../../src/shared/utils/enums/subjectRoles';
 
@@ -47,7 +47,7 @@ describe('processLectures Service', () => {
   beforeEach(() => {
     // Mocks de las funciones externas
     (getDegreeByAcronym as jest.Mock).mockResolvedValue(mockDegree);
-    (getSubjects as jest.Mock).mockResolvedValue({ subjects: mockSubjects });
+    (getAllSubjectNames as jest.Mock).mockResolvedValue(mockSubjects);
     (getModules as jest.Mock).mockResolvedValue(mockModules);
     (addLecture as jest.Mock).mockResolvedValue(undefined);
   });
@@ -66,7 +66,7 @@ describe('processLectures Service', () => {
     );
 
     expect(getDegreeByAcronym).toHaveBeenCalledWith('IS');
-    expect(getSubjects).toHaveBeenCalled();
+    expect(getAllSubjectNames).toHaveBeenCalled();
     expect(getModules).toHaveBeenCalled();
     expect(addLecture).toHaveBeenCalledTimes(2); // Asegura que se llamaron las veces correctas
     expect(resultMessage).toContain(

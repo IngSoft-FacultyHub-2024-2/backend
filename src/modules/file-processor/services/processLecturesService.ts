@@ -1,7 +1,7 @@
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import { getDegreeByAcronym } from '../../degree';
 import { addLecture } from '../../semester';
-import { getSubjects } from '../../subject';
+import { getAllSubjectNames } from '../../subject';
 import { getModules } from '../../teacher';
 import { FileDataDto } from '../dtos/FileDataDto';
 
@@ -50,15 +50,7 @@ export async function processLectures(
   const result: SemesterLectures[] = [];
   let currentGroup = '';
 
-  const { subjects: relevantSubjects } = await getSubjects(
-    undefined,
-    undefined,
-    undefined,
-    'ASC',
-    1,
-    1000,
-    false
-  );
+  const relevantSubjects = await getAllSubjectNames();
   const modules = await getModules();
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 

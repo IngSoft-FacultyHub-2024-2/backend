@@ -3,6 +3,8 @@ export interface LectureResponseDto {
   subject: {
     id: number;
     name: string;
+    acronym: string;
+    valid: boolean; 
   };
   lecture_groups: LectureGroup[];
   lecture_roles: LectureRole[];
@@ -23,6 +25,7 @@ interface LectureRole {
   teachers: {
     id: number;
     name: string;
+    surname: string;
   }[];
   hour_configs: {
     id: number;
@@ -34,10 +37,12 @@ interface LectureRole {
 export class LectureResponseDtoHelper {
   public static fromModel(lecture: any): LectureResponseDto {
     return {
-      id: lecture.id,
+      id: lecture.dataValues.id,
       subject: {
         id: lecture.subject.id,
         name: lecture.subject.name,
+        acronym: lecture.subject.acronym,
+        valid: lecture.subject.valid,
       },
       lecture_groups: lecture.lecture_groups.map((group: any) => ({
         id: group.id,
@@ -53,6 +58,7 @@ export class LectureResponseDtoHelper {
         teachers: role.teachers.map((teacher: any) => ({
           id: teacher.id,
           name: teacher.name,
+          surname: teacher.surname,
         })),
         hour_configs: role.hour_configs.map((config: any) => ({
           id: config.id,

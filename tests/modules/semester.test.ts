@@ -15,6 +15,7 @@ jest.mock('../../src/modules/teacher');
 describe('Semester Service', () => {
   const mockSemester = { id: 1, name: 'Spring 2024' };
   const mockLecture = {
+    dataValues: { id: 1, subject_id: 1 },
     id: 1,
     subject_id: 1,
     lecture_groups: [],

@@ -105,3 +105,21 @@ export async function getSemesterLectures(
 export async function addLecture(lecture: Partial<Lecture>) {
   return await semesterRepository.addLecture(lecture);
 }
+
+export async function getSemesterLecturesGroups(
+  semesterId: number,
+  degreeId?: number
+) {
+  const existsDegree = degreeId ? await getDegreeById(degreeId) : true;
+  if (!existsDegree) {
+    throw new ResourceNotFound(
+      'No se encontró la carrera por la que se filtró'
+    );
+  }
+
+  const lecturesGroups = await semesterRepository.getSemesterLecturesGroups(
+    semesterId,
+    degreeId
+  );
+  return lecturesGroups;
+}

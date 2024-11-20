@@ -7,6 +7,7 @@ import {
   addSemester,
   getSemesterLectures,
   getSemesters,
+  getSemesterLecturesGroups,
 } from '../../src/modules/semester';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
@@ -151,6 +152,48 @@ describe('SemesterController', () => {
     await SemesterController.getLectures(mockReq, mockRes);
 
     expect(getSemesterLectures).toHaveBeenCalledWith('1', '2', '3', 'A');
+    expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
+  });
+});
+
+describe('getLecturesGroups', () => {
+  const mockReq: any = {
+    params: { semesterId: 1 },
+    query: { degreeId: 2 },
+  };
+  const mockRes: any = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  };
+  const mockLectureGroups = [
+    { id: 1, group: 'A' },
+    { id: 2, group: 'B' },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should respond with lecture groups on success', async () => {
+    (getSemesterLecturesGroups as jest.Mock).mockResolvedValue(
+      mockLectureGroups
+    );
+
+    await SemesterController.getLecturesGroups(mockReq, mockRes);
+
+    expect(getSemesterLecturesGroups).toHaveBeenCalledWith(1, 2);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockLectureGroups);
+  });
+
+  it('should handle errors and call returnError on failure', async () => {
+    const mockError = new Error('Some error');
+    (getSemesterLecturesGroups as jest.Mock).mockRejectedValue(mockError);
+
+    await SemesterController.getLecturesGroups(mockReq, mockRes);
+
+    expect(getSemesterLecturesGroups).toHaveBeenCalledWith(1, 2);
+    expect(mockRes.status).not.toHaveBeenCalledWith(200);
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
   });
 });

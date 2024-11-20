@@ -46,7 +46,7 @@ export async function getSemesterLectures(
     throw new ResourceNotFound('No se encontraron el semestre');
   }
 
-  const lecturesPromises = semester.lectures.map(async (lecture) => {
+  const lecturesPromises = semester.lectures.map(async (lecture: Lecture) => {
     const subject = await getSubjectById(lecture.subject_id);
     if (!subject) {
       throw new ResourceNotFound(

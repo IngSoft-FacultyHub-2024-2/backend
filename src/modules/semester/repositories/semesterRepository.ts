@@ -94,6 +94,12 @@ class SemesterRepository {
       ],
     });
 
+    semester?.lectures.forEach((lecture: Lecture) => {
+      lecture.lecture_roles = lecture.lecture_roles.map((role: any) =>
+        role.get({ plain: true })
+      );
+    });
+
     return semester;
   }
 }

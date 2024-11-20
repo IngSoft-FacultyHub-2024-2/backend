@@ -8,7 +8,7 @@ import { processLectures } from './processLecturesService';
 export async function processFile(filename: string, fileData: FileDataDto) {
   const filePath = path.join(__dirname, '../../../uploads', filename);
   const workbook = xlsx.readFile(filePath);
-  let message = '';
+  let ret = [];
   for (let i = 0; i < workbook.SheetNames.length; i++) {
     const sheetName = workbook.SheetNames[i];
     const worksheet = workbook.Sheets[sheetName];
@@ -28,14 +28,14 @@ export async function processFile(filename: string, fileData: FileDataDto) {
       }
     });
     if (fileData.fileType === FileTypes.LECTURES) {
-      const returnMessage = await processLectures(fileData, data, sheetName);
+      const returnLectures = await processLectures(fileData, data, sheetName);
 
-      if (returnMessage) {
-        message += returnMessage;
-      }
+      ret.push({
+        sheetName,
+        lectures: returnLectures || [],
+      });
     }
   }
   fs.unlinkSync(filePath);
-
-  return message;
+  return ret;
 }

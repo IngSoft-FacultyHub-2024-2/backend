@@ -10,12 +10,7 @@ class FileProcessorController {
         req.body
       );
 
-      return res
-        .status(200)
-        .json({
-          message:
-            processedFileMessage || 'El archivo fue procesado correctamente',
-        });
+      return res.status(200).json(processedFileMessage);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

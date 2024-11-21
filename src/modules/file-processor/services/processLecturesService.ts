@@ -197,7 +197,11 @@ function generateResultLectures(
         const groupData = lecture.lecture_groups[0];
         return {
           name: groupData.group,
-          roles: lecture.lecture_roles.map((role) => role.role),
+          roles: lecture.lecture_roles
+            .sort((a, b) => a.role.localeCompare(b.role))
+            .map((role) => {
+              return role.role;
+            }),
         };
       }),
     };

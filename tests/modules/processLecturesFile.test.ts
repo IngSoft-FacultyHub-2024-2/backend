@@ -2,6 +2,7 @@
 
 import { getDegreeByAcronym } from '../../src/modules/degree';
 import { FileDataDto } from '../../src/modules/file-processor/dtos/FileDataDto';
+import { LectureDto } from '../../src/modules/file-processor/dtos/LecturesReturnDto';
 import { processLectures } from '../../src/modules/file-processor/services/processLecturesService';
 import { addLecture } from '../../src/modules/semester';
 import { getAllSubjectNames } from '../../src/modules/subject';
@@ -44,6 +45,17 @@ describe('processLectures Service', () => {
     ],
   ];
 
+  const mockResult: LectureDto[] = [
+    {
+      lecture_groups: [{ name: 'M1A', roles: ['Teórico'] }],
+      subject_name: 'Fundamentos de Ingeniería de Software',
+    },
+    {
+      lecture_groups: [{ name: 'M1A', roles: ['Teórico'] }],
+      subject_name: 'Diseño de Aplicaciones',
+    },
+  ];
+
   beforeEach(() => {
     // Mocks de las funciones externas
     (getDegreeByAcronym as jest.Mock).mockResolvedValue(mockDegree);
@@ -56,34 +68,24 @@ describe('processLectures Service', () => {
     jest.clearAllMocks();
   });
 
-  it('should process lectures and return a success message', async () => {
+  it('should process lectures and return them', async () => {
     const sheetName = 'IS-2024';
 
-    const resultMessage = await processLectures(
-      mockFileData,
-      mockData,
-      sheetName
-    );
+    const result = await processLectures(mockFileData, mockData, sheetName);
 
     expect(getDegreeByAcronym).toHaveBeenCalledWith('IS');
     expect(getAllSubjectNames).toHaveBeenCalled();
     expect(getModules).toHaveBeenCalled();
     expect(addLecture).toHaveBeenCalledTimes(2); // Asegura que se llamaron las veces correctas
-    expect(resultMessage).toContain(
-      'Las siguientes materias se han procesado correctamente'
-    );
+    expect(result).toEqual(mockResult);
   });
 
   it('should not process lectures if degree is not found', async () => {
     (getDegreeByAcronym as jest.Mock).mockResolvedValue(null); // Simula que no se encontró el grado
 
-    const resultMessage = await processLectures(
-      mockFileData,
-      mockData,
-      'IS-2024'
-    );
+    const result = await processLectures(mockFileData, mockData, 'IS-2024');
 
-    expect(resultMessage).toBeUndefined(); // No debe retornar mensaje si no se encuentra el grado
+    expect(result).toBeUndefined();
   });
 
   it('should correctly map subjects and roles to lectures', async () => {

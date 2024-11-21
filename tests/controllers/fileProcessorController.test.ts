@@ -1,10 +1,32 @@
 import { Request, Response } from 'express';
 import FileProcessorController from '../../src/controllers/fileProcessorController';
+import { LecturesReturnDto } from '../../src/modules/file-processor/dtos/LecturesReturnDto';
 import { processFile } from '../../src/modules/file-processor/services/fileProcessorService';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
 jest.mock('../../src/modules/file-processor/services/fileProcessorService');
 jest.mock('../../src/shared/utils/exceptions/handleExceptions');
+
+const mockProcessedSemester: LecturesReturnDto[] = [
+  {
+    sheetName: 'Semestre 1',
+    lectures: [
+      {
+        subject_name: 'Materia 1',
+        lecture_groups: [
+          {
+            name: 'N5A',
+            roles: ['Tecnología', 'Teórico'],
+          },
+        ],
+      },
+      {
+        subject_name: 'Materia 2',
+        lecture_groups: [],
+      },
+    ],
+  },
+];
 
 describe('FileProcessorController', () => {
   let mockReq = {} as Request;
@@ -33,10 +55,9 @@ describe('FileProcessorController', () => {
 
   it('processes a file successfully', async () => {
     // Arrange
-    const mockProcessedMessage = 'El archivo fue procesado exitosamente';
     mockReq.file = mockFile;
     mockReq.body = { someKey: 'someValue' };
-    (processFile as jest.Mock).mockResolvedValue(mockProcessedMessage);
+    (processFile as jest.Mock).mockResolvedValue(mockProcessedSemester);
 
     // Act
     await FileProcessorController.processFile(mockReq, mockRes);
@@ -44,12 +65,10 @@ describe('FileProcessorController', () => {
     // Assert
     expect(processFile).toHaveBeenCalledWith('test-file.xlsx', mockReq.body);
     expect(mockRes.status).toHaveBeenCalledWith(200);
-    expect(mockRes.json).toHaveBeenCalledWith({
-      message: mockProcessedMessage,
-    });
+    expect(mockRes.json).toHaveBeenCalledWith(mockProcessedSemester);
   });
 
-  it('processes a file successfully with default message when no message is returned', async () => {
+  it('processes a file successfully with empty result', async () => {
     // Arrange
     mockReq.file = mockFile;
     mockReq.body = { someKey: 'someValue' };
@@ -61,9 +80,7 @@ describe('FileProcessorController', () => {
     // Assert
     expect(processFile).toHaveBeenCalledWith('test-file.xlsx', mockReq.body);
     expect(mockRes.status).toHaveBeenCalledWith(200);
-    expect(mockRes.json).toHaveBeenCalledWith({
-      message: 'El archivo fue procesado correctamente',
-    });
+    expect(mockRes.json).toHaveBeenCalledWith(null);
   });
 
   it('handles error during file processing', async () => {

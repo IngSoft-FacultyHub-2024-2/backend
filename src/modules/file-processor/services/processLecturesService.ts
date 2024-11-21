@@ -4,6 +4,7 @@ import { addLecture } from '../../semester';
 import { getAllSubjectNames } from '../../subject';
 import { getModules } from '../../teacher';
 import { FileDataDto } from '../dtos/FileDataDto';
+import { LectureDto } from '../dtos/LecturesReturnDto';
 
 interface SemesterLectures {
   semester_id: number;
@@ -41,7 +42,6 @@ export async function processLectures(
   }
 
   const degree = await getDegreeByAcronym(degreeAcronym);
-  console.log(degree);
 
   if (!degree) {
     return;
@@ -53,7 +53,6 @@ export async function processLectures(
   const relevantSubjects = await getAllSubjectNames();
   const modules = await getModules();
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-
   for (const row of data) {
     if (isGroupRow(row[0])) {
       currentGroup = row[0];
@@ -63,12 +62,12 @@ export async function processLectures(
     if (currentGroup && isHourRow(row[0])) {
       const module = findModule(modules, row[0]);
       if (!module) continue;
-
       for (let j = 1; j <= days.length; j++) {
         const subject = normalizeString(row[j] || '').toUpperCase();
         const matchingSubject = relevantSubjects.find((subj) =>
           normalizeString(subject).includes(normalizeString(subj.name))
         );
+
         if (matchingSubject) {
           updateLecture(
             result,
@@ -89,11 +88,11 @@ export async function processLectures(
     await addLecture(lecture as any);
   }
 
-  return generateResultMessage(result, relevantSubjects, degree.name);
+  return generateResultLectures(result, relevantSubjects);
 }
 
 function isGroupRow(value: any): boolean {
-  return typeof value === 'string' && /^M\d{1,2}[A-Z]$/.test(value);
+  return typeof value === 'string' && /^[M,N]\d{1,2}[A-Z]$/.test(value);
 }
 
 function isHourRow(value: any): boolean {
@@ -181,19 +180,34 @@ function createHourConfig(role: string, day: string, moduleId: number) {
   };
 }
 
-function generateResultMessage(
-  result: SemesterLectures[],
-  subjects: any[],
-  degreeName: string
+function generateResultLectures(
+  resultLectures: SemesterLectures[],
+  subjects: any[]
 ) {
-  let returnMessage = `Las siguientes materias se han procesado correctamente para la carrera ${degreeName}:\n`;
-  subjects.forEach((subject) => {
-    const subjectLectures = result.filter(
+  let ret: LectureDto[] = [];
+
+  ret = subjects.map((subject) => {
+    const subjectLectures = resultLectures.filter(
       (res) => res.subject_id === subject.id
     );
-    returnMessage += `- ${subject.name}: ${subjectLectures.length} dictados\n`;
+
+    return {
+      subject_name: subject.name,
+      lecture_groups: subjectLectures.map((lecture) => {
+        const groupData = lecture.lecture_groups[0];
+        return {
+          name: groupData.group,
+          roles: lecture.lecture_roles
+            .sort((a, b) => a.role.localeCompare(b.role))
+            .map((role) => {
+              return role.role;
+            }),
+        };
+      }),
+    };
   });
-  return returnMessage + '\n';
+
+  return ret;
 }
 
 function normalizeString(str: string): string {

@@ -1,0 +1,19 @@
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    return queryInterface.bulkInsert('Categories', [
+      {
+        name: 'Categoría 1',
+      },
+      {
+        name: 'Categoría 2',
+      },
+    ]);
+  },
+
+  async down(queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('Categories', null, {});
+  },
+};

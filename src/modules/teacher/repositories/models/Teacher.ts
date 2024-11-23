@@ -116,7 +116,7 @@ Teacher.init({
     type: DataTypes.DATE,
     allowNull: true,
   },
-  unsusbribe_risk: {
+  unsubscribe_risk: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,

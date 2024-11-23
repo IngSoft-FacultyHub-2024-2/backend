@@ -98,6 +98,7 @@ class TeacherRepository {
     sortField?: string,
     search?: string,
     state?: TeacherStates,
+    risk?: number
   ) {
     const orderOption = sortField ? [[sortField, sortOrder]] as Order : [['id', sortOrder]] as Order;
     const searchQuery = search
@@ -111,10 +112,12 @@ class TeacherRepository {
       : {};
 
     const stateQuery = state ? { state } : {};
+    const riskQuery = risk ? { unsubscribe_risk: risk } : {};
 
     const whereClause = {
       ...searchQuery,
       ...stateQuery,
+      ...riskQuery,
     };
 
     return await Teacher.findAndCountAll({

@@ -67,8 +67,8 @@ class TeacherController {
 
   async getTeachers(req: any, res: Response) {
     try {
-      const { search, state, sortField, sortOrder, withDeleted, page, pageSize } = req.query;
-      const teachersResponse = await getTeachers(search, state, sortField, sortOrder, page, pageSize, withDeleted);
+      const { search, state, unsubscribe_risk, sortField, sortOrder, withDeleted, page, pageSize } = req.query;
+      const teachersResponse = await getTeachers(search, state, unsubscribe_risk, sortField, sortOrder, page, pageSize, withDeleted);
       res.status(200).json(teachersResponse);
     } catch (error) {
       if (error instanceof Error) {

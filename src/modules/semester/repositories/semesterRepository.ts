@@ -1,3 +1,4 @@
+import { Sequelize } from 'sequelize';
 import Lecture from './models/Lecture';
 import LectureGroup from './models/LectureGroup';
 import LectureHourConfig from './models/LectureHourConfig';
@@ -96,7 +97,34 @@ class SemesterRepository {
       ],
     });
 
+    semester?.lectures.forEach((lecture: Lecture) => {
+      lecture.lecture_roles = lecture.lecture_roles.map((role: any) =>
+        role.get({ plain: true })
+      );
+    });
+
     return semester;
+  }
+
+  async getSemesterLecturesGroups(semesterId: number, degreeId?: number) {
+    const degreeWhere = degreeId ? { degree_id: degreeId } : {};
+    const distinctGroups = await LectureGroup.findAll({
+      attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('group')), 'group']], // Select distinct 'group'
+      where: {
+        ...degreeWhere,
+      },
+      include: [
+        {
+          model: Lecture,
+          as: 'lecture',
+          where: { semester_id: semesterId },
+          attributes: [],
+        },
+      ],
+      raw: true,
+      order: [['group', 'ASC']],
+    });
+    return distinctGroups.map((row: any) => row.group);
   }
 }
 

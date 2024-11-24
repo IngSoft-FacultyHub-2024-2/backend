@@ -129,4 +129,67 @@ describe('Semester Service', () => {
       expect(result).toEqual(mockLecture);
     });
   });
+
+  describe('getSemesterLecturesGroups', () => {
+    const mockSemesterId = 1;
+    const mockDegreeId = 2;
+    const mockLectureGroups = [
+      { id: 1, group: 'M5A' },
+      { id: 2, group: 'M5B' },
+    ];
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should return lecture groups when degreeId is provided and valid', async () => {
+      (getDegreeById as jest.Mock).mockResolvedValue(true);
+      (
+        semesterRepository.getSemesterLecturesGroups as jest.Mock
+      ).mockResolvedValue(mockLectureGroups);
+
+      const result = await semesterService.getSemesterLecturesGroups(
+        mockSemesterId,
+        mockDegreeId
+      );
+
+      expect(getDegreeById).toHaveBeenCalledWith(mockDegreeId);
+      expect(semesterRepository.getSemesterLecturesGroups).toHaveBeenCalledWith(
+        mockSemesterId,
+        mockDegreeId
+      );
+      expect(result).toEqual(mockLectureGroups);
+    });
+
+    it('should return lecture groups when degreeId is not provided', async () => {
+      (
+        semesterRepository.getSemesterLecturesGroups as jest.Mock
+      ).mockResolvedValue(mockLectureGroups);
+
+      const result =
+        await semesterService.getSemesterLecturesGroups(mockSemesterId);
+
+      expect(getDegreeById).not.toHaveBeenCalled();
+      expect(semesterRepository.getSemesterLecturesGroups).toHaveBeenCalledWith(
+        mockSemesterId,
+        undefined
+      );
+      expect(result).toEqual(mockLectureGroups);
+    });
+
+    it('should throw ResourceNotFound error when degreeId is invalid', async () => {
+      (getDegreeById as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        semesterService.getSemesterLecturesGroups(mockSemesterId, mockDegreeId)
+      ).rejects.toThrow(
+        new ResourceNotFound('No se encontró la carrera por la que se filtró')
+      );
+
+      expect(getDegreeById).toHaveBeenCalledWith(mockDegreeId);
+      expect(
+        semesterRepository.getSemesterLecturesGroups
+      ).not.toHaveBeenCalled();
+    });
+  });
 });

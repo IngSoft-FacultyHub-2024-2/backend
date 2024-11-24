@@ -192,4 +192,54 @@ describe('Semester Service', () => {
       ).not.toHaveBeenCalled();
     });
   });
+
+  describe('updateLecture', () => {
+    const mockLectureId = 1;
+    const mockLectureData = {
+      dataValues: { id: 1, subject_id: 1 },
+      subjectId: 1,
+    };
+    const mockUpdatedLecture = {
+      id: 1,
+      dataValues: { id: 1, subject_id: 1 },
+      subjectId: 1,
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should call semesterRepository.updateLecture with the correct parameters', async () => {
+      (semesterRepository.updateLecture as jest.Mock).mockResolvedValue(
+        mockUpdatedLecture
+      );
+
+      const result = await semesterService.updateLecture(
+        mockLectureId,
+        mockLectureData
+      );
+
+      expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
+        mockLectureId,
+        mockLectureData
+      );
+      expect(result).toEqual(mockUpdatedLecture);
+    });
+
+    it('should handle errors and propagate them', async () => {
+      const mockError = new Error('Update failed');
+      (semesterRepository.updateLecture as jest.Mock).mockRejectedValue(
+        mockError
+      );
+
+      await expect(
+        semesterService.updateLecture(mockLectureId, mockLectureData)
+      ).rejects.toThrow(mockError);
+
+      expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
+        mockLectureId,
+        mockLectureData
+      );
+    });
+  });
 });

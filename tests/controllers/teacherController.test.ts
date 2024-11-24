@@ -97,7 +97,7 @@ describe('TeacherController', () => {
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;
-
+  
     beforeEach(() => {
       req = { query: {} };
       statusMock = jest.fn().mockReturnThis();
@@ -105,7 +105,7 @@ describe('TeacherController', () => {
       res = { status: statusMock, json: jsonMock };
       jest.clearAllMocks();
     });
-
+  
     it('should return a list of teachers with associated subjects', async () => {
       const mockTeachers = {
         teachers: [
@@ -115,16 +115,18 @@ describe('TeacherController', () => {
         totalPages: 1,
         currentPage: 1
       };
-
+  
       (getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
-
+  
       await teacherController.getTeachers(req as Request, res as Response);
-
-      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+  
+      expect(getTeachers).toHaveBeenCalledWith(
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
-
+  
     it('should accept queries and return a list of teachers with associated subjects', async () => {
       const mockTeachers = {
         teachers: [
@@ -134,39 +136,45 @@ describe('TeacherController', () => {
         totalPages: 1,
         currentPage: 1
       };
-
+  
       (getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
-
+  
       const req = {
         query: {
           search: 'John',
           state: 'active',
+          unsubscribe_risk: '0',
           sortField: 'name',
           sortOrder: 'ASC',
           page: 1,
           pageSize: 10
         }
       };
-
+  
       await teacherController.getTeachers(req, res as Response);
-
-      expect(getTeachers).toHaveBeenCalledWith('John', 'active', 'name', 'ASC', 1, 10, undefined);
+  
+      expect(getTeachers).toHaveBeenCalledWith(
+        'John', 'active','0', 'name', 'ASC', 1, 10, undefined
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
-
+  
     it('should handle errors', async () => {
       const error = new Error('Something went wrong');
       (getTeachers as jest.Mock).mockImplementation(() => {
         throw error;
       });
-
+  
       await teacherController.getTeachers(req as Request, res as Response);
-
-      expect(getTeachers).toHaveBeenCalledWith(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+  
+      expect(getTeachers).toHaveBeenCalledWith(
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+      );
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });
+  
 
   describe('getAllTeachersNames', () => {
     let req: Partial<Request>;

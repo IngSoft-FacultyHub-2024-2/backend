@@ -6,8 +6,8 @@ import { extractParameters } from '../shared/utils/queryParamsHelper';
 
 class EventController {
   async addEvent(req: Request, res: Response) {
-    try{
-      await inputEventSchema.validate(req.body)
+    try {
+      await inputEventSchema.validate(req.body);
       const event = await addEvent(req.body);
       res.status(201).json(event);
     } catch (error) {
@@ -19,10 +19,17 @@ class EventController {
   }
 
   async getEvents(req: Request, res: Response) {
-    try{
+    try {
       const queryParams = req.query;
-      const { filters, sortField, sortOrder, page, pageSize } = extractParameters(queryParams);
-      const events = await getEvents(filters, sortField, sortOrder, page, pageSize);
+      const { filters, sortField, sortOrder, page, pageSize } =
+        extractParameters(queryParams);
+      const events = await getEvents(
+        filters,
+        sortField,
+        sortOrder,
+        page,
+        pageSize
+      );
       res.status(200).json(events);
     } catch (error) {
       console.log(error);

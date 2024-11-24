@@ -5,6 +5,7 @@ import {
   getSemesterLectures,
   getSemesters,
   getSemesterLecturesGroups,
+  updateLecture,
 } from '../modules/semester';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
@@ -37,8 +38,8 @@ class SemesterController {
   async addLecture(req: Request, res: Response) {
     try {
       await inputLectureSchema.validate(req.body);
-      const event = await addLecture(req.body);
-      res.status(201).json(event);
+      const lecture = await addLecture(req.body);
+      res.status(201).json(lecture);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
@@ -72,6 +73,19 @@ class SemesterController {
       const { degreeId, subjectId } = req.query;
       const semester = await getSemesterLecturesGroups(semesterId, degreeId);
       res.status(200).json(semester);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async updateLecture(req: Request, res: Response) {
+    try {
+      await inputLectureSchema.validate(req.body);
+      const lecture = await updateLecture(parseInt(req.params.id), req.body);
+      res.status(200).json(lecture);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {

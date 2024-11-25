@@ -50,6 +50,7 @@ export class LectureResponseDtoHelper {
         degree: {
           id: group.degree.id,
           name: group.degree.name,
+          acronym: group.degree.acronym,
         },
       })),
       lecture_roles: lecture.lecture_roles.map((role: any) => ({

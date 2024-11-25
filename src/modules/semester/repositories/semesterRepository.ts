@@ -12,7 +12,9 @@ class SemesterRepository {
   }
 
   async getSemesters() {
-    return await Semester.findAll();
+    return await Semester.findAll({
+      order: [['start_date', 'DESC']],
+    });
   }
 
   async addLecture(lecture: Partial<Lecture>) {

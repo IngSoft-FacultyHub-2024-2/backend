@@ -13,6 +13,7 @@ export async function addTeacher(teacher: Partial<Teacher>) {
 export async function getTeachers(
   search?: string, 
   state?: TeacherStates,
+  risk?: number,
   sortField?: string,
   sortOrder: 'ASC' | 'DESC' = 'ASC',
   page: number = 1,
@@ -22,7 +23,7 @@ export async function getTeachers(
   const offset = (page - 1) * pageSize;
   const limit = pageSize;
 
-  const teacherRows = await teacherRepository.getTeachers( limit, offset, sortOrder, withDeleted, sortField, search, state);
+  const teacherRows = await teacherRepository.getTeachers( limit, offset, sortOrder, withDeleted, sortField, search, state, risk);
 
   const totalPages = Math.ceil(teacherRows.count / pageSize);
   const teachers = teacherRows.rows;

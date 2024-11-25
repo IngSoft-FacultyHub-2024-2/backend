@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import sequelize from './config/database';
-import { initializeDatabase } from './initializingData';
 import degreeRouter from './routers/degreeRouter';
 import eventRouter from './routers/eventRouter';
 import fileProcessorRouter from './routers/fileProcessorRouter';
@@ -44,7 +43,6 @@ app.listen(PORT, async () => {
     await sequelize.authenticate();
     await sequelize.sync({ force: false }); // create the tables if they do not exist
     console.log('Database connected!');
-    await initializeDatabase();
   } catch (error) {
     console.log('Failed to connect to the database: ', error);
   }

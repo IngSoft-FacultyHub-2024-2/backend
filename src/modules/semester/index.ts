@@ -4,6 +4,7 @@ import {
   getSemesterLectures,
   getSemesters,
   getSemesterLecturesGroups,
+  updateLecture,
 } from './services/semesterService';
 
 export {
@@ -12,4 +13,5 @@ export {
   getSemesterLectures,
   getSemesters,
   getSemesterLecturesGroups,
+  updateLecture,
 };

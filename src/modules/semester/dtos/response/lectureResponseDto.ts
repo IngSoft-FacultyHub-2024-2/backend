@@ -46,11 +46,11 @@ export class LectureResponseDtoHelper {
         valid: lecture.subject.valid,
       },
       lecture_groups: lecture.lecture_groups.map((group: any) => ({
-        id: group.id,
         group: group.group,
         degree: {
           id: group.degree.id,
           name: group.degree.name,
+          acronym: group.degree.acronym,
         },
       })),
       lecture_roles: lecture.lecture_roles.map((role: any) => ({

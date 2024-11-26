@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import Lecture from './models/Lecture';
 import LectureGroup from './models/LectureGroup';
 import LectureHourConfig from './models/LectureHourConfig';
@@ -125,6 +125,122 @@ class SemesterRepository {
       order: [['group', 'ASC']],
     });
     return distinctGroups.map((row: any) => row.group);
+  }
+
+  async updateLecture(lectureId: number, lectureData: Partial<Lecture>) {
+    const transaction: Transaction = await Lecture.sequelize!.transaction();
+
+    try {
+      const lecture = await Lecture.findByPk(lectureId, {
+        include: [
+          { model: LectureGroup, as: 'lecture_groups' },
+          {
+            model: LectureRole,
+            as: 'lecture_roles',
+            include: ['hour_configs', 'teachers'],
+          },
+        ],
+        transaction, // Ensure all queries in the transaction scope
+      });
+
+      if (!lecture) {
+        throw new Error(`Lecture with ID ${lectureId} not found`);
+      }
+
+      // Update the main Lecture attributes
+      if (lectureData) {
+        await lecture.update(lectureData, { transaction });
+      }
+
+      // Update LectureGroups
+      if (lectureData.lecture_groups) {
+        // Remove existing groups
+        await LectureGroup.destroy({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+
+        // Add new groups
+        const newGroups = lectureData.lecture_groups.map((group) => ({
+          lecture_id: lectureId,
+          degree_id: group.degree_id,
+          group: group.group,
+        }));
+        await LectureGroup.bulkCreate(newGroups, { transaction });
+      }
+
+      // Update LectureRoles
+      if (lectureData.lecture_roles) {
+        // Fetch all existing lecture role IDs for cleanup
+        const existingRoles = await LectureRole.findAll({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+        const roleIds = existingRoles.map((role) => role.id);
+
+        // Delete associated LectureHourConfig and LectureTeacher records
+        await LectureHourConfig.destroy({
+          where: { lecture_role_id: roleIds },
+          transaction,
+        });
+
+        await LectureTeacher.destroy({
+          where: { lecture_role_id: roleIds },
+          transaction,
+        });
+
+        // Delete all existing LectureRoles
+        await LectureRole.destroy({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+
+        // Create new roles
+        for (const lectureRole of lectureData.lecture_roles) {
+          const newRole = await LectureRole.create(
+            { ...lectureRole, lecture_id: lectureId },
+            { transaction }
+          );
+
+          // Create nested hour_configs
+          if (lectureRole.hour_configs) {
+            const newHourConfigs = lectureRole.hour_configs.map((config) => ({
+              lecture_role_id: newRole.id,
+              day_of_week: config.day_of_week,
+              modules: config.modules,
+            }));
+            await LectureHourConfig.bulkCreate(newHourConfigs, { transaction });
+          }
+
+          // Create nested teachers
+          if (lectureRole.teachers) {
+            const newTeachers = lectureRole.teachers.map((teacher) => ({
+              lecture_role_id: newRole.id,
+              teacher_id: teacher.teacher_id,
+            }));
+            await LectureTeacher.bulkCreate(newTeachers, { transaction });
+          }
+        }
+      }
+
+      // Commit transaction
+      await transaction.commit();
+
+      // Return updated lecture
+      return await Lecture.findByPk(lectureId, {
+        include: [
+          { model: LectureGroup, as: 'lecture_groups' },
+          {
+            model: LectureRole,
+            as: 'lecture_roles',
+            include: ['hour_configs', 'teachers'],
+          },
+        ],
+      });
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 }
 

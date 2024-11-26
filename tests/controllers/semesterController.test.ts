@@ -8,6 +8,7 @@ import {
   getSemesterLectures,
   getSemesters,
   getSemesterLecturesGroups,
+  updateLecture,
 } from '../../src/modules/semester';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
@@ -195,5 +196,56 @@ describe('getLecturesGroups', () => {
     expect(getSemesterLecturesGroups).toHaveBeenCalledWith(1, 2);
     expect(mockRes.status).not.toHaveBeenCalledWith(200);
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
+  });
+});
+
+describe('updateLecture', () => {
+  const mockReq: Partial<Request> = {
+    params: { id: '1' },
+    body: { name: 'Updated Lecture' },
+  };
+  const mockRes: Partial<Response> = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should update a lecture and respond with the updated lecture', async () => {
+    const mockUpdatedLecture = { id: 1, name: 'Updated Lecture' };
+
+    // Mock validations and service call
+    (inputLectureSchema.validate as jest.Mock).mockResolvedValue(true);
+    (updateLecture as jest.Mock).mockResolvedValue(mockUpdatedLecture);
+
+    await SemesterController.updateLecture(
+      mockReq as Request,
+      mockRes as Response
+    );
+
+    expect(inputLectureSchema.validate).toHaveBeenCalledWith(mockReq.body);
+    expect(updateLecture).toHaveBeenCalledWith(1, mockReq.body);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockUpdatedLecture);
+  });
+
+  it('should handle validation errors and call returnError', async () => {
+    const mockValidationError = new Error('Validation Error');
+
+    // Mock validation failure
+    (inputLectureSchema.validate as jest.Mock).mockRejectedValue(
+      mockValidationError
+    );
+
+    await SemesterController.updateLecture(
+      mockReq as Request,
+      mockRes as Response
+    );
+
+    expect(inputLectureSchema.validate).toHaveBeenCalledWith(mockReq.body);
+    expect(updateLecture).not.toHaveBeenCalled();
+    expect(returnError).toHaveBeenCalledWith(mockRes, mockValidationError);
   });
 });

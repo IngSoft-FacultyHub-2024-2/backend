@@ -123,3 +123,10 @@ export async function getSemesterLecturesGroups(
   );
   return lecturesGroups;
 }
+
+export async function updateLecture(
+  lectureId: number,
+  lecture: Partial<Lecture>
+) {
+  return await semesterRepository.updateLecture(lectureId, lecture);
+}

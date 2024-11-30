@@ -18,7 +18,7 @@ class Teacher extends Model {
   public surname!: string;
   public birth_date!: Date | null;
   public employee_number!: number | null;
-  public cv_file!: string | null; 
+  public cv_file!: string | null;
   public how_they_found_us!: string | null;
   public id_photo!: string | null;
   public hiring_date!: Date | null;
@@ -49,85 +49,113 @@ class Teacher extends Model {
     teacher_subject_groups: HasMany<Teacher, TeacherSubjectGroup>;
     teacher_available_modules: HasMany<Teacher, TeacherAvailableModule>;
   };
+
+  public async getSeniorityInSemesters(): Promise<number> {
+    const subjects_history = await TeacherSubjectHistory.findAll({
+      where: { teacher_id: this.id },
+    });
+    const now = new Date();
+    let totalMonths = 0;
+
+    subjects_history.forEach((subject_history) => {
+      const startDate = subject_history.start_date;
+      const endDate = subject_history.end_date || now;
+
+      // Calculate months of seniority for this history
+      const months =
+        (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+        (endDate.getMonth() - startDate.getMonth());
+      totalMonths += Math.max(0, months); // Ensure no negative values
+    });
+
+    // Convert months to semesters (6 months = 1 semester) and round to nearest integer
+    return Math.round(totalMonths / 6);
+  }
 }
 
-Teacher.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+Teacher.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    surname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    birth_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    employee_number: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: {
+        name: 'employee_number',
+        msg: 'El número de funcionario ya existe',
+      },
+    },
+    cv_file: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    how_they_found_us: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    id_photo: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    hiring_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    linkedin_link: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    graduated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    },
+    notes: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.ENUM(
+        TeacherStates.ACTIVE,
+        TeacherStates.TEMPORARY_LEAVE,
+        TeacherStates.INACTIVE
+      ),
+      allowNull: false,
+      defaultValue: 'activo',
+    },
+    retentionDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    unsubscribe_risk: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  surname: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  birth_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  employee_number: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    unique: {
-      name: 'employee_number',
-      msg: 'El número de funcionario ya existe',
-    }
-
-  },
-  cv_file: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  how_they_found_us: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  id_photo: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  hiring_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  linkedin_link: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  graduated: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-    defaultValue: false,
-  },
-  notes: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  state: {
-    type: DataTypes.ENUM(TeacherStates.ACTIVE, TeacherStates.TEMPORARY_LEAVE, TeacherStates.INACTIVE),
-    allowNull: false,
-    defaultValue: 'activo',
-  },
-  retentionDate: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  unsubscribe_risk: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
-}, {
-  sequelize,
-  modelName: 'Teacher',
-  tableName: 'Teachers',
-  timestamps: true,
-  paranoid: true,
-});
+  {
+    sequelize,
+    modelName: 'Teacher',
+    tableName: 'Teachers',
+    timestamps: true,
+    paranoid: true,
+  }
+);
 
 Teacher.hasMany(Prize, {
   sourceKey: 'id',
@@ -159,12 +187,15 @@ Contact.belongsTo(Teacher, {
   as: 'teacher',
 });
 
+Teacher.hasMany(TeacherCategory, {
+  sourceKey: 'id',
+  as: 'categories',
+  foreignKey: 'teacher_id',
+});
+TeacherCategory.belongsTo(Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
 
-Teacher.hasMany(TeacherCategory, {sourceKey: 'id', as: 'categories', foreignKey: 'teacher_id'});
-TeacherCategory.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
-
-Teacher.hasMany(TeacherBenefit, {as: 'benefits', foreignKey: 'teacher_id'});
-TeacherBenefit.belongsTo(Teacher, {foreignKey: 'teacher_id', as: 'teacher'});
+Teacher.hasMany(TeacherBenefit, { as: 'benefits', foreignKey: 'teacher_id' });
+TeacherBenefit.belongsTo(Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
 
 Teacher.hasMany(TeacherSubjectHistory, {
   sourceKey: 'id',
@@ -190,13 +221,13 @@ Teacher.belongsToMany(TeacherSubjectGroup, {
   through: TeacherSubjectGroupMember,
   as: 'teacher_subject_groups',
   foreignKey: 'teacher_id',
-  otherKey: 'teacher_subject_group_id'
+  otherKey: 'teacher_subject_group_id',
 });
 TeacherSubjectGroup.belongsToMany(Teacher, {
   through: TeacherSubjectGroupMember,
   as: 'teachers',
   foreignKey: 'teacher_subject_group_id',
-  otherKey: 'teacher_id'
+  otherKey: 'teacher_id',
 });
 
 Teacher.hasMany(TeacherAvailableModule, {
@@ -217,6 +248,5 @@ TeacherSubjectGroupMember.belongsTo(TeacherSubjectGroup, {
   foreignKey: 'teacher_subject_group_id',
   as: 'teacher_subject_group',
 });
-
 
 export default Teacher;

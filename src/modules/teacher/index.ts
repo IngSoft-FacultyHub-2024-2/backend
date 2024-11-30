@@ -13,6 +13,7 @@ import {
   getTeachers,
   temporaryDismissTeacher,
   updateTeacher,
+  getTeachersToAssignLectures,
 } from './services/teacherService';
 
 export {
@@ -28,4 +29,5 @@ export {
   TeacherResponseDtoHelper,
   temporaryDismissTeacher,
   updateTeacher,
+  getTeachersToAssignLectures,
 };

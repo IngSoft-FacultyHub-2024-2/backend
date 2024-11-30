@@ -15,6 +15,7 @@ import TeacherSubjectGroup from './models/TeacherSubjectGroup';
 import TeacherSubjectGroupMember from './models/TeacherSubjectGroupMember';
 import TeacherSubjectHistory from './models/TeacherSubjectHistory';
 import TeacherSubjectOfInterest from './models/TeacherSubjectOfInterest';
+import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -504,7 +505,7 @@ class TeacherRepository {
         const availableTimes: { [key: string]: number[] } =
           teacher.teacher_available_modules.reduce(
             (acc: { [key: string]: number[] }, module) => {
-              const day = module.day_of_week;
+              const day = translateWeekDayToEnglish(module.day_of_week);
               if (!acc[day]) {
                 acc[day] = [];
               }
@@ -517,7 +518,7 @@ class TeacherRepository {
         const groups: {
           my_role: string;
           subject: number;
-          other_teacher: { teacher: number; role: string }[];
+          other_teacher: { teacher: number; role: string[] }[];
         }[] = teacher.teacher_subject_groups.map((group) => ({
           my_role: group.members.filter(
             (member) => member.teacher_id === teacher.id
@@ -527,7 +528,7 @@ class TeacherRepository {
             .filter((member) => member.teacher_id !== teacher.id)
             .map((member) => ({
               teacher: member.teacher_id,
-              role: member.role,
+              role: [member.role],
             })),
         }));
 

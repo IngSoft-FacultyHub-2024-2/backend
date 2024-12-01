@@ -33,9 +33,9 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     },
     {}
   );
-  //const response = sendAssignation(assignPayload);
+  const response = sendAssignation(assignPayload);
 
-  return assignPayload;
+  return response;
 }
 
 async function sendAssignation(assignPayload: AssignPayload) {

@@ -1,4 +1,3 @@
-import { translateRolesToEnglish } from '../../../shared/utils/enums/subjectRoles';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import {
   translateWeekDayToEnglish,
@@ -155,25 +154,23 @@ export async function getTeachersToAssignLectures() {
           other_teacher: { teacher: string; role: string[] }[];
         }[] = teacher.teacher_subject_groups.map((group) => ({
           my_role: [
-            translateRolesToEnglish(
-              group.members.filter(
-                (member) => member.teacher_id === teacher.id
-              )[0].role
-            ),
+            group.members.filter(
+              (member) => member.teacher_id === teacher.id
+            )[0].role,
           ],
           subject: group.subject_id.toString(),
           other_teacher: group.members
             .filter((member) => member.teacher_id !== teacher.id)
             .map((member) => ({
               teacher: member.teacher_id.toString(),
-              role: [translateRolesToEnglish(member.role)],
+              role: [member.role],
             })),
         }));
 
         const subjectHeKnowHowToTeach = teacher.subjects_history.map(
           (history) => ({
             subject: history.subject_id.toString(),
-            role: [translateRolesToEnglish(history.role)],
+            role: [history.role],
           })
         );
 

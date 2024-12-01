@@ -1,3 +1,4 @@
+import { translateRolesToEnglish } from '../../../shared/utils/enums/subjectRoles';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import {
   translateWeekDayToEnglish,
@@ -130,55 +131,61 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
 export async function getTeachersToAssignLectures() {
   const teachers = await teacherRepository.getTeachersToAssignLectures();
   const teachersToAssign = await Promise.all(
-    teachers.map(async (teacher: Teacher) => {
-      const seniority = await teacher.getSeniorityInSemesters();
+    teachers
+      .filter((teacher: Teacher) => teacher.subjects_history.length > 0)
+      .map(async (teacher: Teacher) => {
+        const seniority = await teacher.getSeniorityInSemesters();
 
-      const availableTimes: { [key: string]: number[] } =
-        teacher.teacher_available_modules.reduce(
-          (acc: { [key: string]: number[] }, module) => {
-            const day = translateWeekDayToEnglish(module.day_of_week);
-            if (!acc[day]) {
-              acc[day] = [];
-            }
-            acc[day].push(module.module_id);
-            return acc;
-          },
-          {}
+        const availableTimes: { [key: string]: number[] } =
+          teacher.teacher_available_modules.reduce(
+            (acc: { [key: string]: number[] }, module) => {
+              const day = translateWeekDayToEnglish(module.day_of_week);
+              if (!acc[day]) {
+                acc[day] = [];
+              }
+              acc[day].push(module.module_id);
+              return acc;
+            },
+            {}
+          );
+
+        const groups: {
+          my_role: string[];
+          subject: string;
+          other_teacher: { teacher: string; role: string[] }[];
+        }[] = teacher.teacher_subject_groups.map((group) => ({
+          my_role: [
+            translateRolesToEnglish(
+              group.members.filter(
+                (member) => member.teacher_id === teacher.id
+              )[0].role
+            ),
+          ],
+          subject: group.subject_id.toString(),
+          other_teacher: group.members
+            .filter((member) => member.teacher_id !== teacher.id)
+            .map((member) => ({
+              teacher: member.teacher_id.toString(),
+              role: [translateRolesToEnglish(member.role)],
+            })),
+        }));
+
+        const subjectHeKnowHowToTeach = teacher.subjects_history.map(
+          (history) => ({
+            subject: history.subject_id.toString(),
+            role: [translateRolesToEnglish(history.role)],
+          })
         );
 
-      const groups: {
-        my_role: string;
-        subject: number;
-        other_teacher: { teacher: number; role: string[] }[];
-      }[] = teacher.teacher_subject_groups.map((group) => ({
-        my_role: group.members.filter(
-          (member) => member.teacher_id === teacher.id
-        )[0].role,
-        subject: group.subject_id,
-        other_teacher: group.members
-          .filter((member) => member.teacher_id !== teacher.id)
-          .map((member) => ({
-            teacher: member.teacher_id,
-            role: [member.role],
-          })),
-      }));
-
-      const subjectHeKnowHowToTeach = teacher.subjects_history.map(
-        (history) => ({
-          subject: history.subject_id,
-          role: [history.role],
-        })
-      );
-
-      return {
-        id: teacher.id,
-        seniority,
-        subject_he_know_how_to_teach: subjectHeKnowHowToTeach,
-        available_times: availableTimes,
-        weekly_hours_max_work: 80, // TODO: Cambiar por el valor real
-        groups,
-      };
-    })
+        return {
+          id: teacher.id,
+          seniority,
+          subject_he_know_how_to_teach: subjectHeKnowHowToTeach,
+          available_times: availableTimes,
+          weekly_hours_max_work: 80, // TODO: Cambiar por el valor real
+          groups,
+        };
+      })
   );
   return teachersToAssign;
 }

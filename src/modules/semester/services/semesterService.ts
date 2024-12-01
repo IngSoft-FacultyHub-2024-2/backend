@@ -1,3 +1,4 @@
+import { translateRolesToEnglish } from '../../../shared/utils/enums/subjectRoles';
 import {
   translateWeekDayToEnglish,
   WeekDays,
@@ -146,7 +147,7 @@ export async function getSemesterLecturesToAssign(semesterId: number) {
     semester.lectures.map(async (lecture: Lecture) => {
       const lectureRoles = lecture.lecture_roles.map((lecture_role) => {
         return {
-          role: lecture_role.role,
+          role: translateRolesToEnglish(lecture_role.role),
           times: lecture_role.hour_configs.reduce(
             (acc: { [key: string]: number[] }, lectureHourConfig) => {
               const day = translateWeekDayToEnglish(
@@ -166,7 +167,7 @@ export async function getSemesterLecturesToAssign(semesterId: number) {
 
       return {
         id: lecture.id,
-        subject: lecture.subject_id,
+        subject: lecture.subject_id.toString(),
         subClasses: lectureRoles,
       };
     })

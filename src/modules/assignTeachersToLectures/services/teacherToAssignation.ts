@@ -7,10 +7,13 @@ import { getTeachersToAssignLectures } from '../../teacher';
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
 import { deleteTeachersAssignations } from '../../semester/services/semesterService';
+import { getModules } from '../../../modules/teacher';
+import Module from '../../teacher/repositories/models/Module';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
   classes: { [key: string]: LectureToAssign };
+  modules: Module[];
   teacher_names_with_classes: string[];
 }
 
@@ -22,9 +25,12 @@ interface AssignationsResults {
 export async function assignTeachersToSemesterLectures(semesterId: number) {
   const teachersToAssign = await getTeachersToAssignLectures();
   const lecturesToAssign = await getSemesterLecturesToAssign(semesterId);
+  const modules = await getModules();
+
   let assignPayload: AssignPayload = {
     teachers: {},
     classes: {},
+    modules: modules,
     teacher_names_with_classes: [],
   };
   assignPayload.teachers = teachersToAssign.reduce(
@@ -49,22 +55,32 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   await deleteTeachersAssignations(semesterId);
 
   const matches = response.matches;
-  Object.entries(matches).forEach(([lectureId, roles]) => {
-    Object.entries(roles).forEach(([role, teacherIds]) => {
-      teacherIds.forEach((teacherId) => {
-        console.log(
-          'Assigning teacher',
-          teacherId,
-          'to lecture',
-          lectureId,
-          'with role',
-          role
-        );
-        // Uncomment and implement this function as needed
-        setTeacherToLecture(Number(lectureId), Number(teacherId), role);
-      });
-    });
-  });
+
+  await Promise.all(
+    Object.entries(matches).map(async ([lectureId, roles]) => {
+      await Promise.all(
+        Object.entries(roles).map(async ([role, teacherIds]) => {
+          await Promise.all(
+            teacherIds.map(async (teacherId) => {
+              console.log(
+                'Assigning teacher',
+                teacherId,
+                'to lecture',
+                lectureId,
+                'with role',
+                role
+              );
+              await setTeacherToLecture(
+                Number(lectureId),
+                Number(teacherId),
+                role
+              );
+            })
+          );
+        })
+      );
+    })
+  );
 
   return response;
 }

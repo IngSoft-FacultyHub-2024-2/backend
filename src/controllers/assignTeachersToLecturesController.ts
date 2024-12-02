@@ -5,7 +5,9 @@ import { returnError } from '../shared/utils/exceptions/handleExceptions';
 class AssignTeachersToLecturesController {
   async assignTeachersToSemesterLectures(req: Request, res: Response) {
     try {
-      const result = await assignTeachersToSemesterLectures(req.body);
+      const result = await assignTeachersToSemesterLectures(
+        req.body.semesterId
+      );
       res.status(200).json(result);
     } catch (error) {
       if (error instanceof Error) {

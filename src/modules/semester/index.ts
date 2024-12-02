@@ -6,6 +6,7 @@ import {
   getSemesterLecturesGroups,
   updateLecture,
   getSemesterLecturesToAssign,
+  setTeacherToLecture,
 } from './services/semesterService';
 
 export {
@@ -16,4 +17,5 @@ export {
   getSemesterLecturesGroups,
   updateLecture,
   getSemesterLecturesToAssign,
+  setTeacherToLecture,
 };

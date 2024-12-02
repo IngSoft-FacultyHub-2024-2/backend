@@ -5,6 +5,7 @@ import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -241,6 +242,28 @@ class SemesterRepository {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  async setTeacherToLecture(
+    lectureId: number,
+    teacherId: number,
+    role: string
+  ) {
+    const lectureRole = await LectureRole.findOne({
+      where: { lecture_id: lectureId, role },
+    });
+
+    if (!lectureRole) {
+      throw new ResourceNotFound(
+        `Lecture role not found for lecture ${lectureId}`
+      );
+    }
+
+    return await LectureTeacher.create({
+      lecture_role_id: lectureRole.id,
+      teacher_id: teacherId,
+      role,
+    });
   }
 }
 

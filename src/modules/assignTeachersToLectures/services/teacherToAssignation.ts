@@ -10,35 +10,60 @@ interface AssignPayload {
   teacher_names_with_classes: string[];
 }
 
+interface AssignationsResults {
+  matches: { [lectureId: string]: { [role: string]: string[] } };
+  conflicts: any;
+}
+
 export async function assignTeachersToSemesterLectures(semesterId: number) {
   const teachersToAssign = await getTeachersToAssignLectures();
-  const lecturesToAssign = await getSemesterLecturesToAssign(1);
+  const lecturesToAssign = await getSemesterLecturesToAssign(semesterId);
   let assignPayload: AssignPayload = {
     teachers: {},
     classes: {},
     teacher_names_with_classes: [],
   };
   assignPayload.teachers = teachersToAssign.reduce(
-    (acc: { [key: string]: TeacherToAssign }, teacher) => {
-      acc[teacher.id.toString()] = teacher;
+    (acc: { [key: number]: TeacherToAssign }, teacher) => {
+      acc[teacher.id] = teacher;
       return acc;
     },
     {}
   );
 
   assignPayload.classes = lecturesToAssign.reduce(
-    (acc: { [key: string]: LectureToAssign }, lecture) => {
-      acc[lecture.id.toString()] = lecture;
+    (acc: { [key: number]: LectureToAssign }, lecture) => {
+      acc[lecture.id] = lecture;
       return acc;
     },
     {}
   );
-  const response = sendAssignation(assignPayload);
+  const response = await sendAssignation(assignPayload);
+
+  const matches = response.matches;
+  Object.entries(matches).forEach(([lectureId, roles]) => {
+    Object.entries(roles).forEach(([role, teacherIds]) => {
+      teacherIds.forEach((teacherId) => {
+        console.log(
+          'Assigning teacher',
+          teacherId,
+          'to lecture',
+          lectureId,
+          'with role',
+          role
+        );
+        // Uncomment and implement this function as needed
+        // setTeacherToLecture(lectureId, teacherId, role);
+      });
+    });
+  });
 
   return response;
 }
 
-async function sendAssignation(assignPayload: AssignPayload) {
+async function sendAssignation(
+  assignPayload: AssignPayload
+): Promise<AssignationsResults> {
   try {
     const response = await axios.post(
       process.env.ALGORITHM_URL + '/assignTeachers',

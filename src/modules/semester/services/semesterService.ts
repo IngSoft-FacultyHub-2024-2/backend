@@ -174,3 +174,15 @@ export async function getSemesterLecturesToAssign(semesterId: number) {
 
   return lectures;
 }
+
+export async function setTeacherToLecture(
+  lectureId: number,
+  teacherId: number,
+  role: string
+) {
+  return await semesterRepository.setTeacherToLecture(
+    lectureId,
+    teacherId,
+    role
+  );
+}

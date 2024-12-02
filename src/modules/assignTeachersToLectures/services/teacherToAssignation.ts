@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { getSemesterLecturesToAssign } from '../../semester';
+import {
+  getSemesterLecturesToAssign,
+  setTeacherToLecture,
+} from '../../semester';
 import { getTeachersToAssignLectures } from '../../teacher';
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
+import { deleteTeachersAssignations } from '../../semester/services/semesterService';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
@@ -40,6 +44,10 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   );
   const response = await sendAssignation(assignPayload);
 
+  // Delete the old lectures before assigning the new ones
+  // TODO: filter out the locked lectures
+  await deleteTeachersAssignations(semesterId);
+
   const matches = response.matches;
   Object.entries(matches).forEach(([lectureId, roles]) => {
     Object.entries(roles).forEach(([role, teacherIds]) => {
@@ -53,7 +61,7 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
           role
         );
         // Uncomment and implement this function as needed
-        // setTeacherToLecture(lectureId, teacherId, role);
+        setTeacherToLecture(Number(lectureId), Number(teacherId), role);
       });
     });
   });

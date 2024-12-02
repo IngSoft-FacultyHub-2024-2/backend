@@ -186,3 +186,7 @@ export async function setTeacherToLecture(
     role
   );
 }
+
+export async function deleteTeachersAssignations(semesterId: number) {
+  return await semesterRepository.deleteTeachersAssignations(semesterId);
+}

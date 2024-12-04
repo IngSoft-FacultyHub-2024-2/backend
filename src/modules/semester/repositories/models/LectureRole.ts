@@ -11,7 +11,6 @@ class LectureRole extends Model {
   public role!: SubjectRoles;
   public hour_configs!: LectureHourConfig[];
   public teachers!: LectureTeacher[];
-  public number_of_teachers!: number;
 
   public static associations: {
     lecture: BelongsTo<LectureRole, Lecture>;
@@ -41,11 +40,6 @@ LectureRole.init(
     role: {
       type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
       allowNull: false,
-    },
-    number_of_teachers: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
     },
   },
   {

@@ -4,7 +4,7 @@ import {
 } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
-import { getSubjectById } from '../../subject';
+import { getSubjectById, amountOfTeachersPerSubject } from '../../subject';
 import Subject from '../../subject/repositories/models/Subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
@@ -141,28 +141,45 @@ export async function getSemesterLecturesToAssign(semesterId: number) {
   if (!semester) {
     throw new ResourceNotFound('No se encontraron el semestre');
   }
+  const amountOfTeachersPerSubjectDict = await amountOfTeachersPerSubject();
 
   const lectures = await Promise.all(
     semester.lectures.map(async (lecture: Lecture) => {
-      const lectureRoles = lecture.lecture_roles.map((lecture_role) => {
-        return {
-          role: lecture_role.role,
-          times: lecture_role.hour_configs.reduce(
-            (acc: { [key: string]: number[] }, lectureHourConfig) => {
-              const day = translateWeekDayToEnglish(
-                lectureHourConfig.day_of_week
-              );
-              if (!acc[day]) {
-                acc[day] = [];
-              }
-              acc[day] = acc[day].concat(lectureHourConfig.modules);
-              return acc;
-            },
-            {}
-          ),
-          num_teachers: lecture_role.number_of_teachers,
-        };
-      });
+      const lectureRoles = await Promise.all(
+        lecture.lecture_roles.map(async (lecture_role) => {
+          const amountOfTeacherPerRoleOnSubject =
+            amountOfTeachersPerSubjectDict[lecture.subject_id];
+
+          // Check if the role exists in the subjectRoles
+          if (
+            !amountOfTeacherPerRoleOnSubject ||
+            !(lecture_role.role in amountOfTeacherPerRoleOnSubject)
+          ) {
+            const subject = await getSubjectById(lecture.subject_id);
+            throw new Error(
+              `Role '${lecture_role.role}' no fue encontrado en la materia '${subject.name}' (ID: '${lecture.subject_id}')`
+            );
+          }
+
+          return {
+            role: lecture_role.role,
+            times: lecture_role.hour_configs.reduce(
+              (acc: { [key: string]: number[] }, lectureHourConfig) => {
+                const day = translateWeekDayToEnglish(
+                  lectureHourConfig.day_of_week
+                );
+                if (!acc[day]) {
+                  acc[day] = [];
+                }
+                acc[day] = acc[day].concat(lectureHourConfig.modules);
+                return acc;
+              },
+              {}
+            ),
+            num_teachers: amountOfTeacherPerRoleOnSubject[lecture_role.role],
+          };
+        })
+      );
 
       return {
         id: lecture.id,

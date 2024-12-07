@@ -14,7 +14,7 @@ class NeedRepository {
   ) {
     const orderOption = sortField
       ? ([[sortField, sortOrder]] as Order)
-      : ([['name', 'DESC']] as Order);
+      : undefined;
 
     const searchQuery = search
       ? {

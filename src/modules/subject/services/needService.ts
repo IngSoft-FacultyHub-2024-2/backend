@@ -1,8 +1,8 @@
 import Need from '../repositories/models/Need';
 import needRepository from '../repositories/needRepository';
 
-export async function addNeed(event: Partial<Need>) {
-  return await needRepository.addNeed(event);
+export async function addNeed(need: Partial<Need>) {
+  return await needRepository.addNeed(need);
 }
 
 export async function getNeeds(
@@ -18,8 +18,8 @@ export async function getNeedById(id: number) {
   return await needRepository.getNeedById(id);
 }
 
-export async function updateNeed(id: number, event: Partial<Need>) {
-  return await needRepository.updateNeed(id, event);
+export async function updateNeed(id: number, need: Partial<Need>) {
+  return await needRepository.updateNeed(id, need);
 }
 
 export async function deleteNeed(id: number) {

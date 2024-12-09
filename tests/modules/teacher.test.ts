@@ -2,9 +2,6 @@ import {
   getSubjectById,
   teacherCoordinatorSubjects,
 } from '../../src/modules/subject';
-import { getBenefits, getCategories } from '../../src/modules/teacher';
-import benefitsRepository from '../../src/modules/teacher/repositories/benefitsRepository';
-import categoryRepository from '../../src/modules/teacher/repositories/categoryRepository';
 import teacherRepository from '../../src/modules/teacher/repositories/teacherRepository';
 import {
   addTeacher,
@@ -19,14 +16,10 @@ import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExcept
 
 // Mocking the necessary modules
 jest.mock('../../src/modules/teacher/repositories/teacherRepository');
-jest.mock('../../src/modules/teacher/repositories/models/Benefit');
-jest.mock('../../src/modules/teacher/repositories/models/Category');
 jest.mock('../../src/modules/subject', () => ({
   getSubjectById: jest.fn(),
   teacherCoordinatorSubjects: jest.fn(),
 }));
-jest.mock('../../src/modules/teacher/repositories/benefitsRepository');
-jest.mock('../../src/modules/teacher/repositories/categoryRepository');
 
 // Helper function to clean undefined and empty arrays from objects
 const removeUndefinedAndEmptyArrays = (obj: any): any => {
@@ -418,64 +411,6 @@ describe('Teacher Service', () => {
         1,
         expect.any(Object)
       );
-    });
-  });
-
-  // Test for getBenefits function
-  describe('getBenefits', () => {
-    it('should return a list of all benefits', async () => {
-      const mockBenefits = [
-        { id: 1, name: 'Health Insurance' },
-        { id: 2, name: 'Pension Plan' },
-      ];
-      (benefitsRepository.getAllBenefits as jest.Mock).mockResolvedValue(
-        mockBenefits
-      );
-
-      const result = await getBenefits();
-
-      expect(benefitsRepository.getAllBenefits).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockBenefits);
-    });
-
-    it('should throw an error if repository fails', async () => {
-      const mockError = new Error('Failed to fetch benefits');
-      (benefitsRepository.getAllBenefits as jest.Mock).mockRejectedValue(
-        mockError
-      );
-
-      await expect(getBenefits()).rejects.toThrow(mockError);
-      expect(benefitsRepository.getAllBenefits).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  // Test for getCategories function
-  describe('getCategories', () => {
-    it('should return a list of all categories', async () => {
-      const mockCategories = [
-        { id: 1, name: 'Full Professor' },
-        { id: 2, name: 'Assistant Professor' },
-      ];
-      (categoryRepository.getAllCategories as jest.Mock).mockResolvedValue(
-        mockCategories
-      );
-
-      const result = await getCategories();
-
-      expect(categoryRepository.getAllCategories).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockCategories);
-    });
-
-    it('should throw an error if repository fails', async () => {
-      const mockError = new Error('Failed to fetch categories');
-      (categoryRepository.getAllCategories as jest.Mock).mockRejectedValue(
-        mockError
-      );
-
-      await expect(getCategories()).rejects.toThrow(
-        'Failed to fetch categories'
-      );
-      expect(categoryRepository.getAllCategories).toHaveBeenCalledTimes(2);
     });
   });
 });

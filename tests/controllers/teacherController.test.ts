@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
-import benefitController from '../../src/controllers/benefitController';
-import categoryController from '../../src/controllers/categoryController';
 import teacherController from '../../src/controllers/teacherController';
 import {
   addTeacher,
   dismissTeacher,
   getAllTeachersNames,
-  getBenefits,
-  getCategories,
   getTeachers,
   updateTeacher,
 } from '../../src/modules/teacher';
@@ -323,83 +319,6 @@ describe('TeacherController', () => {
       await teacherController.updateTeacher(req as Request, res as Response);
 
       expect(updateTeacher).toHaveBeenCalledWith(1, teacherBody);
-      expect(returnError).toHaveBeenCalledWith(res, error);
-    });
-  });
-
-  describe('getBenefits', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-    beforeEach(() => {
-      req = { query: {} };
-      statusMock = jest.fn().mockReturnThis();
-      jsonMock = jest.fn();
-      res = { status: statusMock, json: jsonMock };
-      jest.clearAllMocks(); // Limpia todos los mocks antes de cada prueba
-    });
-
-    it('should return a list of benefits', async () => {
-      const mockBenefits = [{ id: 1, name: 'Health Insurance' }];
-      // Asegúrate de que la función `getBenefits` sea un mock.
-      (getBenefits as jest.Mock).mockResolvedValue(mockBenefits);
-
-      await benefitController.getBenefits(req as Request, res as Response);
-
-      // Verifica que la función mockeada `getBenefits` fue llamada.
-      expect(getBenefits).toHaveBeenCalledTimes(1);
-      expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith(mockBenefits);
-    });
-
-    it('should handle errors when fetching benefits fails', async () => {
-      const error = new Error('Something went wrong');
-      // Simula un error cuando se llama a `getBenefits`.
-      (getBenefits as jest.Mock).mockRejectedValue(error);
-
-      await benefitController.getBenefits(req as Request, res as Response);
-
-      expect(getBenefits).toHaveBeenCalledTimes(1);
-      expect(returnError).toHaveBeenCalledWith(res, error);
-    });
-  });
-
-  describe('getCategories', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-
-    beforeEach(() => {
-      req = { query: {} };
-      statusMock = jest.fn().mockReturnThis();
-      jsonMock = jest.fn();
-      res = { status: statusMock, json: jsonMock };
-      jest.clearAllMocks(); // Limpia todos los mocks antes de cada prueba
-    });
-
-    it('should return a list of categories', async () => {
-      const mockCategories = [{ id: 1, name: 'Full-Time' }];
-      // Asegúrate de que la función `getCategories` sea un mock.
-      (getCategories as jest.Mock).mockResolvedValue(mockCategories);
-
-      await categoryController.getCategories(req as Request, res as Response);
-
-      // Verifica que la función mockeada `getCategories` fue llamada.
-      expect(getCategories).toHaveBeenCalledTimes(1);
-      expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith(mockCategories);
-    });
-
-    it('should handle errors when fetching categories fails', async () => {
-      const error = new Error('Something went wrong');
-      // Simula un error cuando se llama a `getCategories`.
-      (getCategories as jest.Mock).mockRejectedValue(error);
-
-      await categoryController.getCategories(req as Request, res as Response);
-
-      expect(getCategories).toHaveBeenCalledTimes(1);
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });

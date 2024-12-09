@@ -13,6 +13,7 @@ import {
 import {
   addNeed,
   deleteNeed,
+  getNeedById,
   getNeeds,
   updateNeed,
 } from './services/needService';
@@ -43,7 +44,14 @@ export {
 };
 
 //Need
-export { addNeed, deleteNeed, getNeeds, NeedResponseDto, updateNeed };
+export {
+  addNeed,
+  deleteNeed,
+  getNeedById,
+  getNeeds,
+  NeedResponseDto,
+  updateNeed,
+};
 
 //StudyPlan
 export { addStudyPlan, deleteStudyPlan, getStudyPlans, updateStudyPlan };

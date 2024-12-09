@@ -87,4 +87,59 @@ describe('Degree Service', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('updateDegree', () => {
+    it('should call degreeRepository.updateDegree with the correct parameters and return the updated degree', async () => {
+      const updatedDegree = {
+        id: 1,
+        name: 'Updated Computer Science',
+        acronym: 'UCS',
+      };
+      (degreeRepository.updateDegree as jest.Mock).mockResolvedValue(
+        updatedDegree
+      );
+
+      const result = await degreeService.updateDegree(
+        1,
+        'Updated Computer Science',
+        'UCS'
+      );
+
+      expect(degreeRepository.updateDegree).toHaveBeenCalledWith(
+        1,
+        'Updated Computer Science',
+        'UCS'
+      );
+      expect(result).toEqual(updatedDegree);
+    });
+
+    it('should throw an error if update fails', async () => {
+      const mockError = new Error('Update failed');
+      (degreeRepository.updateDegree as jest.Mock).mockRejectedValue(mockError);
+
+      await expect(
+        degreeService.updateDegree(1, 'Updated Computer Science', 'UCS')
+      ).rejects.toThrow('Update failed');
+    });
+  });
+
+  describe('deleteDegree', () => {
+    it('should call degreeRepository.deleteDegree with the correct id', async () => {
+      (degreeRepository.deleteDegree as jest.Mock).mockResolvedValue(undefined);
+
+      const result = await degreeService.deleteDegree(1);
+
+      expect(degreeRepository.deleteDegree).toHaveBeenCalledWith(1);
+      expect(result).toBeUndefined();
+    });
+
+    it('should throw an error if delete fails', async () => {
+      const mockError = new Error('Delete failed');
+      (degreeRepository.deleteDegree as jest.Mock).mockRejectedValue(mockError);
+
+      await expect(degreeService.deleteDegree(1)).rejects.toThrow(
+        'Delete failed'
+      );
+    });
+  });
 });

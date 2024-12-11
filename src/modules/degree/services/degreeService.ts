@@ -15,3 +15,11 @@ export async function getDegreeById(id: number) {
 export async function getDegreeByAcronym(acronym: string) {
   return await degreeRepository.getDegreeByAcronym(acronym);
 }
+
+export async function updateDegree(id: number, name: string, acronym: string) {
+  return await degreeRepository.updateDegree(id, name, acronym);
+}
+
+export async function deleteDegree(id: number) {
+  return await degreeRepository.deleteDegree(id);
+}

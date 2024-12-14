@@ -2,9 +2,7 @@ import { Op, Order, Transaction } from 'sequelize';
 import sequelize from '../../../config/database';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
-import Benefit from './models/Benefit';
 import CaesCourse from './models/CaesCourse';
-import Category from './models/Category';
 import Contact from './models/Contact';
 import Prize from './models/Prize';
 import Teacher from './models/Teacher';
@@ -15,7 +13,6 @@ import TeacherSubjectGroup from './models/TeacherSubjectGroup';
 import TeacherSubjectGroupMember from './models/TeacherSubjectGroupMember';
 import TeacherSubjectHistory from './models/TeacherSubjectHistory';
 import TeacherSubjectOfInterest from './models/TeacherSubjectOfInterest';
-import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -477,7 +474,6 @@ class TeacherRepository {
           teacher_id: teacherId,
         })
       );
-
       await TeacherAvailableModule.bulkCreate(newTeacherAvailableModules, {
         transaction,
       });
@@ -498,14 +494,6 @@ class TeacherRepository {
       ],
     });
     return teachers;
-  }
-
-  async getAllCategories() {
-    return await Category.findAll();
-  }
-
-  async getAllBenefits() {
-    return await Benefit.findAll();
   }
 }
 

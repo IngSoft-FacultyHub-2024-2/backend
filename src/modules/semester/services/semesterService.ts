@@ -5,7 +5,6 @@ import {
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
 import { getSubjectById, amountOfTeachersPerSubject } from '../../subject';
-import Subject from '../../subject/repositories/models/Subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import Lecture from '../repositories/models/Lecture';

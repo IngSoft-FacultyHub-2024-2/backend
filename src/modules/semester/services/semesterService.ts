@@ -1,6 +1,11 @@
+import {
+  translateWeekDayToEnglish,
+  WeekDays,
+} from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
 import { getSubjectById } from '../../subject';
+import Subject from '../../subject/repositories/models/Subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import Lecture from '../repositories/models/Lecture';
@@ -129,4 +134,59 @@ export async function updateLecture(
   lecture: Partial<Lecture>
 ) {
   return await semesterRepository.updateLecture(lectureId, lecture);
+}
+
+export async function getSemesterLecturesToAssign(semesterId: number) {
+  const semester = await semesterRepository.getSemesterLectures(semesterId);
+  if (!semester) {
+    throw new ResourceNotFound('No se encontraron el semestre');
+  }
+
+  const lectures = await Promise.all(
+    semester.lectures.map(async (lecture: Lecture) => {
+      const lectureRoles = lecture.lecture_roles.map((lecture_role) => {
+        return {
+          role: lecture_role.role,
+          times: lecture_role.hour_configs.reduce(
+            (acc: { [key: string]: number[] }, lectureHourConfig) => {
+              const day = translateWeekDayToEnglish(
+                lectureHourConfig.day_of_week
+              );
+              if (!acc[day]) {
+                acc[day] = [];
+              }
+              acc[day] = acc[day].concat(lectureHourConfig.modules);
+              return acc;
+            },
+            {}
+          ),
+          num_teachers: lecture_role.number_of_teachers,
+        };
+      });
+
+      return {
+        id: lecture.id,
+        subject: lecture.subject_id.toString(),
+        subClasses: lectureRoles,
+      };
+    })
+  );
+
+  return lectures;
+}
+
+export async function setTeacherToLecture(
+  lectureId: number,
+  teacherId: number,
+  role: string
+) {
+  return await semesterRepository.setTeacherToLecture(
+    lectureId,
+    teacherId,
+    role
+  );
+}
+
+export async function deleteTeachersAssignations(semesterId: number) {
+  return await semesterRepository.deleteTeachersAssignations(semesterId);
 }

@@ -9,6 +9,8 @@ import semesterRouter from './routers/semesterRouter';
 import studyPlanRouter from './routers/studyPlanRouter';
 import subjectRouter from './routers/subjectRouter';
 import teacherRouter from './routers/teacherRouter';
+import assignTeachersToLecturesRouter from './routers/assignTeachersToLecturesRouter';
+
 const logger = require('morgan');
 const cors = require('cors');
 
@@ -34,6 +36,7 @@ app.use('/api/modules', moduleRouter);
 app.use('/api/file-processor', fileProcessorRouter);
 app.use('/api/semesters', semesterRouter);
 app.use('/api/degrees', degreeRouter);
+app.use('/api/assignTeachersToLectures', assignTeachersToLecturesRouter);
 
 const PORT = process.env.PORT || 3000;
 

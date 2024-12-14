@@ -5,6 +5,7 @@ import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -240,6 +241,79 @@ class SemesterRepository {
     } catch (error) {
       await transaction.rollback();
       throw error;
+    }
+  }
+
+  async setTeacherToLecture(
+    lectureId: number,
+    teacherId: number,
+    role: string
+  ) {
+    const lectureRole = await LectureRole.findOne({
+      where: { lecture_id: lectureId, role },
+    });
+
+    if (!lectureRole) {
+      throw new ResourceNotFound(
+        `Lecture role not found for lecture ${lectureId}`
+      );
+    }
+
+    return await LectureTeacher.create({
+      lecture_role_id: lectureRole.id,
+      teacher_id: teacherId,
+      role,
+    });
+  }
+
+  async deleteTeachersAssignations(semesterId: number) {
+    // TODO: filter out the locked lectures
+    const semester = await Semester.findByPk(semesterId, {
+      include: [
+        {
+          model: Lecture,
+          as: 'lectures',
+          include: [
+            {
+              model: LectureRole,
+              as: 'lecture_roles',
+              include: [
+                {
+                  model: LectureTeacher,
+                  as: 'teachers',
+                  required: false,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found.`);
+    }
+
+    const lectureTeacherIds: number[] = [];
+    for (const lecture of semester.lectures || []) {
+      for (const lectureRole of lecture.lecture_roles || []) {
+        for (const teacher of lectureRole.teachers || []) {
+          lectureTeacherIds.push(teacher.id);
+        }
+      }
+    }
+
+    if (lectureTeacherIds.length > 0) {
+      await LectureTeacher.destroy({
+        where: {
+          id: lectureTeacherIds,
+        },
+      });
+      console.log(
+        `Deleted ${lectureTeacherIds.length} LectureTeacher entries.`
+      );
+    } else {
+      console.log('No LectureTeacher entries found for the given semester.');
     }
   }
 }

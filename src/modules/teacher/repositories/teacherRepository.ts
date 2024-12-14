@@ -474,11 +474,26 @@ class TeacherRepository {
           teacher_id: teacherId,
         })
       );
-
       await TeacherAvailableModule.bulkCreate(newTeacherAvailableModules, {
         transaction,
       });
     }
+  }
+
+  async getTeachersToAssignLectures() {
+    const teachers = await Teacher.findAll({
+      where: { state: TeacherStates.ACTIVE },
+      include: [
+        {
+          model: TeacherSubjectGroup,
+          as: 'teacher_subject_groups',
+          include: [{ model: TeacherSubjectGroupMember, as: 'members' }],
+        },
+        { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+        { model: TeacherSubjectHistory, as: 'subjects_history' },
+      ],
+    });
+    return teachers;
   }
 }
 

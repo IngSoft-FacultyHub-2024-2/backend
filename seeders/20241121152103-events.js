@@ -6,9 +6,13 @@ module.exports = {
     return queryInterface.bulkInsert('Events', [
       {
         title: 'Obligatorio 1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         title: 'Parcial 1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

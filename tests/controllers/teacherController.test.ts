@@ -1,6 +1,12 @@
 import { Request, Response } from 'express';
 import teacherController from '../../src/controllers/teacherController';
-import { addTeacher, dismissTeacher, getAllTeachersNames, getBenefits, getCategories, getTeachers, updateTeacher } from '../../src/modules/teacher';
+import {
+  addTeacher,
+  dismissTeacher,
+  getAllTeachersNames,
+  getTeachers,
+  updateTeacher,
+} from '../../src/modules/teacher';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
 jest.mock('../../src/modules/teacher');
@@ -9,55 +15,53 @@ jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 
 describe('TeacherController', () => {
   let teacherBody: any = {
-    "name": "John",
-    "surname": "Doe7",
-    "birth_date": "1985-05-15",
-    "employee_number": 2234577,
-    "cv_file": "https://example.com/cv/john_doe.pdf",
-    "how_they_found_us": "LinkedIn",
-    "id_photo": "https://example.com/photos/john_doe.jpg",
-    "hiring_date": "2023-01-15",
-    "contact_hours": "9:00 AM - 5:00 PM",
-    "linkedin_link": "https://linkedin.com/in/johndoe",
-    "graduated": true,
-    "notes": "Experienced in various technologies.",
-    "prizes": [
+    name: 'John',
+    surname: 'Doe7',
+    birth_date: '1985-05-15',
+    employee_number: 2234577,
+    cv_file: 'https://example.com/cv/john_doe.pdf',
+    how_they_found_us: 'LinkedIn',
+    id_photo: 'https://example.com/photos/john_doe.jpg',
+    hiring_date: '2023-01-15',
+    contact_hours: '9:00 AM - 5:00 PM',
+    linkedin_link: 'https://linkedin.com/in/johndoe',
+    graduated: true,
+    notes: 'Experienced in various technologies.',
+    prizes: [
       {
-        "name": "Best Teacher Award",
-        "year": "2022-01-01"
-      }
+        name: 'Best Teacher Award',
+        year: '2022-01-01',
+      },
     ],
-    "caes_courses": [
+    caes_courses: [
       {
-        "name": "Advanced Teaching Methods",
-        "date": "2021-08-10"
-      }
+        name: 'Advanced Teaching Methods',
+        date: '2021-08-10',
+      },
     ],
-    "contacts": [
+    contacts: [
       {
-        "mean": "Email",
-        "data": "johndoe@example7.com",
-        "prefered": true
+        mean: 'Email',
+        data: 'johndoe@example7.com',
+        prefered: true,
       },
       {
-        "mean": "Phone",
-        "data": "+12345678907",
-        "prefered": false
-      }
+        mean: 'Phone',
+        data: '+12345678907',
+        prefered: false,
+      },
     ],
-    "categories": [{ "category_id": 1, "date": "2022-09-01" }],
-    "benefits": [{ "benefit_id": 1, "date": "2022-09-01" }],
-    "subjects_history": [
+    categories: [{ category_id: 1, date: '2022-09-01' }],
+    benefits: [{ benefit_id: 1, date: '2022-09-01' }],
+    subjects_history: [
       {
-        "subject_id": 2,
-        "role": "Tecnología",
-        "start_date": "2022-09-01",
-        "end_date": null
-      }
+        subject_id: 2,
+        role: 'Tecnología',
+        start_date: '2022-09-01',
+        end_date: null,
+      },
     ],
-    "subjects_of_interest": [
-      {"subject_id": 3}
-    ],
+    subjects_of_interest: [{ subject_id: 3 }],
   };
 
   const mockReq = { body: teacherBody } as Request;
@@ -97,7 +101,7 @@ describe('TeacherController', () => {
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;
-  
+
     beforeEach(() => {
       req = { query: {} };
       statusMock = jest.fn().mockReturnThis();
@@ -105,40 +109,67 @@ describe('TeacherController', () => {
       res = { status: statusMock, json: jsonMock };
       jest.clearAllMocks();
     });
-  
+
     it('should return a list of teachers with associated subjects', async () => {
       const mockTeachers = {
         teachers: [
-          { id: 1, name: 'John', surname: 'Doe', subjects_history: [{ subject_id: 101 }] },
-          { id: 2, name: 'Jane', surname: 'Smith', subjects_history: [{ subject_id: 102 }] }
+          {
+            id: 1,
+            name: 'John',
+            surname: 'Doe',
+            subjects_history: [{ subject_id: 101 }],
+          },
+          {
+            id: 2,
+            name: 'Jane',
+            surname: 'Smith',
+            subjects_history: [{ subject_id: 102 }],
+          },
         ],
         totalPages: 1,
-        currentPage: 1
+        currentPage: 1,
       };
-  
+
       (getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
-  
+
       await teacherController.getTeachers(req as Request, res as Response);
-  
+
       expect(getTeachers).toHaveBeenCalledWith(
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
       );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
-  
+
     it('should accept queries and return a list of teachers with associated subjects', async () => {
       const mockTeachers = {
         teachers: [
-          { id: 1, name: 'John', surname: 'Doe', subjects_history: [{ subject_id: 101 }] },
-          { id: 2, name: 'Jane', surname: 'Smith', subjects_history: [{ subject_id: 102 }] }
+          {
+            id: 1,
+            name: 'John',
+            surname: 'Doe',
+            subjects_history: [{ subject_id: 101 }],
+          },
+          {
+            id: 2,
+            name: 'Jane',
+            surname: 'Smith',
+            subjects_history: [{ subject_id: 102 }],
+          },
         ],
         totalPages: 1,
-        currentPage: 1
+        currentPage: 1,
       };
-  
+
       (getTeachers as jest.Mock).mockResolvedValue(mockTeachers);
-  
+
       const req = {
         query: {
           search: 'John',
@@ -147,34 +178,47 @@ describe('TeacherController', () => {
           sortField: 'name',
           sortOrder: 'ASC',
           page: 1,
-          pageSize: 10
-        }
+          pageSize: 10,
+        },
       };
-  
+
       await teacherController.getTeachers(req, res as Response);
-  
+
       expect(getTeachers).toHaveBeenCalledWith(
-        'John', 'active','0', 'name', 'ASC', 1, 10, undefined
+        'John',
+        'active',
+        '0',
+        'name',
+        'ASC',
+        1,
+        10,
+        undefined
       );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith(mockTeachers);
     });
-  
+
     it('should handle errors', async () => {
       const error = new Error('Something went wrong');
       (getTeachers as jest.Mock).mockImplementation(() => {
         throw error;
       });
-  
+
       await teacherController.getTeachers(req as Request, res as Response);
-  
+
       expect(getTeachers).toHaveBeenCalledWith(
-        undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
       );
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });
-  
 
   describe('getAllTeachersNames', () => {
     let req: Partial<Request>;
@@ -189,10 +233,16 @@ describe('TeacherController', () => {
     });
 
     it('should return all teachers names with status 200', async () => {
-      const teachers = [{ id: 1, name: 'John', surname: 'Doe' }, { id: 1, name: 'Jane', surname: 'Smith' }];
+      const teachers = [
+        { id: 1, name: 'John', surname: 'Doe' },
+        { id: 1, name: 'Jane', surname: 'Smith' },
+      ];
       (getAllTeachersNames as jest.Mock).mockResolvedValue(teachers);
 
-      await teacherController.getAllTeachersNames(req as Request, res as Response);
+      await teacherController.getAllTeachersNames(
+        req as Request,
+        res as Response
+      );
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(teachers);
@@ -206,7 +256,7 @@ describe('TeacherController', () => {
     let jsonMock: jest.Mock;
 
     beforeEach(() => {
-      req = { params: { id: "1" } };
+      req = { params: { id: '1' } };
       statusMock = jest.fn().mockReturnThis();
       jsonMock = jest.fn();
       res = { status: statusMock, json: jsonMock };
@@ -242,7 +292,7 @@ describe('TeacherController', () => {
     let jsonMock: jest.Mock;
 
     beforeEach(() => {
-      req = { params: { id: "1" }, body: teacherBody };
+      req = { params: { id: '1' }, body: teacherBody };
       statusMock = jest.fn().mockReturnThis();
       jsonMock = jest.fn();
       res = { status: statusMock, json: jsonMock };
@@ -272,82 +322,4 @@ describe('TeacherController', () => {
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });
-
-  describe('getBenefits', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-    beforeEach(() => {
-      req = { query: {} };
-      statusMock = jest.fn().mockReturnThis();
-      jsonMock = jest.fn();
-      res = { status: statusMock, json: jsonMock };
-      jest.clearAllMocks(); // Limpia todos los mocks antes de cada prueba
-    });
-
-    it('should return a list of benefits', async () => {
-      const mockBenefits = [{ id: 1, name: 'Health Insurance' }];
-      // Asegúrate de que la función `getBenefits` sea un mock.
-      (getBenefits as jest.Mock).mockResolvedValue(mockBenefits);
-
-      await teacherController.getBenefits(req as Request, res as Response);
-
-      // Verifica que la función mockeada `getBenefits` fue llamada.
-      expect(getBenefits).toHaveBeenCalledTimes(1);
-      expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith(mockBenefits);
-    });
-
-    it('should handle errors when fetching benefits fails', async () => {
-      const error = new Error('Something went wrong');
-      // Simula un error cuando se llama a `getBenefits`.
-      (getBenefits as jest.Mock).mockRejectedValue(error);
-
-      await teacherController.getBenefits(req as Request, res as Response);
-
-      expect(getBenefits).toHaveBeenCalledTimes(1);
-      expect(returnError).toHaveBeenCalledWith(res, error);
-    });
-  });
-
-  describe('getCategories', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-
-    beforeEach(() => {
-      req = { query: {} };
-      statusMock = jest.fn().mockReturnThis();
-      jsonMock = jest.fn();
-      res = { status: statusMock, json: jsonMock };
-      jest.clearAllMocks(); // Limpia todos los mocks antes de cada prueba
-    });
-
-    it('should return a list of categories', async () => {
-      const mockCategories = [{ id: 1, name: 'Full-Time' }];
-      // Asegúrate de que la función `getCategories` sea un mock.
-      (getCategories as jest.Mock).mockResolvedValue(mockCategories);
-
-      await teacherController.getCategories(req as Request, res as Response);
-
-      // Verifica que la función mockeada `getCategories` fue llamada.
-      expect(getCategories).toHaveBeenCalledTimes(1);
-      expect(statusMock).toHaveBeenCalledWith(200);
-      expect(jsonMock).toHaveBeenCalledWith(mockCategories);
-    });
-
-    it('should handle errors when fetching categories fails', async () => {
-      const error = new Error('Something went wrong');
-      // Simula un error cuando se llama a `getCategories`.
-      (getCategories as jest.Mock).mockRejectedValue(error);
-
-      await teacherController.getCategories(req as Request, res as Response);
-
-      expect(getCategories).toHaveBeenCalledTimes(1);
-      expect(returnError).toHaveBeenCalledWith(res, error);
-    });
-  });
-
 });

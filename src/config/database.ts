@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,9 +11,15 @@ const sequelize = new Sequelize(
   process.env.PASSWORD_DB,
   {
     host: process.env.HOST_DB,
-    dialect: "postgres",
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
     port: parseInt(process.env.PORT_DB!),
-    logging: false
+    logging: false,
   }
 );
 

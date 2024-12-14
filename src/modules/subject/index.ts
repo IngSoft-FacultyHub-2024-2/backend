@@ -31,6 +31,7 @@ import {
   getSubjects,
   teacherCoordinatorSubjects,
   updateSubject,
+  amountOfTeachersPerSubject,
 } from './services/subjectService';
 
 //Event
@@ -59,13 +60,14 @@ export { addStudyPlan, deleteStudyPlan, getStudyPlans, updateStudyPlan };
 //Subject
 export {
   addSubject,
-  deleteSubject,
-  getAllSubjectNames,
   getSubjectById,
-  getSubjects,
-  HourConfigResponseDto,
-  SubjectRequestDto,
-  SubjectResponseDto,
+  getAllSubjectNames,
   teacherCoordinatorSubjects,
+  SubjectRequestDto,
+  getSubjects,
+  SubjectResponseDto,
+  HourConfigResponseDto,
   updateSubject,
+  deleteSubject,
+  amountOfTeachersPerSubject,
 };

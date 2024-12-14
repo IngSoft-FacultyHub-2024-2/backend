@@ -32,7 +32,6 @@ interface LectureRole {
     day_of_week: string;
     modules: number[];
   }[];
-  number_of_teachers: number;
 }
 
 export class LectureResponseDtoHelper {
@@ -56,7 +55,6 @@ export class LectureResponseDtoHelper {
       lecture_roles: lecture.lecture_roles.map((role: any) => ({
         id: role.id,
         role: role.role,
-        number_of_teachers: role.number_of_teachers,
         teachers: role.teachers.map((teacher: any) => ({
           id: teacher.id,
           name: teacher.name,

@@ -1,23 +1,21 @@
 import { Request, Response } from 'express';
-import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import { 
+import {
   addTeacher,
   dismissTeacher,
   getAllTeachersNames,
-  getBenefits,
-  getCategories,
   getTeacherById,
   getTeachers,
   temporaryDismissTeacher,
-  updateTeacher
+  updateTeacher,
 } from '../modules/teacher';
+import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismisssSchema from './validationSchemas/teacherSchemas/inputTemporaryDismisssSchema';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
     try {
-      await inputTeacherSchema.validate(req.body)
+      await inputTeacherSchema.validate(req.body);
       const teacher = await addTeacher(req.body);
       res.status(201).json(teacher);
     } catch (error) {
@@ -67,8 +65,26 @@ class TeacherController {
 
   async getTeachers(req: any, res: Response) {
     try {
-      const { search, state, unsubscribe_risk, sortField, sortOrder, withDeleted, page, pageSize } = req.query;
-      const teachersResponse = await getTeachers(search, state, unsubscribe_risk, sortField, sortOrder, page, pageSize, withDeleted);
+      const {
+        search,
+        state,
+        unsubscribe_risk,
+        sortField,
+        sortOrder,
+        withDeleted,
+        page,
+        pageSize,
+      } = req.query;
+      const teachersResponse = await getTeachers(
+        search,
+        state,
+        unsubscribe_risk,
+        sortField,
+        sortOrder,
+        page,
+        pageSize,
+        withDeleted
+      );
       res.status(200).json(teachersResponse);
     } catch (error) {
       if (error instanceof Error) {
@@ -100,29 +116,6 @@ class TeacherController {
       }
     }
   }
-
-  async getBenefits(req: Request, res: Response) {
-    try {
-      const benefits = await getBenefits();
-      res.status(200).json(benefits);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
-  }
-
-  async getCategories(req: Request, res: Response) {
-    try {
-      const categories = await getCategories();
-      res.status(200).json(categories);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
-  }
 }
-
 
 export default new TeacherController();

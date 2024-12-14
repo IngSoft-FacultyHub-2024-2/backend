@@ -1,26 +1,22 @@
 import {
+  getSubjectById,
+  teacherCoordinatorSubjects,
+} from '../../src/modules/subject';
+import teacherRepository from '../../src/modules/teacher/repositories/teacherRepository';
+import {
   addTeacher,
-  getTeachers,
-  getTeacherById,
-  getBenefits,
-  getCategories,
-  getAllTeachersNames,
   dismissTeacher,
+  getAllTeachersNames,
+  getTeacherById,
+  getTeachers,
   temporaryDismissTeacher,
   updateTeacher,
   getTeachersToAssignLectures,
 } from '../../src/modules/teacher/services/teacherService';
-import teacherRepository from '../../src/modules/teacher/repositories/teacherRepository';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
-import {
-  getSubjectById,
-  teacherCoordinatorSubjects,
-} from '../../src/modules/subject';
 
 // Mocking the necessary modules
 jest.mock('../../src/modules/teacher/repositories/teacherRepository');
-jest.mock('../../src/modules/teacher/repositories/models/Benefit');
-jest.mock('../../src/modules/teacher/repositories/models/Category');
 jest.mock('../../src/modules/subject', () => ({
   getSubjectById: jest.fn(),
   teacherCoordinatorSubjects: jest.fn(),
@@ -418,63 +414,61 @@ describe('Teacher Service', () => {
       );
     });
   });
+});
 
-  // Test for getBenefits function
-  describe('getBenefits', () => {
-    it('should return a list of all benefits', async () => {
-      const mockBenefits = [
-        { id: 1, name: 'Health Insurance' },
-        { id: 2, name: 'Pension Plan' },
-      ];
-      (teacherRepository.getAllBenefits as jest.Mock).mockResolvedValue(
-        mockBenefits
-      );
+describe('getTeachersToAssignLectures', () => {
+  it('should return formatted teacher data for assigning lectures', async () => {
+    // Mock teacher data
+    const mockTeachers = [
+      {
+        id: 1,
+        subjects_history: [{ subject_id: 101, role: 'Teórico' }],
+        teacher_available_modules: [
+          { day_of_week: 'Lunes', module_id: 1 },
+          { day_of_week: 'Lunes', module_id: 2 },
+        ],
+        teacher_subject_groups: [
+          {
+            subject_id: 101,
+            members: [
+              { teacher_id: 1, role: 'Teórico' },
+              { teacher_id: 2, role: 'Práctico' },
+            ],
+          },
+        ],
+        getSeniorityInSemesters: jest.fn().mockResolvedValue(5),
+      },
+    ];
 
-      const result = await getBenefits();
+    (
+      teacherRepository.getTeachersToAssignLectures as jest.Mock
+    ).mockResolvedValue(mockTeachers);
 
-      expect(teacherRepository.getAllBenefits).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockBenefits);
-    });
+    // Execute the function
+    const result = await getTeachersToAssignLectures();
 
-    it('should throw an error if repository fails', async () => {
-      const mockError = new Error('Failed to fetch benefits');
-      (teacherRepository.getAllBenefits as jest.Mock).mockRejectedValue(
-        mockError
-      );
+    // Verify the result
+    expect(result).toEqual([
+      {
+        id: 1,
+        seniority: 5,
+        subject_he_know_how_to_teach: [{ subject: '101', role: ['Teórico'] }],
+        available_times: {
+          Monday: [1, 2],
+        },
+        weekly_hours_max_work: 80,
+        groups: [
+          {
+            my_role: ['Teórico'],
+            subject: '101',
+            other_teacher: [{ teacher: '2', role: ['Práctico'] }],
+          },
+        ],
+      },
+    ]);
 
-      await expect(getBenefits()).rejects.toThrow(mockError);
-      expect(teacherRepository.getAllBenefits).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  // Test for getCategories function
-  describe('getCategories', () => {
-    it('should return a list of all categories', async () => {
-      const mockCategories = [
-        { id: 1, name: 'Full Professor' },
-        { id: 2, name: 'Assistant Professor' },
-      ];
-      (teacherRepository.getAllCategories as jest.Mock).mockResolvedValue(
-        mockCategories
-      );
-
-      const result = await getCategories();
-
-      expect(teacherRepository.getAllCategories).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockCategories);
-    });
-
-    it('should throw an error if repository fails', async () => {
-      const mockError = new Error('Failed to fetch categories');
-      (teacherRepository.getAllCategories as jest.Mock).mockRejectedValue(
-        mockError
-      );
-
-      await expect(getCategories()).rejects.toThrow(
-        'Failed to fetch categories'
-      );
-      expect(teacherRepository.getAllCategories).toHaveBeenCalledTimes(2);
-    });
+    // Verify the mocked method was called
+    expect(mockTeachers[0].getSeniorityInSemesters).toHaveBeenCalled();
   });
 });
 

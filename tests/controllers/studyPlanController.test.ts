@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
-import { getStudyPlans, addStudyPlan } from '../../src/modules/subject';
 import studyPlanController from '../../src/controllers/studyPlanController';
+import {
+  addStudyPlan,
+  deleteStudyPlan,
+  getStudyPlans,
+  updateStudyPlan,
+} from '../../src/modules/subject';
 
 jest.mock('../../src/modules/subject');
 
@@ -9,54 +14,121 @@ describe('StudyPlanController', () => {
   const mockRes = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
+    send: jest.fn(),
   } as unknown as Response;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('retrieves studyPlans successfully with filters, sorting', async () => {
-    // Arrange
-    const mockStudyPlans = [{ id: 1, year: 2024 }];
-    const queryParams = { sortField: 'year', sortOrder: 'asc'};
+  describe('getStudyPlans', () => {
+    it('retrieves study plans successfully with filters and sorting', async () => {
+      const mockStudyPlans = [{ id: 1, year: 2024 }];
+      const queryParams = { sortField: 'year', sortOrder: 'asc' };
 
-    mockReq.query = queryParams;
-    (getStudyPlans as jest.Mock).mockResolvedValue(mockStudyPlans);
+      mockReq.query = queryParams;
+      (getStudyPlans as jest.Mock).mockResolvedValue(mockStudyPlans);
 
-    // Act
-    await studyPlanController.getStudyPlans(mockReq, mockRes)
+      await studyPlanController.getStudyPlans(mockReq, mockRes);
 
-    // Assert
-    expect(getStudyPlans).toHaveBeenCalledWith({}, undefined, 'year', 'asc');
-    expect(mockRes.status).toHaveBeenCalledWith(200);
-    expect(mockRes.json).toHaveBeenCalledWith(mockStudyPlans);
-  });
-
-  it('should create an studyPlan successfully', async () => {
-    const mockStudyPlan = { id: 1, year: 2024 };
-    mockReq.body = mockStudyPlan;
-    (addStudyPlan as jest.Mock).mockImplementation(async () => {
-      return mockStudyPlan;
+      expect(getStudyPlans).toHaveBeenCalledWith({}, undefined, 'year', 'asc');
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockStudyPlans);
     });
 
-    await studyPlanController.addStudyPlan(mockReq, mockRes);
+    it('handles error when retrieving study plans', async () => {
+      const mockError = new Error('Failed to fetch study plans');
+      mockReq.query = {};
+      (getStudyPlans as jest.Mock).mockRejectedValue(mockError);
 
-    expect(addStudyPlan).toHaveBeenCalledWith(mockStudyPlan);
-    expect(mockRes.status).toHaveBeenCalledWith(201);
-    expect(mockRes.json).toHaveBeenCalledWith(mockStudyPlan);
+      await studyPlanController.getStudyPlans(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: 'Failed to fetch study plans',
+      });
+    });
   });
 
-  it('should handle error when creating an studyPlan', async () => {
-    const mockError = new Error('Failed to create studyPlan');
-    mockReq.body = { year: 2024 };
-    (addStudyPlan as jest.Mock).mockImplementation(async () => {
-      throw mockError;
+  describe('addStudyPlan', () => {
+    it('creates a study plan successfully', async () => {
+      const mockStudyPlan = { id: 1, year: 2024 };
+      mockReq.body = mockStudyPlan;
+      (addStudyPlan as jest.Mock).mockResolvedValue(mockStudyPlan);
+
+      await studyPlanController.addStudyPlan(mockReq, mockRes);
+
+      expect(addStudyPlan).toHaveBeenCalledWith(mockStudyPlan);
+      expect(mockRes.status).toHaveBeenCalledWith(201);
+      expect(mockRes.json).toHaveBeenCalledWith(mockStudyPlan);
     });
 
-    await studyPlanController.addStudyPlan(mockReq, mockRes);
+    it('handles error when creating a study plan', async () => {
+      const mockError = new Error('Failed to create study plan');
+      mockReq.body = { year: 2024 };
+      (addStudyPlan as jest.Mock).mockRejectedValue(mockError);
 
-    expect(addStudyPlan).toHaveBeenCalledWith({  year: 2024 });
-    expect(mockRes.status).toHaveBeenCalledWith(500);
-    expect(mockRes.json).toHaveBeenCalledWith({ error: 'Failed to create studyPlan' });
+      await studyPlanController.addStudyPlan(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: 'Failed to create study plan',
+      });
+    });
+  });
+
+  describe('updateStudyPlan', () => {
+    it('updates a study plan successfully', async () => {
+      const mockStudyPlan = { id: 1, year: 2025 };
+      mockReq.params = { id: '1' };
+      mockReq.body = mockStudyPlan;
+      (updateStudyPlan as jest.Mock).mockResolvedValue(mockStudyPlan);
+
+      await studyPlanController.updateStudyPlan(mockReq, mockRes);
+
+      expect(updateStudyPlan).toHaveBeenCalledWith(1, mockStudyPlan);
+      expect(mockRes.status).toHaveBeenCalledWith(201);
+      expect(mockRes.json).toHaveBeenCalledWith(mockStudyPlan);
+    });
+
+    it('handles error when updating a study plan', async () => {
+      const mockError = new Error('Failed to update study plan');
+      mockReq.params = { id: '1' };
+      mockReq.body = { year: 2025 };
+      (updateStudyPlan as jest.Mock).mockRejectedValue(mockError);
+
+      await studyPlanController.updateStudyPlan(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: 'Failed to update study plan',
+      });
+    });
+  });
+
+  describe('deleteStudyPlan', () => {
+    it('deletes a study plan successfully', async () => {
+      mockReq.params = { id: '1' };
+      (deleteStudyPlan as jest.Mock).mockResolvedValue(undefined);
+
+      await studyPlanController.deleteStudyPlan(mockReq, mockRes);
+
+      expect(deleteStudyPlan).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(204);
+      expect(mockRes.send).toHaveBeenCalled();
+    });
+
+    it('handles error when deleting a study plan', async () => {
+      const mockError = new Error('Failed to delete study plan');
+      mockReq.params = { id: '1' };
+      (deleteStudyPlan as jest.Mock).mockRejectedValue(mockError);
+
+      await studyPlanController.deleteStudyPlan(mockReq, mockRes);
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: 'Failed to delete study plan',
+      });
+    });
   });
 });

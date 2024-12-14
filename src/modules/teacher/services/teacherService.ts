@@ -1,8 +1,5 @@
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
-import {
-  translateWeekDayToEnglish,
-  WeekDays,
-} from '../../../shared/utils/enums/WeekDays';
+import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../subject';
 import {
@@ -189,12 +186,4 @@ export async function getTeachersToAssignLectures() {
 
 export async function updateTeacher(id: number, teacher: Partial<Teacher>) {
   return await teacherRepository.updateTeacher(id, teacher);
-}
-
-export async function getBenefits() {
-  return await teacherRepository.getAllBenefits();
-}
-
-export async function getCategories() {
-  return await teacherRepository.getAllCategories();
 }

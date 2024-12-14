@@ -6,12 +6,18 @@ module.exports = {
     return queryInterface.bulkInsert('Needs', [
       {
         name: 'Salon grande',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         name: 'Proyector',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         name: 'Internet',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

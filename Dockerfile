@@ -1,5 +1,5 @@
 # Usa la imagen oficial de Node.js como imagen base
-FROM node:14
+FROM node:20
 
 # Establece el directorio de trabajo en /app
 WORKDIR /app
@@ -13,8 +13,11 @@ RUN npm install
 # Copia el resto de la aplicación
 COPY . .
 
+RUN npm run build
+
 # Expone el puerto en el que la aplicación está escuchando
-EXPOSE 3000
+EXPOSE 8080
+
 
 # Define el comando para ejecutar la aplicación
 CMD ["npm", "start"]

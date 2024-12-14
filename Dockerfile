@@ -13,8 +13,6 @@ RUN npm install
 # Copia el resto de la aplicación
 COPY . .
 
-RUN npm run build
-
 # Expone el puerto en el que la aplicación está escuchando
 EXPOSE 8080
 

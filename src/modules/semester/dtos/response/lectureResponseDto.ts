@@ -32,6 +32,7 @@ interface LectureRole {
     day_of_week: string;
     modules: number[];
   }[];
+  is_lecture_locked: boolean;
 }
 
 export class LectureResponseDtoHelper {
@@ -60,6 +61,7 @@ export class LectureResponseDtoHelper {
           name: teacher.name,
           surname: teacher.surname,
         })),
+        is_lecture_locked: role.is_lecture_locked,
         hour_configs: role.hour_configs.map((config: any) => ({
           id: config.id,
           day_of_week: config.day_of_week,

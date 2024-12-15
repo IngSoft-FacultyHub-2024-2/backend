@@ -11,6 +11,7 @@ class LectureRole extends Model {
   public role!: SubjectRoles;
   public hour_configs!: LectureHourConfig[];
   public teachers!: LectureTeacher[];
+  public is_lecture_locked!: boolean; 
 
   public static associations: {
     lecture: BelongsTo<LectureRole, Lecture>;
@@ -40,6 +41,11 @@ LectureRole.init(
     role: {
       type: DataTypes.ENUM(SubjectRoles.TECHNOLOGY, SubjectRoles.THEORY),
       allowNull: false,
+    },
+    is_lecture_locked: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

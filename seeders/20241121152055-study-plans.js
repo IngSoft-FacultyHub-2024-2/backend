@@ -7,14 +7,20 @@ module.exports = {
       {
         year: 2019,
         valid: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         year: 2021,
         valid: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         year: 2024,
         valid: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

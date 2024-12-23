@@ -242,4 +242,38 @@ describe('Semester Service', () => {
       );
     });
   });
+
+  describe('deleteLecture', () => {
+    const mockLectureId = 1;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should call semesterRepository.deleteLecture with the correct parameters', async () => {
+      (semesterRepository.deleteLecture as jest.Mock).mockResolvedValue(true);
+
+      const result = await semesterService.deleteLecture(mockLectureId);
+
+      expect(semesterRepository.deleteLecture).toHaveBeenCalledWith(
+        mockLectureId
+      );
+      expect(result).toBe(true);
+    });
+
+    it('should handle errors and propagate them', async () => {
+      const mockError = new Error('Delete failed');
+      (semesterRepository.deleteLecture as jest.Mock).mockRejectedValue(
+        mockError
+      );
+
+      await expect(
+        semesterService.deleteLecture(mockLectureId)
+      ).rejects.toThrow(mockError);
+
+      expect(semesterRepository.deleteLecture).toHaveBeenCalledWith(
+        mockLectureId
+      );
+    });
+  });
 });

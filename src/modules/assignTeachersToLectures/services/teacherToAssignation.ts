@@ -55,7 +55,6 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   await deleteTeachersAssignations(semesterId);
 
   const matches = response.matches;
-
   await Promise.all(
     Object.entries(matches).map(async ([lectureId, roles]) => {
       await Promise.all(

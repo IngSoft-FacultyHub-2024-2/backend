@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger';
 import sequelize from './config/database';
 import degreeRouter from './routers/degreeRouter';
 import eventRouter from './routers/eventRouter';
@@ -26,6 +28,9 @@ app.use(
 );
 app.use(express.json());
 app.use(logger('dev'));
+
+// Add swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/subjects', subjectRouter);
 app.use('/api/events', eventRouter);

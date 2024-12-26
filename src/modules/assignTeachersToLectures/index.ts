@@ -1,3 +1,6 @@
-import { assignTeachersToSemesterLectures } from './services/teacherToAssignation';
+import {
+  assignTeachersToSemesterLectures,
+  getAssignationsConflicts,
+} from './services/teacherToAssignation';
 
-export { assignTeachersToSemesterLectures };
+export { assignTeachersToSemesterLectures, getAssignationsConflicts };

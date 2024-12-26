@@ -2,6 +2,7 @@ import axios from 'axios';
 import {
   getSemesterLecturesToAssign,
   setTeacherToLecture,
+  getSemesterLectures,
 } from '../../semester';
 import { getTeachersToAssignLectures } from '../../teacher';
 import { TeacherToAssign } from '../models/teacherToAssign';
@@ -127,4 +128,57 @@ async function sendAssignation(
       throw new Error('An unexpected error occurred during the request.');
     }
   }
+}
+
+export async function getAssignationsConflicts(semesterId: number) {
+  const unassignedTeachers = await getUnassignedTeachers(semesterId);
+  const unassignedLecturesRolesIds =
+    await getUnassignedLecturesRolesIds(semesterId);
+  return {
+    unassignedTeachers: unassignedTeachers,
+    unassignedLecturesRolesIds: unassignedLecturesRolesIds,
+  };
+}
+
+async function getUnassignedTeachers(semesterId: number) {
+  const teachersToAssign = await getTeachersToAssignLectures();
+  const semesterLectures = await getSemesterLectures(semesterId);
+  const unassignedTeachers = teachersToAssign.filter((teacher) => {
+    return !semesterLectures.some((lecture) =>
+      lecture.lecture_roles.some((role) =>
+        role.teachers.some((t) => t.id === teacher.id)
+      )
+    );
+  });
+  return unassignedTeachers;
+}
+
+async function getUnassignedLecturesRolesIds(semesterId: number) {
+  const lecturesToAssign = await getSemesterLecturesToAssign(semesterId);
+  const semesterLectures = await getSemesterLectures(semesterId);
+  // Extract unassigned lectures
+  const unassignedLectures = semesterLectures.flatMap((lecture) => {
+    const lectureToAssign = lecturesToAssign.find(
+      (assign) => assign.id === lecture.id
+    );
+
+    if (!lectureToAssign) {
+      // If the lecture is not in `lecturesToAssign`, consider all roles unassigned
+      return lecture.lecture_roles;
+    }
+
+    return lecture.lecture_roles.filter((role) => {
+      const requiredTeachers = lectureToAssign.subClasses.filter(
+        (subclass) => subclass.role === role.role
+      )[0].num_teachers;
+      const assignedTeachers = role.teachers.length;
+
+      // Role is unassigned if the required number of teachers is not met
+      return assignedTeachers < requiredTeachers;
+    });
+  });
+
+  const unassignedLecturesIds = unassignedLectures.map((lecture) => lecture.id);
+
+  return unassignedLecturesIds;
 }

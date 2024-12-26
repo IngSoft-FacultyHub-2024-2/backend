@@ -7,5 +7,9 @@ router.post(
   '/',
   assignTeachersToLecturesController.assignTeachersToSemesterLectures
 );
+router.get(
+  '/conflicts/:semesterId',
+  assignTeachersToLecturesController.getAssignationsConflicts
+);
 
 export default router;

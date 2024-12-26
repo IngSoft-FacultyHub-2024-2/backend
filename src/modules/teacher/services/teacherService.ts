@@ -173,6 +173,8 @@ export async function getTeachersToAssignLectures() {
 
         return {
           id: teacher.id,
+          name: teacher.name,
+          surname: teacher.surname,
           seniority,
           subject_he_know_how_to_teach: subjectHeKnowHowToTeach,
           available_times: availableTimes,

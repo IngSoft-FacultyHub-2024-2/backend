@@ -8,8 +8,12 @@ import { returnError } from '../shared/utils/exceptions/handleExceptions';
 class AssignTeachersToLecturesController {
   async assignTeachersToSemesterLectures(req: Request, res: Response) {
     try {
+      const { semesterId } = req.body;
+      if (!semesterId || isNaN(Number(semesterId))) {
+        throw new Error('El semetreId es invalido');
+      }
       const result = await assignTeachersToSemesterLectures(
-        req.body.semesterId
+        semesterId
       );
       res.status(200).json(result);
     } catch (error) {

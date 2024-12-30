@@ -316,6 +316,68 @@ class SemesterRepository {
       console.log('No LectureTeacher entries found for the given semester.');
     }
   }
+
+  async deleteLecture(lectureId: number): Promise<void> {
+    const lecture = await Lecture.findByPk(lectureId, {
+      include: [
+        { association: Lecture.associations.lecture_groups },
+        { association: Lecture.associations.lecture_roles },
+      ],
+    });
+
+    if (!lecture) {
+      throw new Error(`Lecture with ID ${lectureId} not found`);
+    }
+
+    const transaction = await Lecture.sequelize!.transaction();
+
+    try {
+      // Delete associated lecture groups
+      if (lecture.lecture_groups && lecture.lecture_groups.length > 0) {
+        await LectureGroup.destroy({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+      }
+
+      // Delete associated lecture roles
+      if (lecture.lecture_roles && lecture.lecture_roles.length > 0) {
+        const existingRoles = await LectureRole.findAll({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+        const roleIds = existingRoles.map((role) => role.id);
+
+        await LectureHourConfig.destroy({
+          where: { lecture_role_id: roleIds },
+          transaction,
+        });
+
+        await LectureTeacher.destroy({
+          where: { lecture_role_id: roleIds },
+          transaction,
+        });
+
+        await LectureRole.destroy({
+          where: { lecture_id: lectureId },
+          transaction,
+        });
+      }
+
+      // Delete the lecture itself
+      await Lecture.destroy({
+        where: { id: lectureId },
+        transaction,
+      });
+
+      // Commit the transaction
+      await transaction.commit();
+    } catch (error) {
+      // Rollback the transaction in case of any error
+      await transaction.rollback();
+      throw error;
+    }
+  }
 }
 
 export default new SemesterRepository();

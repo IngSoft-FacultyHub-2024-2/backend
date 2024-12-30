@@ -110,6 +110,10 @@ export async function addLecture(lecture: Partial<Lecture>) {
   return await semesterRepository.addLecture(lecture);
 }
 
+export async function deleteLecture(lectureId: number) {
+  return await semesterRepository.deleteLecture(lectureId);
+}
+
 export async function getSemesterLecturesGroups(
   semesterId: number,
   degreeId?: number

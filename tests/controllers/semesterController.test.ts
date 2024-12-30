@@ -9,6 +9,7 @@ import {
   getSemesters,
   getSemesterLecturesGroups,
   updateLecture,
+  deleteLecture,
 } from '../../src/modules/semester';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
@@ -247,5 +248,52 @@ describe('updateLecture', () => {
     expect(inputLectureSchema.validate).toHaveBeenCalledWith(mockReq.body);
     expect(updateLecture).not.toHaveBeenCalled();
     expect(returnError).toHaveBeenCalledWith(mockRes, mockValidationError);
+  });
+});
+
+describe('deleteLecture', () => {
+  const mockReq: Partial<Request> = {
+    params: { id: '1' },
+  };
+  const mockRes: Partial<Response> = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should delete a lecture and respond with status 200', async () => {
+    // Mock the service call
+    const mockDeletedLecture = {
+      id: 1,
+      message: 'Lecture deleted successfully',
+    };
+    (deleteLecture as jest.Mock).mockResolvedValue(mockDeletedLecture);
+
+    await SemesterController.deleteLecture(
+      mockReq as Request,
+      mockRes as Response
+    );
+
+    expect(deleteLecture).toHaveBeenCalledWith(1);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockDeletedLecture);
+  });
+
+  it('should handle errors and call returnError', async () => {
+    const mockError = new Error('Lecture not found');
+
+    // Mock the service call to throw an error
+    (deleteLecture as jest.Mock).mockRejectedValue(mockError);
+
+    await SemesterController.deleteLecture(
+      mockReq as Request,
+      mockRes as Response
+    );
+
+    expect(deleteLecture).toHaveBeenCalledWith(1);
+    expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
   });
 });

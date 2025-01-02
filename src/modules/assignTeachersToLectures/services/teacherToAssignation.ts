@@ -250,7 +250,6 @@ function isTeacherAvailableAtLectureTime(
 }
 
 function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
-  console.log(teacher.subjects_history);
   return teacher.subjects_history?.map((history) => ({
     subject: history.subject_id.toString(),
     role: [history.role],
@@ -263,12 +262,9 @@ function canTeacherTeachLecture(
   role: LectureRoleResponseDto
 ) {
   const subjectHeKnowHowToTeach = getSubjectHeKnowHowToTeach(teacher);
-  console.log(subjectHeKnowHowToTeach);
   if (!subjectHeKnowHowToTeach) {
     return false;
   }
-  console.log(subject);
-  console.log(role.role);
   return subjectHeKnowHowToTeach.some((subjectHeKnow) => {
     return (
       subjectHeKnow.subject === subject.id.toString() &&

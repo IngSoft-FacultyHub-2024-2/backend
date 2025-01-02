@@ -210,3 +210,19 @@ export async function setTeacherToLecture(
 export async function deleteTeachersAssignations(semesterId: number) {
   return await semesterRepository.deleteTeachersAssignations(semesterId);
 }
+
+export async function getTeachersAssignedToLectures(semesterId: number) {
+  const semesterLectures = await getSemesterLectures(semesterId);
+  const assignedTeachers = semesterLectures.flatMap((lecture) =>
+    lecture.lecture_roles.flatMap((role) => role.teachers)
+  );
+  return assignedTeachers;
+}
+
+export async function getLecturesWithTeachers(semesterId: number) {
+  const semesterLectures = await getSemesterLectures(semesterId);
+  semesterLectures.filter((lecture) =>
+    lecture.lecture_roles.filter((role) => role.teachers.length > 0)
+  );
+  return semesterLectures;
+}

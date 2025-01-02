@@ -8,7 +8,10 @@ import {
   getSemesterLecturesToAssign,
   setTeacherToLecture,
   deleteLecture,
+  deleteTeachersAssignations,
 } from './services/semesterService';
+
+import { LectureRoleResponseDto } from './dtos/response/lectureResponseDto';
 
 export {
   addLecture,
@@ -20,4 +23,6 @@ export {
   getSemesterLecturesToAssign,
   setTeacherToLecture,
   deleteLecture,
+  deleteTeachersAssignations,
+  LectureRoleResponseDto,
 };

@@ -3,11 +3,16 @@ import {
   getSemesterLecturesToAssign,
   setTeacherToLecture,
   getSemesterLectures,
+  deleteTeachersAssignations,
+  LectureRoleResponseDto,
 } from '../../semester';
-import { getTeachersToAssignLectures } from '../../teacher';
+import {
+  getTeacherById,
+  getTeachersToAssignLectures,
+  TeacherResponseDto,
+} from '../../teacher';
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
-import { deleteTeachersAssignations } from '../../semester/services/semesterService';
 import { getModules } from '../../../modules/teacher';
 import Module from '../../teacher/repositories/models/Module';
 
@@ -134,7 +139,10 @@ export async function getAssignationsConflicts(semesterId: number) {
   const unassignedTeachers = await getUnassignedTeachers(semesterId);
   const unassignedLecturesRolesIds =
     await getUnassignedLecturesRolesIds(semesterId);
+  const teachersBusyAtLectureTimeConflicts =
+    await getTeachersBusyAtLectureTimeConflicts(semesterId);
   return {
+    teachersBusyAtLectureTimeConflicts: teachersBusyAtLectureTimeConflicts,
     unassignedTeachers: unassignedTeachers,
     unassignedLecturesRolesIds: unassignedLecturesRolesIds,
   };
@@ -181,4 +189,55 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
   const unassignedLecturesIds = unassignedLectures.map((lecture) => lecture.id);
 
   return unassignedLecturesIds;
+}
+
+export async function getTeachersBusyAtLectureTimeConflicts(
+  semesterId: number
+) {
+  const teachersBusyAtLectureTime: any[] = [];
+  const semesterLectures = await getSemesterLectures(semesterId);
+  const teachers: { [key: number]: TeacherResponseDto } = {};
+
+  for (const lecture of semesterLectures) {
+    for (const role of lecture.lecture_roles) {
+      for (const teacher of role.teachers) {
+        if (!teachers[teacher.id]) {
+          teachers[teacher.id] = await getTeacherById(teacher.id, false);
+        }
+      }
+    }
+  }
+  semesterLectures.forEach((lecture) => {
+    lecture.lecture_roles.forEach((role) => {
+      role.teachers.forEach(async (t) => {
+        const teacher = teachers[t.id];
+        console.log(teacher, t.id);
+        if (!isTeacherAvailableAtLectureTime(teacher, role)) {
+          teachersBusyAtLectureTime.push(teacher, role);
+        }
+      });
+    });
+  });
+  return teachersBusyAtLectureTime;
+}
+
+function isTeacherAvailableAtLectureTime(
+  teacher: TeacherResponseDto,
+  role: LectureRoleResponseDto
+) {
+  const isAvailable = role.hour_configs.every((config) => {
+    return config.modules.every((module) => {
+      const isModuleAvailable = teacher.teacher_available_modules.some(
+        (teacherModule) => {
+          return (
+            teacherModule.day_of_week === config.day_of_week &&
+            teacherModule.module_id === module
+          );
+        }
+      );
+      return isModuleAvailable;
+    });
+  });
+
+  return isAvailable;
 }

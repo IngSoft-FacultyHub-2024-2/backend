@@ -11,7 +11,10 @@ import {
   deleteTeachersAssignations,
 } from './services/semesterService';
 
-import { LectureRoleResponseDto } from './dtos/response/lectureResponseDto';
+import {
+  LectureRoleResponseDto,
+  LectureResponseDto,
+} from './dtos/response/lectureResponseDto';
 
 export {
   addLecture,
@@ -25,4 +28,5 @@ export {
   deleteLecture,
   deleteTeachersAssignations,
   LectureRoleResponseDto,
+  LectureResponseDto,
 };

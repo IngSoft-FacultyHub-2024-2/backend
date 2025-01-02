@@ -5,6 +5,7 @@ import {
   getSemesterLectures,
   deleteTeachersAssignations,
   LectureRoleResponseDto,
+  LectureResponseDto,
 } from '../../semester';
 import {
   getTeacherById,
@@ -192,10 +193,12 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
   return unassignedLecturesIds;
 }
 
-export async function getTeachersLectureConflicts(semesterId: number) {
+async function getTeachersLectureConflicts(semesterId: number) {
   const teachersBusyAtLectureTime: any[] = [];
   const teachersDoNotKnowSubject: any[] = [];
   const semesterLectures = await getSemesterLectures(semesterId);
+  const teacherTeaching2LectureAtSameTime =
+    teachersTeaching2LecturesAtSameTime(semesterLectures);
   const teachers: { [key: number]: TeacherResponseDto } = {};
 
   for (const lecture of semesterLectures) {
@@ -220,7 +223,11 @@ export async function getTeachersLectureConflicts(semesterId: number) {
       });
     });
   });
-  return { teachersBusyAtLectureTime, teachersDoNotKnowSubject };
+  return {
+    teachersBusyAtLectureTime,
+    teachersDoNotKnowSubject,
+    teacherTeaching2LectureAtSameTime,
+  };
 }
 
 function isTeacherAvailableAtLectureTime(
@@ -272,4 +279,53 @@ function canTeacherTeachLecture(
   });
 }
 
-//function isTeacherTeaching2LecturesAtSameTime(){}
+function teachersTeaching2LecturesAtSameTime(
+  semesterLectures: LectureResponseDto[]
+): { teacherId: number; conflictingLectures: LectureResponseDto[] }[] {
+  const teacherSchedule: Record<
+    number,
+    { day: string; modules: Set<number> }[]
+  > = {};
+
+  const conflictingTeachers: {
+    teacherId: number;
+    conflictingLectures: LectureResponseDto[];
+  }[] = [];
+
+  for (const lecture of semesterLectures) {
+    for (const role of lecture.lecture_roles) {
+      for (const teacher of role.teachers) {
+        if (!teacherSchedule[teacher.id]) {
+          teacherSchedule[teacher.id] = [];
+        }
+
+        for (const hourConfig of role.hour_configs) {
+          // Check for conflicts with the teacher's existing schedule
+          for (const schedule of teacherSchedule[teacher.id]) {
+            if (schedule.day === hourConfig.day_of_week) {
+              const overlappingModules = hourConfig.modules.filter((module) =>
+                schedule.modules.has(module)
+              );
+              if (overlappingModules.length > 0) {
+                // Add the teacher and conflicting lecture to the result
+                conflictingTeachers.push({
+                  teacherId: teacher.id,
+                  conflictingLectures: [lecture],
+                });
+                return conflictingTeachers;
+              }
+            }
+          }
+
+          // Add current hourConfig to the teacher's schedule
+          teacherSchedule[teacher.id].push({
+            day: hourConfig.day_of_week,
+            modules: new Set(hourConfig.modules),
+          });
+        }
+      }
+    }
+  }
+
+  return conflictingTeachers; // Return the list of teachers with conflicting lectures
+}

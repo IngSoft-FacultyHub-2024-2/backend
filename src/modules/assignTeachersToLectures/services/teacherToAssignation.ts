@@ -14,14 +14,12 @@ import {
 } from '../../teacher';
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
-import { getModules } from '../../../modules/teacher';
-import Module from '../../teacher/repositories/models/Module';
-import { TeacherDTO } from '../../teacher/dtos/response/teacherToAssignDto';
+import { getModules, ModuleResponseDto } from '../../../modules/teacher';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
   classes: { [key: string]: LectureToAssign };
-  modules: Module[];
+  modules: ModuleResponseDto[];
   teacher_names_with_classes: string[];
 }
 

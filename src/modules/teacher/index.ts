@@ -2,6 +2,7 @@ import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
 } from './dtos/response/teacherResponseDto';
+import { ModuleResponseDto } from './dtos/response/moduleResponseDto';
 import {
   addBenefit,
   deleteBenefit,
@@ -47,4 +48,4 @@ export { addBenefit, deleteBenefit, getBenefits, updateBenefit };
 export { addCategory, deleteCategory, getCategories, updateCategory };
 
 //Module
-export { getModules };
+export { getModules, ModuleResponseDto };

@@ -164,12 +164,7 @@ export async function getTeachersToAssignLectures() {
             })),
         }));
 
-        const subjectHeKnowHowToTeach = teacher.subjects_history.map(
-          (history) => ({
-            subject: history.subject_id.toString(),
-            role: [history.role],
-          })
-        );
+        const subjectHeKnowHowToTeach = getSubjectHeKnowHowToTeach(teacher);
 
         return {
           id: teacher.id,
@@ -184,6 +179,13 @@ export async function getTeachersToAssignLectures() {
       })
   );
   return teachersToAssign;
+}
+
+function getSubjectHeKnowHowToTeach(teacher: Teacher) {
+  return teacher.subjects_history.map((history) => ({
+    subject: history.subject_id.toString(),
+    role: [history.role],
+  }));
 }
 
 export async function updateTeacher(id: number, teacher: Partial<Teacher>) {

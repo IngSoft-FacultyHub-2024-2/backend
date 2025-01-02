@@ -15,6 +15,7 @@ import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
 import { getModules } from '../../../modules/teacher';
 import Module from '../../teacher/repositories/models/Module';
+import { TeacherDTO } from '../../teacher/dtos/response/teacherToAssignDto';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
@@ -139,10 +140,10 @@ export async function getAssignationsConflicts(semesterId: number) {
   const unassignedTeachers = await getUnassignedTeachers(semesterId);
   const unassignedLecturesRolesIds =
     await getUnassignedLecturesRolesIds(semesterId);
-  const teachersBusyAtLectureTimeConflicts =
-    await getTeachersBusyAtLectureTimeConflicts(semesterId);
+  const teachersLectureConflicts =
+    await getTeachersLectureConflicts(semesterId);
   return {
-    teachersBusyAtLectureTimeConflicts: teachersBusyAtLectureTimeConflicts,
+    ...teachersLectureConflicts,
     unassignedTeachers: unassignedTeachers,
     unassignedLecturesRolesIds: unassignedLecturesRolesIds,
   };
@@ -191,10 +192,9 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
   return unassignedLecturesIds;
 }
 
-export async function getTeachersBusyAtLectureTimeConflicts(
-  semesterId: number
-) {
+export async function getTeachersLectureConflicts(semesterId: number) {
   const teachersBusyAtLectureTime: any[] = [];
+  const teachersDoNotKnowSubject: any[] = [];
   const semesterLectures = await getSemesterLectures(semesterId);
   const teachers: { [key: number]: TeacherResponseDto } = {};
 
@@ -202,7 +202,7 @@ export async function getTeachersBusyAtLectureTimeConflicts(
     for (const role of lecture.lecture_roles) {
       for (const teacher of role.teachers) {
         if (!teachers[teacher.id]) {
-          teachers[teacher.id] = await getTeacherById(teacher.id, false);
+          teachers[teacher.id] = await getTeacherById(teacher.id, true);
         }
       }
     }
@@ -211,14 +211,16 @@ export async function getTeachersBusyAtLectureTimeConflicts(
     lecture.lecture_roles.forEach((role) => {
       role.teachers.forEach(async (t) => {
         const teacher = teachers[t.id];
-        console.log(teacher, t.id);
         if (!isTeacherAvailableAtLectureTime(teacher, role)) {
           teachersBusyAtLectureTime.push(teacher, role);
+        }
+        if (!canTeacherTeachLecture(teacher, lecture.subject, role)) {
+          teachersDoNotKnowSubject.push(teacher, lecture.subject, role);
         }
       });
     });
   });
-  return teachersBusyAtLectureTime;
+  return { teachersBusyAtLectureTime, teachersDoNotKnowSubject };
 }
 
 function isTeacherAvailableAtLectureTime(
@@ -241,3 +243,33 @@ function isTeacherAvailableAtLectureTime(
 
   return isAvailable;
 }
+
+function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
+  console.log(teacher.subjects_history);
+  return teacher.subjects_history?.map((history) => ({
+    subject: history.subject_id.toString(),
+    role: [history.role],
+  }));
+}
+
+function canTeacherTeachLecture(
+  teacher: TeacherResponseDto,
+  subject: any,
+  role: LectureRoleResponseDto
+) {
+  const subjectHeKnowHowToTeach = getSubjectHeKnowHowToTeach(teacher);
+  console.log(subjectHeKnowHowToTeach);
+  if (!subjectHeKnowHowToTeach) {
+    return false;
+  }
+  console.log(subject);
+  console.log(role.role);
+  return subjectHeKnowHowToTeach.some((subjectHeKnow) => {
+    return (
+      subjectHeKnow.subject === subject.id.toString() &&
+      subjectHeKnow.role.includes(role.role)
+    );
+  });
+}
+
+//function isTeacherTeaching2LecturesAtSameTime(){}

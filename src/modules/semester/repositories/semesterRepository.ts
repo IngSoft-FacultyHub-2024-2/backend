@@ -130,7 +130,7 @@ class SemesterRepository {
 
   async updateLecture(lectureId: number, lectureData: Partial<Lecture>) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
-    
+
     try {
       const lecture = await Lecture.findByPk(lectureId, {
         include: [

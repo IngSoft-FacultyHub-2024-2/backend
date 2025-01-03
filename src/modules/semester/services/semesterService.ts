@@ -7,6 +7,7 @@ import { getDegreeById } from '../../degree';
 import { getSubjectById, amountOfTeachersPerSubject } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
+import { lectureToAssignResponseDto } from '../dtos/response/lectureToAssignResponseDto';
 import Lecture from '../repositories/models/Lecture';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
@@ -135,7 +136,9 @@ export async function updateLecture(
   return await semesterRepository.updateLecture(lectureId, lecture);
 }
 
-export async function getSemesterLecturesToAssign(semesterId: number) {
+export async function getSemesterLecturesToAssign(
+  semesterId: number
+): Promise<lectureToAssignResponseDto[]> {
   const semester = await semesterRepository.getSemesterLectures(semesterId);
   if (!semester) {
     throw new ResourceNotFound('No se encontraron el semestre');
@@ -205,4 +208,23 @@ export async function setTeacherToLecture(
 
 export async function deleteTeachersAssignations(semesterId: number) {
   return await semesterRepository.deleteTeachersAssignations(semesterId);
+}
+
+export async function getPreassignedTeachers(semesterId: number) {
+  const semesterLecture = await getSemesterLectures(semesterId);
+  const preassigned = semesterLecture.reduce(
+    (acc: { [lectureId: string]: { [role: string]: string[] } }, lecture) => {
+      acc[lecture.id] = {};
+      lecture.lecture_roles.forEach((role) => {
+        if (role.is_lecture_locked) {
+          acc[lecture.id][role.role] = role.teachers.map((teacher) =>
+            teacher.id.toString()
+          );
+        }
+      });
+      return acc;
+    },
+    {}
+  );
+  return preassigned;
 }

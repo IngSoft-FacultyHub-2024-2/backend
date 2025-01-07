@@ -10,7 +10,7 @@ import {
 } from '../modules/teacher';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
-import inputTemporaryDismisssSchema from './validationSchemas/teacherSchemas/inputTemporaryDismisssSchema';
+import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
@@ -51,7 +51,7 @@ class TeacherController {
 
   async temporaryDismissTeacher(req: Request, res: Response) {
     try {
-      await inputTemporaryDismisssSchema.validate(req.body);
+      await inputTemporaryDismissSchema.validate(req.body);
       const teacherId = parseInt(req.params.id);
       const retentionDate = req.body.retentionDate;
       temporaryDismissTeacher(teacherId, retentionDate);

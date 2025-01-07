@@ -69,16 +69,19 @@ class TeacherController {
         search,
         state,
         unsubscribe_risk,
+        subject_id,
         sortField,
         sortOrder,
         withDeleted,
         page,
         pageSize,
       } = req.query;
+      console.log(subject_id);
       const teachersResponse = await getTeachers(
         search,
         state,
         unsubscribe_risk,
+        subject_id,
         sortField,
         sortOrder,
         page,

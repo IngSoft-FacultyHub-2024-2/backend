@@ -9,6 +9,7 @@ import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import { lectureToAssignResponseDto } from '../dtos/response/lectureToAssignResponseDto';
 import Lecture from '../repositories/models/Lecture';
+import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
 
@@ -137,7 +138,26 @@ export async function updateLecture(
   lectureId: number,
   lecture: Partial<Lecture>
 ) {
-  return await semesterRepository.updateLecture(lectureId, lecture);
+  const teachers = lecture.lecture_roles
+    ? (
+      await Promise.all(
+        lecture.lecture_roles.map(async (role) => {
+          const teachersPromises = role.teachers.map(async (teacher) => {
+            const teacherData = await getTeacherById(teacher.teacher_id, true);
+            if (!teacherData) {
+              throw new ResourceNotFound(
+                'No se encontró el profesor con id ' + teacher.teacher_id
+              );
+            }
+            return teacherData;
+          });
+
+          return await Promise.all(teachersPromises);
+        })
+      )
+    ).flat()
+    : [];
+  return await semesterRepository.updateLecture(lectureId, lecture, teachers);
 }
 
 export async function getSemesterLecturesToAssign(

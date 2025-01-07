@@ -7,10 +7,14 @@ module.exports = {
       {
         name: 'Ingeniería en Sistemas',
         acronym: 'ID',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         name: 'Licenciatura en Sistemas',
         acronym: 'AN',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

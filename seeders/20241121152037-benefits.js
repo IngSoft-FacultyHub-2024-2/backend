@@ -6,9 +6,13 @@ module.exports = {
     return queryInterface.bulkInsert('Benefits', [
       {
         name: 'Descuento en la mensualidad',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         name: 'Descuento en inscripción',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

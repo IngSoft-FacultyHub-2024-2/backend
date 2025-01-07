@@ -6,11 +6,11 @@ export interface LectureResponseDto {
     acronym: string;
     valid: boolean;
   };
-  lecture_groups: LectureGroup[];
-  lecture_roles: LectureRole[];
+  lecture_groups: LectureGroupResponseDto[];
+  lecture_roles: LectureRoleResponseDto[];
 }
 
-interface LectureGroup {
+export interface LectureGroupResponseDto {
   id: number;
   group: string;
   degree: {
@@ -19,7 +19,7 @@ interface LectureGroup {
   };
 }
 
-interface LectureRole {
+export interface LectureRoleResponseDto {
   id: number;
   role: string;
   teachers: {

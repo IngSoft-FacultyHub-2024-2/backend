@@ -111,6 +111,10 @@ export async function addLecture(lecture: Partial<Lecture>) {
   return await semesterRepository.addLecture(lecture);
 }
 
+export async function deleteLecture(lectureId: number) {
+  return await semesterRepository.deleteLecture(lectureId);
+}
+
 export async function getSemesterLecturesGroups(
   semesterId: number,
   degreeId?: number
@@ -227,4 +231,20 @@ export async function getPreassignedTeachers(semesterId: number) {
     {}
   );
   return preassigned;
+}
+
+export async function getTeachersAssignedToLectures(semesterId: number) {
+  const semesterLectures = await getSemesterLectures(semesterId);
+  const assignedTeachers = semesterLectures.flatMap((lecture) =>
+    lecture.lecture_roles.flatMap((role) => role.teachers)
+  );
+  return assignedTeachers;
+}
+
+export async function getLecturesWithTeachers(semesterId: number) {
+  const semesterLectures = await getSemesterLectures(semesterId);
+  semesterLectures.filter((lecture) =>
+    lecture.lecture_roles.filter((role) => role.teachers.length > 0)
+  );
+  return semesterLectures;
 }

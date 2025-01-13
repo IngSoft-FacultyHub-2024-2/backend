@@ -230,7 +230,7 @@ class SemesterRepository {
           }
         }
       }
-      
+
       if (lockingAction) {
         await this.validateLockedLectures(teachers, lecture);
       }
@@ -288,7 +288,7 @@ class SemesterRepository {
       if (
         !this.matchesLectureTime(availableModules, updateLectureData, teacher.id)
       ) {
-        throw new Error(`Teacher ${teacher.name} ${teacher.surname} does not have available hours for the lecture.`);
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`);
       }
 
       // 2. Validate if the teacher has taught the subject before
@@ -298,7 +298,7 @@ class SemesterRepository {
           (history) => history.subject_id == updateLectureData.subject_id
         )
       ) {
-        throw new Error(`Teacher ${teacher.name} ${teacher.surname} has not taught the subject before.`);
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`);
       }
 
       // 3. Validate if the teacher is already assigned to another lecture at the same time
@@ -317,7 +317,7 @@ class SemesterRepository {
       });
       console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
-        throw new Error(`Teacher ${teacher.name} ${teacher.surname} is already assigned to another lecture at the same time.`);
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`);
       }
     }
   }
@@ -330,33 +330,35 @@ class SemesterRepository {
     const existingLectureRoles = otherLectures.flatMap(
       (lecture) => lecture.lecture_roles || []
     );
-    console.log('lectureRoles', JSON.stringify(existingLectureRoles, null, 2));
+
     for (const lectureRole of existingLectureRoles || []) {
       const existingTeachers = lectureRole.teachers || [];
       const existingHoursConfig = lectureRole.hour_configs || [];
+      const isLocked = lectureRole.is_lecture_locked;
+      if (isLocked) {
+        for (const oneLectureRole of toBeAssignedLectureRoles) {
+          const toBeAssignedTeachers = oneLectureRole.teachers || [];
+          const toBeAssignedHoursConfig = oneLectureRole.hour_configs || [];
 
-      for (const oneLectureRole of toBeAssignedLectureRoles) {
-        const toBeAssignedTeachers = oneLectureRole.teachers || [];
-        const toBeAssignedHoursConfig = oneLectureRole.hour_configs || [];
+          for (const teacher of toBeAssignedTeachers) {
+            // Verificar si el profesor está en el dictado existente
+            const isSameTeacher = existingTeachers.some(
+              (existingTeacher) => existingTeacher.teacher_id == teacher.teacher_id
+            );
 
-        for (const teacher of toBeAssignedTeachers) {
-          // Verificar si el profesor está en el dictado existente
-          const isSameTeacher = existingTeachers.some(
-            (existingTeacher) => existingTeacher.teacher_id == teacher.teacher_id
-          );
-
-          if (isSameTeacher) {
-            // Verificar si hay conflicto de horarios
-            for (const newHourConfig of toBeAssignedHoursConfig) {
-              for (const existingHourConfig of existingHoursConfig) {
-                if (
-                  newHourConfig.day_of_week == existingHourConfig.day_of_week &&
-                  newHourConfig.modules.some((module) =>
-                    existingHourConfig.modules.includes(module)
-                  )
-                ) {
-                  // Hay conflicto
-                  return true;
+            if (isSameTeacher) {
+              // Verificar si hay conflicto de horarios
+              for (const newHourConfig of toBeAssignedHoursConfig) {
+                for (const existingHourConfig of existingHoursConfig) {
+                  if (
+                    newHourConfig.day_of_week == existingHourConfig.day_of_week &&
+                    newHourConfig.modules.some((module) =>
+                      existingHourConfig.modules.includes(module)
+                    )
+                  ) {
+                    // Hay conflicto
+                    return true;
+                  }
                 }
               }
             }

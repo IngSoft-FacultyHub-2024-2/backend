@@ -7,6 +7,7 @@ import {
   updateLecture,
   getSemesterLecturesToAssign,
   setTeacherToLecture,
+  getPreassignedTeachers,
   deleteLecture,
   deleteTeachersAssignations,
 } from './services/semesterService';
@@ -25,6 +26,7 @@ export {
   updateLecture,
   getSemesterLecturesToAssign,
   setTeacherToLecture,
+  getPreassignedTeachers,
   deleteLecture,
   deleteTeachersAssignations,
   LectureRoleResponseDto,

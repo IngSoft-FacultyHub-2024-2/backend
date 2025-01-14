@@ -14,6 +14,7 @@ const inputLectureRoleSchema = yup.object().shape({
     .array()
     .of(inputLectureConfigHourSchema)
     .required('Al menos una configuración de horas es requerida'),
+  is_lecture_locked: yup.boolean().required('El bloqueo del dictado es requerido'),
 });
 
 export default inputLectureRoleSchema;

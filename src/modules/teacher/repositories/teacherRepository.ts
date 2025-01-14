@@ -109,7 +109,8 @@ class TeacherRepository {
     sortField?: string,
     search?: string,
     state?: TeacherStates,
-    risk?: number
+    risk?: number,
+    subject_id?: number
   ) {
     const orderOption = sortField
       ? ([[sortField, sortOrder]] as Order)
@@ -130,12 +131,22 @@ class TeacherRepository {
     const stateQuery = state ? { state } : {};
     const riskQuery = risk ? { unsubscribe_risk: risk } : {};
 
+    const subjectInclude = subject_id
+      ? {
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
+      : { model: TeacherSubjectHistory, as: 'subjects_history' };
+    console.log('subjectQuery', subjectInclude);
+
     const whereClause = {
       ...searchQuery,
       ...stateQuery,
       ...riskQuery,
     };
-
+    console.log(whereClause);
     return await Teacher.findAndCountAll({
       where: whereClause,
       order: orderOption,
@@ -147,7 +158,7 @@ class TeacherRepository {
         { model: CaesCourse, as: 'caes_courses' },
         { model: Contact, as: 'contacts' },
         { model: Prize, as: 'prizes' },
-        { model: TeacherSubjectHistory, as: 'subjects_history' },
+        subjectInclude,
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },

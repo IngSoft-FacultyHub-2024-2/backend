@@ -21,35 +21,45 @@ class SemesterRepository {
   }
 
   async addLecture(lecture: Partial<Lecture>) {
-    const newLecture = await Lecture.create(lecture, {
-      include: [
-        {
-          model: Semester,
-          as: 'semester',
-        },
-        {
-          model: LectureGroup,
-          as: 'lecture_groups',
-        },
-        {
-          model: LectureRole,
-          as: 'lecture_roles',
-          include: [
-            {
-              model: LectureHourConfig,
-              as: 'hour_configs',
-            },
-            {
-              model: LectureTeacher,
-              as: 'teachers',
-              required: false,
-            },
-          ],
-        },
-      ],
-    });
+    const transaction: Transaction = await Lecture.sequelize!.transaction();
+    try {
+      const newLecture = await Lecture.create(lecture, {
+        include: [
+          {
+            model: Semester,
+            as: 'semester',
+          },
+          {
+            model: LectureGroup,
+            as: 'lecture_groups',
+          },
+          {
+            model: LectureRole,
+            as: 'lecture_roles',
+            include: [
+              {
+                model: LectureHourConfig,
+                as: 'hour_configs',
+              },
+              {
+                model: LectureTeacher,
+                as: 'teachers',
+                required: false,
+              },
+            ],
+          },
+        ],
+        transaction, // Ensure the creation is part of the transaction
+      });
 
-    return newLecture;
+      // Commit the transaction if all operations succeed
+      await transaction.commit();
+      return newLecture;
+    } catch (error) {
+      // Roll back the transaction if any operation fails
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   async getSemesterLectures(
@@ -130,7 +140,11 @@ class SemesterRepository {
     return distinctGroups.map((row: any) => row.group);
   }
 
-  async updateLecture(lectureId: number, lectureData: Partial<Lecture>, teachers: TeacherResponseDto[]) {
+  async updateLecture(
+    lectureId: number,
+    lectureData: Partial<Lecture>,
+    teachers: TeacherResponseDto[]
+  ) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
 
     try {
@@ -281,14 +295,19 @@ class SemesterRepository {
     teachers: TeacherResponseDto[],
     updateLectureData: Lecture
   ) {
-
     for (const teacher of teachers) {
       // 1. Validate if the teacher has available hours
       const availableModules = teacher.teacher_available_modules;
       if (
-        !this.matchesLectureTime(availableModules, updateLectureData, teacher.id)
+        !this.matchesLectureTime(
+          availableModules,
+          updateLectureData,
+          teacher.id
+        )
       ) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`
+        );
       }
 
       // 2. Validate if the teacher has taught the subject before
@@ -298,7 +317,9 @@ class SemesterRepository {
           (history) => history.subject_id == updateLectureData.subject_id
         )
       ) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`
+        );
       }
 
       // 3. Validate if the teacher is already assigned to another lecture at the same time
@@ -317,7 +338,9 @@ class SemesterRepository {
       });
       console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`
+        );
       }
     }
   }
@@ -343,7 +366,8 @@ class SemesterRepository {
           for (const teacher of toBeAssignedTeachers) {
             // Verificar si el profesor está en el dictado existente
             const isSameTeacher = existingTeachers.some(
-              (existingTeacher) => existingTeacher.teacher_id == teacher.teacher_id
+              (existingTeacher) =>
+                existingTeacher.teacher_id == teacher.teacher_id
             );
 
             if (isSameTeacher) {
@@ -351,7 +375,8 @@ class SemesterRepository {
               for (const newHourConfig of toBeAssignedHoursConfig) {
                 for (const existingHourConfig of existingHoursConfig) {
                   if (
-                    newHourConfig.day_of_week == existingHourConfig.day_of_week &&
+                    newHourConfig.day_of_week ==
+                      existingHourConfig.day_of_week &&
                     newHourConfig.modules.some((module) =>
                       existingHourConfig.modules.includes(module)
                     )
@@ -414,11 +439,6 @@ class SemesterRepository {
     }
     return isMatch;
   }
-
-
-
-
-
 
   async deleteTeachersAssignations(semesterId: number) {
     // TODO: filter out the locked lectures

@@ -1,15 +1,48 @@
 import { Sequelize, Transaction } from 'sequelize';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import Lecture from './models/Lecture';
 import LectureGroup from './models/LectureGroup';
 import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
-import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
     return await Semester.create(semester);
+  }
+
+  async deleteSemester(semesterId: number) {
+    const semester = await Semester.findByPk(semesterId, {
+      include: [
+        {
+          model: Lecture,
+          as: 'lectures',
+        },
+      ],
+    });
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    for (const lecture of semester.lectures || []) {
+      await this.deleteLecture(lecture.id);
+    }
+
+    return await Semester.destroy({
+      where: { id: semesterId },
+    });
+  }
+
+  async updateSemester(semesterId: number, semesterData: Partial<Semester>) {
+    const semester = await Semester.findByPk(semesterId);
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    return await semester.update(semesterData);
   }
 
   async getSemesters() {

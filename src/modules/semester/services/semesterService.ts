@@ -1,10 +1,7 @@
-import {
-  translateWeekDayToEnglish,
-  WeekDays,
-} from '../../../shared/utils/enums/WeekDays';
+import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
-import { getSubjectById, amountOfTeachersPerSubject } from '../../subject';
+import { amountOfTeachersPerSubject, getSubjectById } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import Lecture from '../repositories/models/Lecture';
@@ -13,6 +10,17 @@ import semesterRepository from '../repositories/semesterRepository';
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
+}
+
+export async function deleteSemester(semesterId: number) {
+  return await semesterRepository.deleteSemester(semesterId);
+}
+
+export async function updateSemester(
+  semesterId: number,
+  semester: Partial<Semester>
+) {
+  return await semesterRepository.updateSemester(semesterId, semester);
 }
 
 export async function getSemesters() {

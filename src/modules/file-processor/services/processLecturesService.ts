@@ -1,6 +1,6 @@
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import { getDegreeByAcronym } from '../../degree';
-import { addLecture } from '../../semester';
+import { addLecture, deleteLecture, getSemesterLectures } from '../../semester';
 import { getAllSubjectNames } from '../../subject';
 import { getModules } from '../../teacher';
 import { FileDataDto } from '../dtos/FileDataDto';
@@ -22,11 +22,25 @@ interface SemesterLectures {
   }[];
 }
 
+export async function clearSemester(semester_id: number) {
+  console.log('Clearing semester:', semester_id);
+  const semesterLectures = await getSemesterLectures(semester_id);
+
+  if (!semesterLectures || semesterLectures.length === 0) {
+    return;
+  }
+
+  for (const lecture of semesterLectures) {
+    await deleteLecture(lecture.id);
+  }
+}
+
 export async function processLectures(
   fileData: FileDataDto,
   data: string[][],
   sheetName: string
 ) {
+  console.log('Processing lectures for sheet:', sheetName);
   let degreeAcronym;
 
   if (sheetName.includes('-')) {

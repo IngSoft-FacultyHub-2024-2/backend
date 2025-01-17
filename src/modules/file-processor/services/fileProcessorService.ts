@@ -3,12 +3,23 @@ import path from 'path';
 import xlsx from 'xlsx';
 import { FileTypes } from '../../../shared/utils/enums/fileTypes';
 import { FileDataDto } from '../dtos/FileDataDto';
-import { processLectures } from './processLecturesService';
+import { clearSemester, processLectures } from './processLecturesService';
 
 export async function processFile(filename: string, fileData: FileDataDto) {
   const filePath = path.join(__dirname, '../../../uploads', filename);
   const workbook = xlsx.readFile(filePath);
   let ret = [];
+
+  if (fileData.fileType === FileTypes.LECTURES) {
+    if (!fileData.semesterId) {
+      throw new Error(
+        'Se necesita el id del semestre para procesar la subida de dictados'
+      );
+    }
+
+    await clearSemester(fileData.semesterId);
+  }
+
   for (let i = 0; i < workbook.SheetNames.length; i++) {
     const sheetName = workbook.SheetNames[i];
     const worksheet = workbook.Sheets[sheetName];

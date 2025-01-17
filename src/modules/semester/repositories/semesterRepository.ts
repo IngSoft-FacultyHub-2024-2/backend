@@ -48,6 +48,16 @@ class SemesterRepository {
   async getSemesters() {
     return await Semester.findAll({
       order: [['start_date', 'DESC']],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(
+              `(SELECT COUNT(*) FROM "Lectures" WHERE "Semester"."id" = "Lectures"."semester_id")`
+            ),
+            'lectures_count',
+          ],
+        ],
+      },
     });
   }
 

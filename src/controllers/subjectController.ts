@@ -102,7 +102,7 @@ class SubjectController {
 
   getSubjectsNamesByStudyPlan = async (req: Request, res: Response) => {
     try {
-      const studyPlanId = parseInt(req.params.studyPlanId);
+      const studyPlanId = parseInt(req.params.id);
       const subjects = await getSubjectNamesByStudyPlan(studyPlanId);
       res.status(200).json(subjects);
     } catch (error) {

@@ -17,6 +17,20 @@ export async function addTeacher(teacher: Partial<Teacher>) {
   return await teacherRepository.addTeacher(teacher);
 }
 
+export async function getTeachersContacts(
+  search?: string,
+  state?: TeacherStates,
+  risk?: number,
+  subject_id?: number,
+) {
+  return await teacherRepository.getTeachersContacts(
+    search,
+    state,
+    risk,
+    subject_id
+  );
+}
+
 export async function getTeachers(
   search?: string,
   state?: TeacherStates,
@@ -102,7 +116,7 @@ export async function dismissTeacher(id: number) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
@@ -117,7 +131,7 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 

@@ -13,6 +13,8 @@ import TeacherSubjectGroup from './models/TeacherSubjectGroup';
 import TeacherSubjectGroupMember from './models/TeacherSubjectGroupMember';
 import TeacherSubjectHistory from './models/TeacherSubjectHistory';
 import TeacherSubjectOfInterest from './models/TeacherSubjectOfInterest';
+import fs from 'fs';
+import path from 'path';
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -101,6 +103,89 @@ class TeacherRepository {
     }
   }
 
+  async getTeachersContacts(
+    search?: string,
+    state?: TeacherStates,
+    risk?: number,
+    subject_id?: number
+  ) {
+    const searchQuery = search
+      ? {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
+      : {};
+
+    const stateQuery = state ? { state } : {};
+    const riskQuery = risk ? { unsubscribe_risk: risk } : {};
+
+    const subjectInclude = subject_id
+      ? {
+        model: TeacherSubjectHistory,
+        as: 'subjects_history',
+        where: { subject_id },
+        required: true,
+      }
+      : { model: TeacherSubjectHistory, as: 'subjects_history' };
+
+    const whereClause = {
+      ...searchQuery,
+      ...stateQuery,
+      ...riskQuery,
+    };
+
+    const teachers = await Teacher.findAll({
+      where: whereClause,
+      include: [
+        { model: CaesCourse, as: 'caes_courses' },
+        { model: Contact, as: 'contacts' },
+        { model: Prize, as: 'prizes' },
+        subjectInclude,
+        { model: TeacherCategory, as: 'categories' },
+        { model: TeacherBenefit, as: 'benefits' },
+        { model: TeacherAvailableModule, as: 'teacher_available_modules' },
+        {
+          model: TeacherSubjectGroup,
+          as: 'teacher_subject_groups',
+          include: [{ model: TeacherSubjectGroupMember, as: 'members' }],
+        },
+        { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
+      ],
+    });
+
+    const contactsFilePath = await this.generateContactsTxt(teachers);
+
+    return contactsFilePath;
+  }
+
+  generateContactsTxt = async (teachers: Teacher[]) => {
+    try {
+      const contacts = teachers
+        .flatMap(teacher => teacher.contacts || [])
+        .map(contact => {
+          const { prefered, data } = contact;
+          return prefered ? data : undefined;
+        }) // Extract specific fields
+        .filter(Boolean); // Remove undefined/null entries
+
+      const contactsString = contacts.join(';');
+
+      // Write the contacts to a TXT file
+      const filePath = './contacts.txt';
+      fs.writeFileSync(filePath, contactsString, 'utf8');
+      const absoluteFilePath = path.resolve('./contacts.txt');
+      return absoluteFilePath;
+    } catch (error) {
+      console.error('Error generating contacts TXT file:', error);
+    }
+  };
+
   async getTeachers(
     limit: number,
     offset: number,
@@ -117,15 +202,15 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${search}%` } },
-            { surname: { [Op.iLike]: `%${search}%` } },
-            sequelize.where(
-              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-          ],
-        }
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -133,11 +218,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-          model: TeacherSubjectHistory,
-          as: 'subjects_history',
-          where: { subject_id },
-          required: true,
-        }
+        model: TeacherSubjectHistory,
+        as: 'subjects_history',
+        where: { subject_id },
+        required: true,
+      }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
     console.log('subjectQuery', subjectInclude);
 

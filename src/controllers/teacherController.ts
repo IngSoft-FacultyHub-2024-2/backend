@@ -11,6 +11,8 @@ import {
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
+import { getTeachersContacts } from '../modules/teacher/services/teacherService';
+import fs from 'fs';
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {
@@ -56,6 +58,47 @@ class TeacherController {
       const retentionDate = req.body.retentionDate;
       temporaryDismissTeacher(teacherId, retentionDate);
       res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getTeachersContacts(req: any, res: Response) {
+    try {
+      const {
+        search,
+        state,
+        unsubscribe_risk,
+        subject_id,
+      } = req.query;
+
+      const teachersContactsFilePath = await getTeachersContacts(
+        search,
+        state,
+        unsubscribe_risk,
+        subject_id
+      );
+
+      if (!teachersContactsFilePath) {
+        return res.status(404).json({ message: 'Hubo un problema al generar el archivo' });
+      }
+
+      res.download(teachersContactsFilePath, 'contactos.txt', (err) => {
+        if (err) {
+          console.error('Error sending file:', err);
+          res.status(500).json({ message: 'Hubo un problema al enviar el archivo' });
+        } else {
+          fs.unlink(teachersContactsFilePath, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error('Error deleting file:', unlinkErr);
+            } else {
+              console.log('File deleted successfully');
+            }
+          });
+        }
+      });
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

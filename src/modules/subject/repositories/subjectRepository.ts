@@ -235,6 +235,7 @@ class SubjectRepository {
     return await Subject.findAll({
       attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],
       where: { study_plan_id: studyPlanId },
+      order: [['name', 'ASC']],
     });
   }
 }

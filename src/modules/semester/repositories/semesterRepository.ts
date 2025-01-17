@@ -61,6 +61,10 @@ class SemesterRepository {
     });
   }
 
+  async getSemesterById(semesterId: number) {
+    return await Semester.findByPk(semesterId);
+  }
+
   async addLecture(lecture: Partial<Lecture>) {
     const newLecture = await Lecture.create(lecture, {
       include: [

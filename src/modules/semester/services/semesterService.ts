@@ -27,6 +27,10 @@ export async function getSemesters() {
   return await semesterRepository.getSemesters();
 }
 
+export async function getSemesterById(semesterId: number) {
+  return await semesterRepository.getSemesterById(semesterId);
+}
+
 export async function getSemesterLectures(
   semesterId: number,
   degreeId?: number,

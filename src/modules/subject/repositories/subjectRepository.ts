@@ -113,7 +113,14 @@ class SubjectRepository {
 
   async getAllSubjectNames() {
     return await Subject.findAll({
-      attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],
+      attributes: [
+        'id',
+        'name',
+        'acronym',
+        'valid',
+        'study_plan_year',
+        'is_teo_tec_at_same_time',
+      ],
       order: [['study_plan_year', 'DESC']],
     });
   }

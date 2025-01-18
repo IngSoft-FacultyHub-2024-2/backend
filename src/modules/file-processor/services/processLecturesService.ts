@@ -77,7 +77,8 @@ export async function processLectures(
             days[j - 1],
             module.id,
             subject,
-            degree.id
+            degree.id,
+            matchingSubject.is_teo_tec_at_same_time
           );
         }
       }
@@ -113,7 +114,8 @@ function updateLecture(
   day: string,
   moduleId: number,
   subject: string,
-  degreeId: number
+  degreeId: number,
+  is_teo_tec_at_same_time: boolean
 ) {
   const existingLecture = result.find(
     (res) =>
@@ -135,12 +137,48 @@ function updateLecture(
     );
     if (lectureRole) {
       addModuleToDay(lectureRole, day, moduleId);
+      if (is_teo_tec_at_same_time) {
+        const otherRole =
+          role === SubjectRoles.TECHNOLOGY
+            ? SubjectRoles.THEORY
+            : SubjectRoles.TECHNOLOGY;
+        const otherLectureRole = existingLecture.lecture_roles.find(
+          (r) => r.role === otherRole
+        );
+        if (otherLectureRole) {
+          addModuleToDay(otherLectureRole, day, moduleId);
+        } else {
+          existingLecture.lecture_roles.push(
+            createHourConfig(otherRole, day, moduleId)
+          );
+        }
+      }
     } else {
       existingLecture.lecture_roles.push(createHourConfig(role, day, moduleId));
+      if (is_teo_tec_at_same_time) {
+        existingLecture.lecture_roles.push(
+          createHourConfig(
+            role === SubjectRoles.TECHNOLOGY
+              ? SubjectRoles.THEORY
+              : SubjectRoles.TECHNOLOGY,
+            day,
+            moduleId
+          )
+        );
+      }
     }
   } else {
     result.push(
-      createLecture(fileData, subjectId, group, role, day, moduleId, degreeId)
+      createLecture(
+        fileData,
+        subjectId,
+        group,
+        role,
+        day,
+        moduleId,
+        degreeId,
+        is_teo_tec_at_same_time
+      )
     );
   }
 }
@@ -163,13 +201,26 @@ function createLecture(
   role: string,
   day: string,
   moduleId: number,
-  degreeId: number
+  degreeId: number,
+  is_teo_tec_at_same_time: boolean
 ): SemesterLectures {
+  let lecture_roles = [createHourConfig(role, day, moduleId)];
+  if (is_teo_tec_at_same_time) {
+    lecture_roles.push(
+      createHourConfig(
+        role === SubjectRoles.TECHNOLOGY
+          ? SubjectRoles.THEORY
+          : SubjectRoles.TECHNOLOGY,
+        day,
+        moduleId
+      )
+    );
+  }
   return {
     semester_id: fileData.semesterId!,
     subject_id: subjectId,
     lecture_groups: [{ degree_id: degreeId, group }],
-    lecture_roles: [createHourConfig(role, day, moduleId)],
+    lecture_roles: lecture_roles,
   };
 }
 

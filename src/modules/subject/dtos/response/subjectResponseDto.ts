@@ -1,35 +1,45 @@
-import { HourConfigResponseDto, HourConfigResponseDtoHelper } from './hourConfigResponseDto';
+import {
+  HourConfigResponseDto,
+  HourConfigResponseDtoHelper,
+} from './hourConfigResponseDto';
 import { NeedResponseDto, NeedResponseDtoHelper } from './needResponseDto';
-import Subject from "../../repositories/models/Subject";
-import { SubjectEventResponseDto, SubjectEventResponseDtoHelper } from './subjectEventResponseDto';
+import Subject from '../../repositories/models/Subject';
+import {
+  SubjectEventResponseDto,
+  SubjectEventResponseDtoHelper,
+} from './subjectEventResponseDto';
 import { TeacherResponseDto } from '../../../teacher';
 import StudyPlan from '../../repositories/models/StudyPlan';
 
 export interface SubjectResponseDto {
-    id: number;
-    name: string;
-    subject_code: string;
-    acronym: string;
-    study_plan_id: number;
-    study_plan: StudyPlan | null;
-    associated_coordinator: TeacherResponseDto | null;
-    index: number;
-    frontal_hours: number;
-    total_hours: number;
-    intro_folder?: string | null;
-    subject_folder?: string | null;
-    technologies?: string | null;
-    notes?: string | null;
-    valid: boolean;
-    hour_configs?: HourConfigResponseDto[];
-    needs?: NeedResponseDto[];
-    needs_notes: string;
-    events?: SubjectEventResponseDto[];
+  id: number;
+  name: string;
+  subject_code: string;
+  acronym: string;
+  study_plan_id: number;
+  study_plan: StudyPlan | null;
+  associated_coordinator: TeacherResponseDto | null;
+  index: number;
+  frontal_hours: number;
+  total_hours: number;
+  intro_folder?: string | null;
+  subject_folder?: string | null;
+  technologies?: string | null;
+  notes?: string | null;
+  is_teo_tec_at_same_time: boolean;
+  valid: boolean;
+  hour_configs?: HourConfigResponseDto[];
+  needs?: NeedResponseDto[];
+  needs_notes: string;
+  events?: SubjectEventResponseDto[];
 }
 
 export class SubjectResponseDtoHelper {
   // Method to convert Subject model instance to SubjectResponseDto
-  public static fromModel(subject: Subject, teacherDto: TeacherResponseDto | null = null): SubjectResponseDto {
+  public static fromModel(
+    subject: Subject,
+    teacherDto: TeacherResponseDto | null = null
+  ): SubjectResponseDto {
     return {
       id: subject.id,
       name: subject.name,
@@ -45,11 +55,19 @@ export class SubjectResponseDtoHelper {
       subject_folder: subject.subject_folder,
       technologies: subject.technologies,
       notes: subject.notes,
+      is_teo_tec_at_same_time: subject.is_teo_tec_at_same_time,
       valid: subject.valid,
-      hour_configs: subject.hour_configs?.map((hc) => HourConfigResponseDtoHelper.fromModel(hc)) || [],
-      needs: subject.needs?.map((n) => NeedResponseDtoHelper.fromModel(n)) || [],
+      hour_configs:
+        subject.hour_configs?.map((hc) =>
+          HourConfigResponseDtoHelper.fromModel(hc)
+        ) || [],
+      needs:
+        subject.needs?.map((n) => NeedResponseDtoHelper.fromModel(n)) || [],
       needs_notes: subject.needs_notes,
-      events: subject.events?.map((e) => SubjectEventResponseDtoHelper.fromModel(e)) || [],
+      events:
+        subject.events?.map((e) =>
+          SubjectEventResponseDtoHelper.fromModel(e)
+        ) || [],
     };
   }
 }

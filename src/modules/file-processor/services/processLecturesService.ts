@@ -265,6 +265,8 @@ function normalizeString(str: string): string {
   return str
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ') // Replace multiple spaces with a single space
+    .trim() // Trim any leading or trailing spaces
     .toUpperCase();
 }
 

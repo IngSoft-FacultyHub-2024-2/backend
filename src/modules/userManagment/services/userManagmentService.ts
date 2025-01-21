@@ -1,0 +1,11 @@
+import bcrypt from 'bcrypt';
+import User from '../repositories/models/User';
+import userRepository from '../repositories/userRepository';
+
+export async function createUser(user: Partial<User>) {
+  // hash password
+  const hashedPassword = await bcrypt.hash(user.password!, 10);
+  user.password = hashedPassword;
+
+  return await userRepository.createUser(user);
+}

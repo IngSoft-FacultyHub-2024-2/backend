@@ -142,6 +142,7 @@ describe('TeacherController', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         undefined
       );
       expect(statusMock).toHaveBeenCalledWith(200);
@@ -175,6 +176,7 @@ describe('TeacherController', () => {
           search: 'John',
           state: 'active',
           unsubscribe_risk: '0',
+          subject_id: '1',
           sortField: 'name',
           sortOrder: 'ASC',
           page: 1,
@@ -188,6 +190,7 @@ describe('TeacherController', () => {
         'John',
         'active',
         '0',
+        '1',
         'name',
         'ASC',
         1,
@@ -207,6 +210,7 @@ describe('TeacherController', () => {
       await teacherController.getTeachers(req as Request, res as Response);
 
       expect(getTeachers).toHaveBeenCalledWith(
+        undefined,
         undefined,
         undefined,
         undefined,

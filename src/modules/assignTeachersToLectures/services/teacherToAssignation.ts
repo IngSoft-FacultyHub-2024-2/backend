@@ -6,6 +6,7 @@ import {
   deleteTeachersAssignations,
   LectureRoleResponseDto,
   LectureResponseDto,
+  getPreassignedTeachers,
 } from '../../semester';
 import {
   getTeacherById,
@@ -21,23 +22,28 @@ interface AssignPayload {
   classes: { [key: string]: LectureToAssign };
   modules: ModuleResponseDto[];
   teacher_names_with_classes: string[];
+  preassigned: { [lectureId: string]: { [role: string]: string[] } };
 }
 
 interface AssignationsResults {
   matches: { [lectureId: string]: { [role: string]: string[] } };
   conflicts: any;
+  status: string;
+  amount_of_lectures_assigned: number;
 }
 
 export async function assignTeachersToSemesterLectures(semesterId: number) {
   const teachersToAssign = await getTeachersToAssignLectures();
   const lecturesToAssign = await getSemesterLecturesToAssign(semesterId);
   const modules = await getModules();
+  const preassigned = await getPreassignedTeachers(semesterId);
 
   let assignPayload: AssignPayload = {
     teachers: {},
     classes: {},
     modules: modules,
     teacher_names_with_classes: [],
+    preassigned: preassigned,
   };
   assignPayload.teachers = teachersToAssign.reduce(
     (acc: { [key: number]: TeacherToAssign }, teacher) => {
@@ -55,12 +61,17 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     {}
   );
   const response = await sendAssignation(assignPayload);
-
+  console.log(response.status);
+  if (response.status === 'Infeasible') {
+    throw new Error(
+      'Fallo al asignar profesores la optimizacion, problema imposible, chequee los locks'
+    );
+  }
   // Delete the old lectures before assigning the new ones
-  // TODO: filter out the locked lectures
   await deleteTeachersAssignations(semesterId);
 
   const matches = response.matches;
+  let amount_of_lectures_assigned = 0;
 
   await Promise.all(
     Object.entries(matches).map(async ([lectureId, roles]) => {
@@ -76,6 +87,7 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
                 'with role',
                 role
               );
+              amount_of_lectures_assigned += 1;
               await setTeacherToLecture(
                 Number(lectureId),
                 Number(teacherId),
@@ -87,7 +99,7 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
       );
     })
   );
-
+  response.amount_of_lectures_assigned = amount_of_lectures_assigned;
   return response;
 }
 

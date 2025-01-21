@@ -135,6 +135,7 @@ describe('Teacher Service', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         undefined
       );
       expect(getSubjectById).toHaveBeenCalledTimes(2); // Once for each teacher's subjects_history
@@ -153,6 +154,7 @@ describe('Teacher Service', () => {
 
       const result = await getTeachers(
         'NonExistentTeacher',
+        undefined,
         undefined,
         undefined,
         'name',
@@ -176,6 +178,7 @@ describe('Teacher Service', () => {
           'NonExistentTeacher',
           undefined,
           undefined,
+          undefined,
           'name',
           'ASC',
           1,
@@ -190,6 +193,7 @@ describe('Teacher Service', () => {
         true,
         'name',
         'NonExistentTeacher',
+        undefined,
         undefined,
         undefined
       );

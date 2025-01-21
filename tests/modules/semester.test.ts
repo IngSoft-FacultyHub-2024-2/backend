@@ -216,12 +216,13 @@ describe('Semester Service', () => {
 
       const result = await semesterService.updateLecture(
         mockLectureId,
-        mockLectureData
+        mockLectureData,
       );
 
       expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
         mockLectureId,
-        mockLectureData
+        mockLectureData,
+        []
       );
       expect(result).toEqual(mockUpdatedLecture);
     });
@@ -238,7 +239,8 @@ describe('Semester Service', () => {
 
       expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
         mockLectureId,
-        mockLectureData
+        mockLectureData,
+        []
       );
     });
   });

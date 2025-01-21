@@ -21,6 +21,7 @@ export async function getTeachers(
   search?: string,
   state?: TeacherStates,
   risk?: number,
+  subject_id?: number,
   sortField?: string,
   sortOrder: 'ASC' | 'DESC' = 'ASC',
   page: number = 1,
@@ -38,7 +39,8 @@ export async function getTeachers(
     sortField,
     search,
     state,
-    risk
+    risk,
+    subject_id
   );
 
   const totalPages = Math.ceil(teacherRows.count / pageSize);

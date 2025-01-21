@@ -1,11 +1,13 @@
-import { Sequelize, Transaction } from 'sequelize';
-import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import Lecture from './models/Lecture';
 import LectureGroup from './models/LectureGroup';
 import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import { TeacherResponseDto } from '../../teacher';
+import TeacherAvailableModule from '../../teacher/repositories/models/TeacherAvailableModules';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -175,7 +177,7 @@ class SemesterRepository {
     return distinctGroups.map((row: any) => row.group);
   }
 
-  async updateLecture(lectureId: number, lectureData: Partial<Lecture>) {
+  async updateLecture(lectureId: number, lectureData: Partial<Lecture>, teachers: TeacherResponseDto[]) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
 
     try {
@@ -217,6 +219,7 @@ class SemesterRepository {
         await LectureGroup.bulkCreate(newGroups, { transaction });
       }
 
+      let lockingAction = false;
       // Update LectureRoles
       if (lectureData.lecture_roles) {
         // Fetch all existing lecture role IDs for cleanup
@@ -245,6 +248,10 @@ class SemesterRepository {
 
         // Create new roles
         for (const lectureRole of lectureData.lecture_roles) {
+          if (lectureRole.is_lecture_locked) {
+            lockingAction = true;
+          }
+
           const newRole = await LectureRole.create(
             { ...lectureRole, lecture_id: lectureId },
             { transaction }
@@ -269,6 +276,10 @@ class SemesterRepository {
             await LectureTeacher.bulkCreate(newTeachers, { transaction });
           }
         }
+      }
+
+      if (lockingAction) {
+        await this.validateLockedLectures(teachers, lecture);
       }
 
       // Commit transaction
@@ -312,6 +323,149 @@ class SemesterRepository {
       role,
     });
   }
+
+  async validateLockedLectures(
+    teachers: TeacherResponseDto[],
+    updateLectureData: Lecture
+  ) {
+
+    for (const teacher of teachers) {
+      // 1. Validate if the teacher has available hours
+      const availableModules = teacher.teacher_available_modules;
+      if (
+        !this.matchesLectureTime(availableModules, updateLectureData, teacher.id)
+      ) {
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`);
+      }
+
+      // 2. Validate if the teacher has taught the subject before
+      const subjectHistory = teacher.subjects_history || [];
+      if (
+        !subjectHistory.some(
+          (history) => history.subject_id == updateLectureData.subject_id
+        )
+      ) {
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`);
+      }
+
+      // 3. Validate if the teacher is already assigned to another lecture at the same time
+      const otherLectures = await Lecture.findAll({
+        include: [
+          { model: LectureGroup, as: 'lecture_groups' },
+          {
+            model: LectureRole,
+            as: 'lecture_roles',
+            include: ['hour_configs', 'teachers'],
+          },
+        ],
+        where: {
+          id: { [Op.ne]: updateLectureData.id },
+        },
+      });
+      console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
+      if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
+        throw new Error(`Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`);
+      }
+    }
+  }
+
+  isAlreadyAssignedTeacher(
+    otherLectures: Lecture[],
+    updateLectureData: Partial<Lecture>
+  ): boolean {
+    const toBeAssignedLectureRoles = updateLectureData.lecture_roles || [];
+    const existingLectureRoles = otherLectures.flatMap(
+      (lecture) => lecture.lecture_roles || []
+    );
+
+    for (const lectureRole of existingLectureRoles || []) {
+      const existingTeachers = lectureRole.teachers || [];
+      const existingHoursConfig = lectureRole.hour_configs || [];
+      const isLocked = lectureRole.is_lecture_locked;
+      if (isLocked) {
+        for (const oneLectureRole of toBeAssignedLectureRoles) {
+          const toBeAssignedTeachers = oneLectureRole.teachers || [];
+          const toBeAssignedHoursConfig = oneLectureRole.hour_configs || [];
+
+          for (const teacher of toBeAssignedTeachers) {
+            // Verificar si el profesor está en el dictado existente
+            const isSameTeacher = existingTeachers.some(
+              (existingTeacher) => existingTeacher.teacher_id == teacher.teacher_id
+            );
+
+            if (isSameTeacher) {
+              // Verificar si hay conflicto de horarios
+              for (const newHourConfig of toBeAssignedHoursConfig) {
+                for (const existingHourConfig of existingHoursConfig) {
+                  if (
+                    newHourConfig.day_of_week == existingHourConfig.day_of_week &&
+                    newHourConfig.modules.some((module) =>
+                      existingHourConfig.modules.includes(module)
+                    )
+                  ) {
+                    // Hay conflicto
+                    return true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    // No hay conflictos
+    return false;
+  }
+
+  // Helper function to match lecture time
+  matchesLectureTime(
+    teacherHourConfig: TeacherAvailableModule[],
+    lecture: Lecture,
+    teacherId: number
+  ): boolean {
+    let isMatch = true;
+    // console.log('lecture roles:', JSON.stringify(lecture.lecture_roles, null, 2));
+
+    const leactureAssignedToTeacher = lecture.lecture_roles?.find((row) =>
+      row.teachers?.find((teacher) => teacher.teacher_id == teacherId)
+    );
+
+    if (!leactureAssignedToTeacher) {
+      throw new Error(`Teacher ${teacherId} is not assigned to the lecture.`);
+    }
+
+    const lectureHoursConfig = leactureAssignedToTeacher?.hour_configs;
+
+    if (lectureHoursConfig) {
+      for (const config of lectureHoursConfig) {
+        const leactureDayOfWeek = config.day_of_week;
+        const leactureModules = config.modules;
+
+        for (const lectureModuleId of leactureModules) {
+          const isTeacherAvailable = teacherHourConfig.find(
+            (row) =>
+              row.day_of_week == leactureDayOfWeek &&
+              row.module_id == lectureModuleId
+          );
+
+          if (!isTeacherAvailable) {
+            isMatch = false;
+            break;
+          }
+        }
+
+        if (!isMatch) {
+          break;
+        }
+      }
+    }
+    return isMatch;
+  }
+
+
+
+
+
 
   async deleteTeachersAssignations(semesterId: number) {
     // TODO: filter out the locked lectures

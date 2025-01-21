@@ -275,14 +275,20 @@ export async function deleteTeachersAssignations(semesterId: number) {
 
 export async function getPreassignedTeachers(semesterId: number) {
   const semesterLecture = await getSemesterLectures(semesterId);
+
   const preassigned = semesterLecture.reduce(
     (acc: { [lectureId: string]: { [role: string]: string[] } }, lecture) => {
       acc[lecture.id] = {};
       lecture.lecture_roles.forEach((role) => {
         if (role.is_lecture_locked) {
-          acc[lecture.id][role.role] = role.teachers.map((teacher) =>
-            teacher.id.toString()
-          );
+          acc[lecture.id][role.role] = role.teachers
+            .filter((teacher) => !teacher.is_technology_teacher)
+            .map((teacher) => teacher.id.toString());
+          if (lecture.subject.is_teo_tec_at_same_time) {
+            acc[lecture.id][SubjectRoles.TECHNOLOGY] = role.teachers
+              .filter((teacher) => teacher.is_technology_teacher)
+              .map((teacher) => teacher.id.toString());
+          }
         }
       });
       return acc;

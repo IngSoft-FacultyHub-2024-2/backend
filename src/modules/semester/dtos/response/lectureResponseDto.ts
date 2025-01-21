@@ -27,6 +27,7 @@ export interface LectureRoleResponseDto {
     id: number;
     name: string;
     surname: string;
+    is_technology_teacher: boolean;
   }[];
   hour_configs: {
     id: number;

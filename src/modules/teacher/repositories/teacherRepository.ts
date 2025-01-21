@@ -143,19 +143,8 @@ class TeacherRepository {
     const teachers = await Teacher.findAll({
       where: whereClause,
       include: [
-        { model: CaesCourse, as: 'caes_courses' },
         { model: Contact, as: 'contacts' },
-        { model: Prize, as: 'prizes' },
         subjectInclude,
-        { model: TeacherCategory, as: 'categories' },
-        { model: TeacherBenefit, as: 'benefits' },
-        { model: TeacherAvailableModule, as: 'teacher_available_modules' },
-        {
-          model: TeacherSubjectGroup,
-          as: 'teacher_subject_groups',
-          include: [{ model: TeacherSubjectGroupMember, as: 'members' }],
-        },
-        { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });
 
@@ -177,9 +166,10 @@ class TeacherRepository {
       const contactsString = contacts.join(';');
 
       // Write the contacts to a TXT file
-      const filePath = './contacts.txt';
+      const date = new Date().toISOString().replace(/:/g, '-');
+      const filePath = `./contacts-${date}.txt`;
       fs.writeFileSync(filePath, contactsString, 'utf8');
-      const absoluteFilePath = path.resolve('./contacts.txt');
+      const absoluteFilePath = path.resolve(filePath);
       return absoluteFilePath;
     } catch (error) {
       console.error('Error generating contacts TXT file:', error);

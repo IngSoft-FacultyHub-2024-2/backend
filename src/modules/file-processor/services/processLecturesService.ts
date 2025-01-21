@@ -135,6 +135,8 @@ function updateLecture(
     );
     if (lectureRole) {
       addModuleToDay(lectureRole, day, moduleId);
+    } else {
+      existingLecture.lecture_roles.push(createHourConfig(role, day, moduleId));
     }
   } else {
     result.push(
@@ -163,12 +165,11 @@ function createLecture(
   moduleId: number,
   degreeId: number
 ): SemesterLectures {
-  let lecture_roles = [createHourConfig(role, day, moduleId)];
   return {
     semester_id: fileData.semesterId!,
     subject_id: subjectId,
     lecture_groups: [{ degree_id: degreeId, group }],
-    lecture_roles: lecture_roles,
+    lecture_roles: [createHourConfig(role, day, moduleId)],
   };
 }
 

@@ -6,7 +6,7 @@ import RolePermission from './RolePermission';
 
 class User extends Model {
   public id!: number;
-  public teacherCode!: number;
+  public teacherId!: number;
   public password!: string;
   public is_active!: boolean;
   public roleId!: number;
@@ -23,7 +23,7 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    teacherCode: {
+    teacherId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

@@ -130,7 +130,11 @@ class SemesterRepository {
     return distinctGroups.map((row: any) => row.group);
   }
 
-  async updateLecture(lectureId: number, lectureData: Partial<Lecture>, teachers: TeacherResponseDto[]) {
+  async updateLecture(
+    lectureId: number,
+    lectureData: Partial<Lecture>,
+    teachers: TeacherResponseDto[]
+  ) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
 
     try {
@@ -225,6 +229,7 @@ class SemesterRepository {
             const newTeachers = lectureRole.teachers.map((teacher) => ({
               lecture_role_id: newRole.id,
               teacher_id: teacher.teacher_id,
+              is_technology_teacher: teacher.is_technology_teacher,
             }));
             await LectureTeacher.bulkCreate(newTeachers, { transaction });
           }
@@ -258,7 +263,8 @@ class SemesterRepository {
   async setTeacherToLecture(
     lectureId: number,
     teacherId: number,
-    role: string
+    role: string,
+    is_technology_teacher: boolean
   ) {
     const lectureRole = await LectureRole.findOne({
       where: { lecture_id: lectureId, role },
@@ -274,6 +280,7 @@ class SemesterRepository {
       lecture_role_id: lectureRole.id,
       teacher_id: teacherId,
       role,
+      is_technology_teacher,
     });
   }
 
@@ -281,14 +288,19 @@ class SemesterRepository {
     teachers: TeacherResponseDto[],
     updateLectureData: Lecture
   ) {
-
     for (const teacher of teachers) {
       // 1. Validate if the teacher has available hours
       const availableModules = teacher.teacher_available_modules;
       if (
-        !this.matchesLectureTime(availableModules, updateLectureData, teacher.id)
+        !this.matchesLectureTime(
+          availableModules,
+          updateLectureData,
+          teacher.id
+        )
       ) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`
+        );
       }
 
       // 2. Validate if the teacher has taught the subject before
@@ -298,7 +310,9 @@ class SemesterRepository {
           (history) => history.subject_id == updateLectureData.subject_id
         )
       ) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`
+        );
       }
 
       // 3. Validate if the teacher is already assigned to another lecture at the same time
@@ -317,7 +331,9 @@ class SemesterRepository {
       });
       console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
-        throw new Error(`Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`);
+        throw new Error(
+          `Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`
+        );
       }
     }
   }
@@ -343,7 +359,8 @@ class SemesterRepository {
           for (const teacher of toBeAssignedTeachers) {
             // Verificar si el profesor está en el dictado existente
             const isSameTeacher = existingTeachers.some(
-              (existingTeacher) => existingTeacher.teacher_id == teacher.teacher_id
+              (existingTeacher) =>
+                existingTeacher.teacher_id == teacher.teacher_id
             );
 
             if (isSameTeacher) {
@@ -351,7 +368,8 @@ class SemesterRepository {
               for (const newHourConfig of toBeAssignedHoursConfig) {
                 for (const existingHourConfig of existingHoursConfig) {
                   if (
-                    newHourConfig.day_of_week == existingHourConfig.day_of_week &&
+                    newHourConfig.day_of_week ==
+                      existingHourConfig.day_of_week &&
                     newHourConfig.modules.some((module) =>
                       existingHourConfig.modules.includes(module)
                     )
@@ -414,11 +432,6 @@ class SemesterRepository {
     }
     return isMatch;
   }
-
-
-
-
-
 
   async deleteTeachersAssignations(semesterId: number) {
     // TODO: filter out the locked lectures

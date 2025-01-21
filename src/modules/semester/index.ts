@@ -10,6 +10,7 @@ import {
   getPreassignedTeachers,
   deleteLecture,
   deleteTeachersAssignations,
+  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
 } from './services/semesterService';
 
 import {
@@ -29,6 +30,7 @@ export {
   getPreassignedTeachers,
   deleteLecture,
   deleteTeachersAssignations,
+  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
   LectureRoleResponseDto,
   LectureResponseDto,
 };

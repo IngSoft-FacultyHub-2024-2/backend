@@ -1,3 +1,4 @@
+import exp from 'constants';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getTeacherById } from '../../teacher';
 import {
@@ -103,4 +104,10 @@ export async function amountOfTeachersPerSubject() {
   const amountOfTeachersPerSubject =
     await subjectRepository.amountOfTeachersPerSubject();
   return amountOfTeachersPerSubject;
+}
+
+export async function getSubjectsIdsWithTecTeoAtSameTime() {
+  const subjectsIds =
+    await subjectRepository.getSubjectsIdsWithTecTeoAtSameTime();
+  return subjectsIds;
 }

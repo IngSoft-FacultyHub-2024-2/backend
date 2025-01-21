@@ -5,6 +5,7 @@ export interface LectureResponseDto {
     name: string;
     acronym: string;
     valid: boolean;
+    is_teo_tec_at_same_time: boolean;
   };
   lecture_groups: LectureGroupResponseDto[];
   lecture_roles: LectureRoleResponseDto[];
@@ -44,6 +45,7 @@ export class LectureResponseDtoHelper {
         name: lecture.subject.name,
         acronym: lecture.subject.acronym,
         valid: lecture.subject.valid,
+        is_teo_tec_at_same_time: lecture.subject.is_teo_tec_at_same_time,
       },
       lecture_groups: lecture.lecture_groups.map((group: any) => ({
         group: group.group,
@@ -60,6 +62,7 @@ export class LectureResponseDtoHelper {
           id: teacher.id,
           name: teacher.name,
           surname: teacher.surname,
+          is_technology_teacher: teacher.is_technology_teacher,
         })),
         is_lecture_locked: role.is_lecture_locked,
         hour_configs: role.hour_configs.map((config: any) => ({

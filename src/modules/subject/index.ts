@@ -32,6 +32,7 @@ import {
   teacherCoordinatorSubjects,
   updateSubject,
   amountOfTeachersPerSubject,
+  getSubjectsIdsWithTecTeoAtSameTime,
 } from './services/subjectService';
 
 //Event
@@ -70,4 +71,5 @@ export {
   updateSubject,
   deleteSubject,
   amountOfTeachersPerSubject,
+  getSubjectsIdsWithTecTeoAtSameTime,
 };

@@ -237,5 +237,14 @@ class SubjectRepository {
       return acc;
     }, {});
   }
+
+  async getSubjectsIdsWithTecTeoAtSameTime(): Promise<number[]> {
+    const subjects = await Subject.findAll({
+      where: { is_teo_tec_at_same_time: true },
+      attributes: ['id'],
+    });
+
+    return subjects.map((subject) => subject.id);
+  }
 }
 export default new SubjectRepository();

@@ -1,8 +1,8 @@
+import { ModuleResponseDto } from './dtos/response/moduleResponseDto';
 import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
 } from './dtos/response/teacherResponseDto';
-import { ModuleResponseDto } from './dtos/response/moduleResponseDto';
 import {
   addBenefit,
   deleteBenefit,
@@ -15,16 +15,16 @@ import {
   getCategories,
   updateCategory,
 } from './services/categoryService';
-import { getModules } from './services/moduleService';
+import { addModule, getModules, updateModule } from './services/moduleService';
 import {
   addTeacher,
   dismissTeacher,
   getAllTeachersNames,
   getTeacherById,
   getTeachers,
+  getTeachersToAssignLectures,
   temporaryDismissTeacher,
   updateTeacher,
-  getTeachersToAssignLectures,
 } from './services/teacherService';
 
 //Teacher
@@ -34,11 +34,11 @@ export {
   getAllTeachersNames,
   getTeacherById,
   getTeachers,
+  getTeachersToAssignLectures,
   TeacherResponseDto,
   TeacherResponseDtoHelper,
   temporaryDismissTeacher,
   updateTeacher,
-  getTeachersToAssignLectures,
 };
 
 //Benefit
@@ -48,4 +48,4 @@ export { addBenefit, deleteBenefit, getBenefits, updateBenefit };
 export { addCategory, deleteCategory, getCategories, updateCategory };
 
 //Module
-export { getModules, ModuleResponseDto };
+export { addModule, getModules, ModuleResponseDto, updateModule };

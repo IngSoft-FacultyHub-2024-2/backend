@@ -1,12 +1,12 @@
-import Subject from './models/Subject';
+import { Op, Order, Transaction } from 'sequelize';
+import sequelize from '../../../config/database';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import Event from './models/Event';
 import HourConfig from './models/HourConfig';
 import Need from './models/Need';
-import SubjectEvent from './models/SubjectEvent';
-import Event from './models/Event';
-import { Op, Order, Transaction } from 'sequelize';
 import StudyPlan from './models/StudyPlan';
-import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
-import sequelize from '../../../config/database';
+import Subject from './models/Subject';
+import SubjectEvent from './models/SubjectEvent';
 
 type AmountOfTeachersPerRoleDict = {
   [role: string]: number;
@@ -229,6 +229,14 @@ class SubjectRepository {
 
       return acc;
     }, {});
+  }
+
+  async getSubjectNamesByStudyPlan(studyPlanId: number) {
+    return await Subject.findAll({
+      attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],
+      where: { study_plan_id: studyPlanId },
+      order: [['name', 'ASC']],
+    });
   }
 }
 export default new SubjectRepository();

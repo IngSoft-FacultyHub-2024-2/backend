@@ -14,10 +14,57 @@ class SemesterRepository {
     return await Semester.create(semester);
   }
 
+  async deleteSemester(semesterId: number) {
+    const semester = await Semester.findByPk(semesterId, {
+      include: [
+        {
+          model: Lecture,
+          as: 'lectures',
+        },
+      ],
+    });
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    for (const lecture of semester.lectures || []) {
+      await this.deleteLecture(lecture.id);
+    }
+
+    return await Semester.destroy({
+      where: { id: semesterId },
+    });
+  }
+
+  async updateSemester(semesterId: number, semesterData: Partial<Semester>) {
+    const semester = await Semester.findByPk(semesterId);
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    return await semester.update(semesterData);
+  }
+
   async getSemesters() {
     return await Semester.findAll({
       order: [['start_date', 'DESC']],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(
+              `(SELECT COUNT(*) FROM "Lectures" WHERE "Semester"."id" = "Lectures"."semester_id")`
+            ),
+            'lectures_count',
+          ],
+        ],
+      },
     });
+  }
+
+  async getSemesterById(semesterId: number) {
+    return await Semester.findByPk(semesterId);
   }
 
   async addLecture(lecture: Partial<Lecture>) {

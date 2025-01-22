@@ -104,3 +104,9 @@ export async function amountOfTeachersPerSubject() {
     await subjectRepository.amountOfTeachersPerSubject();
   return amountOfTeachersPerSubject;
 }
+
+export async function getSubjectNamesByStudyPlan(studyPlanId: number) {
+  const subjects =
+    await subjectRepository.getSubjectNamesByStudyPlan(studyPlanId);
+  return subjects;
+}

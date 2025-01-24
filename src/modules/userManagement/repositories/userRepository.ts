@@ -1,4 +1,5 @@
 import Teacher from '../../teacher/repositories/models/Teacher';
+import Role from './models/Role';
 import User from './models/User';
 
 class userRepository {
@@ -6,10 +7,10 @@ class userRepository {
     return await User.create(user);
   }
 
-  async getUserByTeacherId(teacherId: number) {
+  async getUserByTeacherId(teacher_id: number) {
     return await User.findOne({
       where: {
-        teacherId,
+        teacher_id,
       },
     });
   }
@@ -18,8 +19,8 @@ class userRepository {
     return await User.findByPk(id, {
       include: [
         {
-          association: User.associations.role,
-          attributes: ['name'],
+          model: Role,
+          as: 'role',
         },
         {
           model: Teacher,
@@ -33,12 +34,14 @@ class userRepository {
     return await User.findAll({
       include: [
         {
-          association: User.associations.role,
-          attributes: ['name'],
+          model: Role,
+          as: 'role',
+          foreignKey: 'role_id',
         },
         {
           model: Teacher,
           as: 'teacher',
+          foreignKey: 'teacher_id',
         },
       ],
     });

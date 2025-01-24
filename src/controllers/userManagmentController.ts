@@ -50,8 +50,8 @@ class userManagementController {
       const userId = parseInt(req.params.id);
       await inputUpdatePasswordSchema.validate(req.body);
 
-      const oldPassword = req.body.oldPassword;
-      const newPassword = req.body.newPassword;
+      const oldPassword = req.body.old_password;
+      const newPassword = req.body.new_password;
 
       await updatePassword(userId, oldPassword, newPassword);
       res.status(200).json();

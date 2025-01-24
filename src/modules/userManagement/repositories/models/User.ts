@@ -1,18 +1,20 @@
 import { DataTypes, HasOne, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
+import Teacher from '../../../teacher/repositories/models/Teacher';
 import Permission from './Permission';
 import Role from './Role';
 import RolePermission from './RolePermission';
 
 class User extends Model {
   public id!: number;
-  public teacherId!: number;
+  public teacher_id!: number;
   public password!: string;
   public is_active!: boolean;
-  public roleId!: number;
+  public role_id!: number;
 
   public static associations: {
     role: HasOne<User, Role>;
+    teacher: HasOne<User, Teacher>;
   };
 }
 
@@ -23,10 +25,14 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    teacherId: {
+    teacher_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: true,
+      references: {
+        model: 'Teachers',
+        key: 'id',
+      },
     },
     password: {
       type: DataTypes.STRING,
@@ -37,7 +43,7 @@ User.init(
       allowNull: false,
       defaultValue: true,
     },
-    roleId: {
+    role_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -58,22 +64,33 @@ User.init(
 
 export default User;
 
-User.hasOne(Role, {
-  foreignKey: 'roleId',
+Role.hasMany(User, {
+  foreignKey: 'role_id',
+  as: 'users',
+});
+
+User.belongsTo(Role, {
+  foreignKey: 'role_id',
   as: 'role',
 });
-Role.belongsTo(User, {
-  foreignKey: 'roleId',
+
+Teacher.hasOne(User, {
+  foreignKey: 'teacher_id',
   as: 'user',
+});
+
+User.belongsTo(Teacher, {
+  foreignKey: 'teacher_id',
+  as: 'teacher',
 });
 
 Role.belongsToMany(Permission, {
   through: RolePermission,
-  foreignKey: 'roleId',
+  foreignKey: 'role_id',
   as: 'permissions',
 });
 Permission.belongsToMany(Role, {
   through: RolePermission,
-  foreignKey: 'permissionId',
+  foreignKey: 'permission_id',
   as: 'roles',
 });

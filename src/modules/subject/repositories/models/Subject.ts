@@ -140,7 +140,6 @@ Subject.init(
               0
             )
           : 0;
-        console.log(totalHours, hourConfigsTotal);
         if (totalHours !== hourConfigsTotal) {
           throw new Error(
             'La suma de las horas totales docentes debe ser igual a la cantidad de horas totales configuradas que se van a dictar'

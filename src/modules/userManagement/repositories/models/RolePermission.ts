@@ -5,8 +5,8 @@ import Role from './Role';
 
 class RolePermission extends Model {
   public id!: number;
-  public roleId!: number;
-  public permissionId!: number;
+  public role_id!: number;
+  public permission_id!: number;
 
   public static associations: {
     role: HasMany<RolePermission, Role>;
@@ -21,7 +21,7 @@ RolePermission.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    roleId: {
+    role_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -31,7 +31,7 @@ RolePermission.init(
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     },
-    permissionId: {
+    permission_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {

@@ -4,12 +4,12 @@ import User from '../repositories/models/User';
 import userRepository from '../repositories/userRepository';
 
 export async function createUser(user: Partial<User>) {
-  const teacherExist = await getTeacherById(user.teacherId!);
+  const teacherExist = await getTeacherById(user.teacher_id!);
   if (!teacherExist) {
     throw new Error('El docente no existe');
   }
 
-  const userExist = await userRepository.getUserByTeacherId(user.teacherId!);
+  const userExist = await userRepository.getUserByTeacherId(user.teacher_id!);
   if (userExist) {
     throw new Error('El usuario de este docente ya existe');
   }

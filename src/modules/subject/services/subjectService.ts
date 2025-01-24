@@ -105,6 +105,12 @@ export async function amountOfTeachersPerSubject() {
   return amountOfTeachersPerSubject;
 }
 
+export async function getSubjectsIdsWithTecTeoAtSameTime() {
+  const subjectsIds =
+    await subjectRepository.getSubjectsIdsWithTecTeoAtSameTime();
+  return subjectsIds;
+}
+
 export async function getSubjectNamesByStudyPlan(studyPlanId: number) {
   const subjects =
     await subjectRepository.getSubjectNamesByStudyPlan(studyPlanId);

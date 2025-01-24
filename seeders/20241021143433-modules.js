@@ -35,6 +35,12 @@ module.exports = {
         'updatedAt': new Date()
       },
       {
+        'time': '17:30 - 18:25',
+        'turn': 'Nocturno',
+        'createdAt': new Date(),
+        'updatedAt': new Date()
+      },
+      {
         'time': '18:30 - 19:25',
         'turn': 'Nocturno',
         'createdAt': new Date(),

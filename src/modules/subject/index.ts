@@ -25,7 +25,6 @@ import {
 } from './services/studyPlanService';
 import {
   addSubject,
-  amountOfTeachersPerSubject,
   deleteSubject,
   getAllSubjectNames,
   getSubjectById,
@@ -33,6 +32,8 @@ import {
   getSubjects,
   teacherCoordinatorSubjects,
   updateSubject,
+  amountOfTeachersPerSubject,
+  getSubjectsIdsWithTecTeoAtSameTime,
 } from './services/subjectService';
 
 //Event
@@ -62,6 +63,7 @@ export { addStudyPlan, deleteStudyPlan, getStudyPlans, updateStudyPlan };
 export {
   addSubject,
   amountOfTeachersPerSubject,
+  getSubjectsIdsWithTecTeoAtSameTime,
   deleteSubject,
   getAllSubjectNames,
   getSubjectById,

@@ -113,7 +113,14 @@ class SubjectRepository {
 
   async getAllSubjectNames() {
     return await Subject.findAll({
-      attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],
+      attributes: [
+        'id',
+        'name',
+        'acronym',
+        'valid',
+        'study_plan_year',
+        'is_teo_tec_at_same_time',
+      ],
       order: [['study_plan_year', 'DESC']],
     });
   }
@@ -231,9 +238,25 @@ class SubjectRepository {
     }, {});
   }
 
+  async getSubjectsIdsWithTecTeoAtSameTime(): Promise<number[]> {
+    const subjects = await Subject.findAll({
+      where: { is_teo_tec_at_same_time: true },
+      attributes: ['id'],
+    });
+
+    return subjects.map((subject) => subject.id);
+  }
+
   async getSubjectNamesByStudyPlan(studyPlanId: number) {
     return await Subject.findAll({
-      attributes: ['id', 'name', 'acronym', 'valid', 'study_plan_year'],
+      attributes: [
+        'id',
+        'name',
+        'acronym',
+        'valid',
+        'study_plan_year',
+        'is_teo_tec_at_same_time',
+      ],
       where: { study_plan_id: studyPlanId },
       order: [['name', 'ASC']],
     });

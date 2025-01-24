@@ -16,6 +16,8 @@ import {
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
 import { getModules, ModuleResponseDto } from '../../../modules/teacher';
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
+import { getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime } from '../../semester';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
@@ -52,7 +54,8 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     },
     {}
   );
-
+  const lectureIdsOfSubjectsIdsWithTecTeoAtSameTime =
+    await getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(semesterId);
   assignPayload.classes = lecturesToAssign.reduce(
     (acc: { [key: number]: LectureToAssign }, lecture) => {
       acc[lecture.id] = lecture;
@@ -72,7 +75,6 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
 
   const matches = response.matches;
   let amount_of_lectures_assigned = 0;
-
   await Promise.all(
     Object.entries(matches).map(async ([lectureId, roles]) => {
       await Promise.all(
@@ -88,10 +90,16 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
                 role
               );
               amount_of_lectures_assigned += 1;
+              const is_technology_teacher =
+                role === SubjectRoles.TECHNOLOGY &&
+                lectureIdsOfSubjectsIdsWithTecTeoAtSameTime.includes(
+                  Number(lectureId)
+                );
               await setTeacherToLecture(
                 Number(lectureId),
                 Number(teacherId),
-                role
+                role,
+                is_technology_teacher
               );
             })
           );
@@ -133,7 +141,7 @@ async function sendAssignation(
       // Throw a custom error with detailed information
       throw new Error(
         `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
-          JSON.stringify(error.response?.data) || 'No additional error details.'
+          JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {

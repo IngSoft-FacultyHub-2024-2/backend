@@ -286,6 +286,7 @@ class SemesterRepository {
             const newTeachers = lectureRole.teachers.map((teacher) => ({
               lecture_role_id: newRole.id,
               teacher_id: teacher.teacher_id,
+              is_technology_teacher: teacher.is_technology_teacher,
             }));
             await LectureTeacher.bulkCreate(newTeachers, { transaction });
           }
@@ -319,7 +320,8 @@ class SemesterRepository {
   async setTeacherToLecture(
     lectureId: number,
     teacherId: number,
-    role: string
+    role: string,
+    is_technology_teacher: boolean
   ) {
     const lectureRole = await LectureRole.findOne({
       where: { lecture_id: lectureId, role },
@@ -335,6 +337,7 @@ class SemesterRepository {
       lecture_role_id: lectureRole.id,
       teacher_id: teacherId,
       role,
+      is_technology_teacher,
     });
   }
 

@@ -14,42 +14,99 @@ class SemesterRepository {
     return await Semester.create(semester);
   }
 
-  async getSemesters() {
-    return await Semester.findAll({
-      order: [['start_date', 'DESC']],
-    });
-  }
-
-  async addLecture(lecture: Partial<Lecture>) {
-    const newLecture = await Lecture.create(lecture, {
+  async deleteSemester(semesterId: number) {
+    const semester = await Semester.findByPk(semesterId, {
       include: [
         {
-          model: Semester,
-          as: 'semester',
-        },
-        {
-          model: LectureGroup,
-          as: 'lecture_groups',
-        },
-        {
-          model: LectureRole,
-          as: 'lecture_roles',
-          include: [
-            {
-              model: LectureHourConfig,
-              as: 'hour_configs',
-            },
-            {
-              model: LectureTeacher,
-              as: 'teachers',
-              required: false,
-            },
-          ],
+          model: Lecture,
+          as: 'lectures',
         },
       ],
     });
 
-    return newLecture;
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    for (const lecture of semester.lectures || []) {
+      await this.deleteLecture(lecture.id);
+    }
+
+    return await Semester.destroy({
+      where: { id: semesterId },
+    });
+  }
+
+  async updateSemester(semesterId: number, semesterData: Partial<Semester>) {
+    const semester = await Semester.findByPk(semesterId);
+
+    if (!semester) {
+      throw new ResourceNotFound(`Semester with ID ${semesterId} not found`);
+    }
+
+    return await semester.update(semesterData);
+  }
+
+  async getSemesters() {
+    return await Semester.findAll({
+      order: [['start_date', 'DESC']],
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(
+              `(SELECT COUNT(*) FROM "Lectures" WHERE "Semester"."id" = "Lectures"."semester_id")`
+            ),
+            'lectures_count',
+          ],
+        ],
+      },
+    });
+  }
+
+  async getSemesterById(semesterId: number) {
+    return await Semester.findByPk(semesterId);
+  }
+
+  async addLecture(lecture: Partial<Lecture>) {
+    const transaction: Transaction = await Lecture.sequelize!.transaction();
+    try {
+      const newLecture = await Lecture.create(lecture, {
+        include: [
+          {
+            model: Semester,
+            as: 'semester',
+          },
+          {
+            model: LectureGroup,
+            as: 'lecture_groups',
+          },
+          {
+            model: LectureRole,
+            as: 'lecture_roles',
+            include: [
+              {
+                model: LectureHourConfig,
+                as: 'hour_configs',
+              },
+              {
+                model: LectureTeacher,
+                as: 'teachers',
+                required: false,
+              },
+            ],
+          },
+        ],
+        transaction, // Ensure the creation is part of the transaction
+      });
+
+      // Commit the transaction if all operations succeed
+      await transaction.commit();
+      return newLecture;
+    } catch (error) {
+      // Roll back the transaction if any operation fails
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   async getSemesterLectures(

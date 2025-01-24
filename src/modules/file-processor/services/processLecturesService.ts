@@ -1,7 +1,12 @@
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import { getDegreeByAcronym } from '../../degree';
-import { addLecture } from '../../semester';
-import { getAllSubjectNames } from '../../subject';
+import {
+  addLecture,
+  deleteLecture,
+  getSemesterById,
+  getSemesterLectures,
+} from '../../semester';
+import { getAllSubjectNames, getSubjectNamesByStudyPlan } from '../../subject';
 import { getModules } from '../../teacher';
 import { FileDataDto } from '../dtos/FileDataDto';
 import { LectureDto } from '../dtos/LecturesReturnDto';
@@ -20,6 +25,18 @@ interface SemesterLectures {
       modules: number[];
     }[];
   }[];
+}
+
+export async function clearSemester(semester_id: number) {
+  const semesterLectures = await getSemesterLectures(semester_id);
+
+  if (!semesterLectures || semesterLectures.length === 0) {
+    return;
+  }
+
+  for (const lecture of semesterLectures) {
+    await deleteLecture(lecture.id);
+  }
 }
 
 export async function processLectures(
@@ -47,15 +64,32 @@ export async function processLectures(
     return;
   }
 
+  const semesterId = fileData.semesterId;
+  if (!semesterId) {
+    throw new Error(
+      'Se necesita el id del semestre para procesar la subida de dictados'
+    );
+  }
+
+  const semester = await getSemesterById(semesterId);
+  if (!semester) {
+    throw new Error('No se encontró el semestre con id ' + semesterId);
+  }
+
   const result: SemesterLectures[] = [];
   let currentGroup = '';
 
-  const relevantSubjects = await getAllSubjectNames();
+  const relevantSubjects = semester.study_plan_id
+    ? await getSubjectNamesByStudyPlan(semester.study_plan_id)
+    : await getAllSubjectNames();
+
   const modules = await getModules();
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+
   for (const row of data) {
-    if (isGroupRow(row[0])) {
-      currentGroup = row[0];
+    const isGroup = isGroupRow(row[0]);
+    if (isGroup) {
+      currentGroup = isGroup;
       continue;
     }
 
@@ -83,7 +117,6 @@ export async function processLectures(
       }
     }
   }
-
   for (const lecture of result) {
     await addLecture(lecture as any);
   }
@@ -91,8 +124,12 @@ export async function processLectures(
   return generateResultLectures(result, relevantSubjects);
 }
 
-function isGroupRow(value: any): boolean {
-  return typeof value === 'string' && /^[M,N]\d{1,2}[A-Z]$/.test(value);
+function isGroupRow(value: any): string | null {
+  // const match = value.match(/^([A-Z]\d+[A-Z])/);
+  const match =
+    typeof value === 'string' ? value.match(/^([A-Z]\d+[A-Z])/) : null;
+  // return match !== null ? /^[M,N]\d{1,2}[A-Z]$/.test(match[1]);
+  return match ? match[1] : null;
 }
 
 function isHourRow(value: any): boolean {

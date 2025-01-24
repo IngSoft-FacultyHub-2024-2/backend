@@ -4,8 +4,12 @@ import { getDegreeByAcronym } from '../../src/modules/degree';
 import { FileDataDto } from '../../src/modules/file-processor/dtos/FileDataDto';
 import { LectureDto } from '../../src/modules/file-processor/dtos/LecturesReturnDto';
 import { processLectures } from '../../src/modules/file-processor/services/processLecturesService';
-import { addLecture } from '../../src/modules/semester';
-import { getAllSubjectNames } from '../../src/modules/subject';
+import { addLecture, getSemesterById } from '../../src/modules/semester';
+import Semester from '../../src/modules/semester/repositories/models/Semester';
+import {
+  getAllSubjectNames,
+  getSubjectNamesByStudyPlan,
+} from '../../src/modules/subject';
 import { getModules } from '../../src/modules/teacher';
 import { SubjectRoles } from '../../src/shared/utils/enums/subjectRoles';
 
@@ -27,8 +31,8 @@ describe('processLectures Service', () => {
 
   const mockDegree = { id: 1, name: 'Ingeniería de Software' };
   const mockSubjects = [
-    { id: 1, name: 'Fundamentos de Ingeniería de Software' },
-    { id: 2, name: 'Diseño de Aplicaciones' },
+    { id: 1, name: 'Fundamentos de Ingeniería de Software', StudyPlanId: 1 },
+    { id: 2, name: 'Diseño de Aplicaciones', StudyPlanId: 1 },
   ];
 
   const mockData = [
@@ -56,6 +60,12 @@ describe('processLectures Service', () => {
     },
   ];
 
+  const mockSemester: Partial<Semester> = {
+    id: 1,
+    name: 'Semestre 1',
+    study_plan_id: 1,
+  };
+
   beforeEach(() => {
     // Mocks de las funciones externas
     (getDegreeByAcronym as jest.Mock).mockResolvedValue(mockDegree);
@@ -70,11 +80,16 @@ describe('processLectures Service', () => {
 
   it('should process lectures and return them', async () => {
     const sheetName = 'IS-2024';
+    (getSemesterById as jest.Mock).mockResolvedValue(mockSemester);
+    (getSubjectNamesByStudyPlan as jest.Mock).mockResolvedValue(mockSubjects);
 
     const result = await processLectures(mockFileData, mockData, sheetName);
 
+    expect(getSemesterById).toHaveBeenCalledWith(mockSemester.id);
     expect(getDegreeByAcronym).toHaveBeenCalledWith('IS');
-    expect(getAllSubjectNames).toHaveBeenCalled();
+    expect(getSubjectNamesByStudyPlan).toHaveBeenCalledWith(
+      mockSemester.study_plan_id
+    );
     expect(getModules).toHaveBeenCalled();
     expect(addLecture).toHaveBeenCalledTimes(2); // Asegura que se llamaron las veces correctas
     expect(result).toEqual(mockResult);
@@ -89,6 +104,9 @@ describe('processLectures Service', () => {
   });
 
   it('should correctly map subjects and roles to lectures', async () => {
+    (getSemesterById as jest.Mock).mockResolvedValue(mockSemester);
+    (getSubjectNamesByStudyPlan as jest.Mock).mockResolvedValue(mockSubjects);
+
     const sheetName = 'IS-2024';
     const dataWithRoles = [
       [

@@ -141,7 +141,7 @@ async function sendAssignation(
       // Throw a custom error with detailed information
       throw new Error(
         `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
-          JSON.stringify(error.response?.data) || 'No additional error details.'
+          JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {

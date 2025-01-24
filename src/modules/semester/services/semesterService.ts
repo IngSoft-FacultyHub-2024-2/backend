@@ -1,11 +1,8 @@
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
-import {
-  translateWeekDayToEnglish,
-  WeekDays,
-} from '../../../shared/utils/enums/WeekDays';
+import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
-import { getSubjectById, amountOfTeachersPerSubject } from '../../subject';
+import { amountOfTeachersPerSubject, getSubjectById } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import { lectureToAssignResponseDto } from '../dtos/response/lectureToAssignResponseDto';
@@ -19,8 +16,23 @@ export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
 }
 
+export async function deleteSemester(semesterId: number) {
+  return await semesterRepository.deleteSemester(semesterId);
+}
+
+export async function updateSemester(
+  semesterId: number,
+  semester: Partial<Semester>
+) {
+  return await semesterRepository.updateSemester(semesterId, semester);
+}
+
 export async function getSemesters() {
   return await semesterRepository.getSemesters();
+}
+
+export async function getSemesterById(semesterId: number) {
+  return await semesterRepository.getSemesterById(semesterId);
 }
 
 export async function getSemesterLectures(

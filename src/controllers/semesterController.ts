@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import {
   addLecture,
   addSemester,
-  getSemesterLectures,
-  getSemesters,
-  getSemesterLecturesGroups,
-  updateLecture,
   deleteLecture,
+  deleteSemester,
+  getSemesterLectures,
+  getSemesterLecturesGroups,
+  getSemesters,
+  updateLecture,
+  updateSemester,
 } from '../modules/semester';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
@@ -18,6 +20,29 @@ class SemesterController {
       await inputSemesterSchema.validate(req.body);
       const semester = await addSemester(req.body);
       res.status(201).json(semester);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async updateSemester(req: Request, res: Response) {
+    try {
+      await inputSemesterSchema.validate(req.body);
+      const semester = await updateSemester(parseInt(req.params.id), req.body);
+      res.status(201).json(semester);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async deleteSemester(req: Request, res: Response) {
+    try {
+      const semester = await deleteSemester(parseInt(req.params.id));
+      res.status(200).json(semester);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

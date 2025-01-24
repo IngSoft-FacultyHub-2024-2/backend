@@ -9,6 +9,8 @@ router.post('/', teacherController.addTeacher);
 router.get('/', teacherController.getTeachers);
 router.get('/names', teacherController.getAllTeachersNames);
 
+router.get('/contacts', teacherController.getTeachersContacts);
+
 router.get('/benefits', benefitController.getBenefits);
 router.post('/benefits', benefitController.addBenefit);
 router.put('/benefits/:id', benefitController.updateBenefit);

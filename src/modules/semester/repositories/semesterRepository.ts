@@ -8,6 +8,7 @@ import Semester from './models/Semester';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { TeacherResponseDto } from '../../teacher';
 import TeacherAvailableModule from '../../teacher/repositories/models/TeacherAvailableModules';
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -362,13 +363,23 @@ class SemesterRepository {
 
       // 2. Validate if the teacher has taught the subject before
       const subjectHistory = teacher.subjects_history || [];
+      let roleHeIsAssigned = updateLectureData.lecture_roles.find((role) =>
+        role.teachers.find(
+          (t) => t.teacher_id == teacher.id && !t.is_technology_teacher
+        )
+      )?.role;
+      if (this.isRoleTechnologyForThatTeacher(teacher, updateLectureData)) {
+        roleHeIsAssigned = SubjectRoles.TECHNOLOGY;
+      }
       if (
         !subjectHistory.some(
-          (history) => history.subject_id == updateLectureData.subject_id
+          (history) =>
+            history.subject_id == updateLectureData.subject_id &&
+            history.role == roleHeIsAssigned
         )
       ) {
         throw new Error(
-          `Docente ${teacher.name} ${teacher.surname} no ha dictado la materia antes.`
+          `Docente ${teacher.name} ${teacher.surname} no ha dictado la materia y rol antes.`
         );
       }
 
@@ -601,6 +612,22 @@ class SemesterRepository {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  isRoleTechnologyForThatTeacher(
+    teacher: TeacherResponseDto,
+    updateLectureData: Lecture
+  ) {
+    if (
+      updateLectureData.lecture_roles.find((role) =>
+        role.teachers.find(
+          (t) => t.teacher_id == teacher.id && t.is_technology_teacher
+        )
+      )
+    ) {
+      return true;
+    }
+    return false;
   }
 }
 

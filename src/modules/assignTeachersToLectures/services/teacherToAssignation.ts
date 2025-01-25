@@ -235,7 +235,11 @@ async function getTeachersLectureConflicts(semesterId: number) {
         if (!isTeacherAvailableAtLectureTime(teacher, role)) {
           teachersBusyAtLectureTime.push(teacher, role);
         }
-        if (!canTeacherTeachLecture(teacher, lecture.subject, role)) {
+        let roleString = role.role;
+        if (t.is_technology_teacher) {
+          roleString = SubjectRoles.TECHNOLOGY;
+        }
+        if (!canTeacherTeachLecture(teacher, lecture.subject, roleString)) {
           teachersDoNotKnowSubject.push(teacher, lecture.subject, role);
         }
       });
@@ -279,7 +283,7 @@ function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
 function canTeacherTeachLecture(
   teacher: TeacherResponseDto,
   subject: any,
-  role: LectureRoleResponseDto
+  role: string
 ) {
   const subjectHeKnowHowToTeach = getSubjectHeKnowHowToTeach(teacher);
   if (!subjectHeKnowHowToTeach) {
@@ -288,7 +292,7 @@ function canTeacherTeachLecture(
   return subjectHeKnowHowToTeach.some((subjectHeKnow) => {
     return (
       subjectHeKnow.subject === subject.id.toString() &&
-      subjectHeKnow.role.includes(role.role)
+      subjectHeKnow.role.includes(role)
     );
   });
 }

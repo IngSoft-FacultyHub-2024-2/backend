@@ -54,6 +54,7 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     },
     {}
   );
+
   const lectureIdsOfSubjectsIdsWithTecTeoAtSameTime =
     await getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(semesterId);
   assignPayload.classes = lecturesToAssign.reduce(
@@ -63,6 +64,9 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     },
     {}
   );
+
+  // Set the amount of teachers to assign to each lecture lock as the number of teacher they are there
+  setNumberOfTeacherToLockedLectures(preassigned, assignPayload);
   const response = await sendAssignation(assignPayload);
   console.log(response.status);
   if (response.status === 'Infeasible') {
@@ -109,6 +113,25 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   );
   response.amount_of_lectures_assigned = amount_of_lectures_assigned;
   return response;
+}
+
+function setNumberOfTeacherToLockedLectures(
+  preassigned: { [lectureId: string]: { [role: string]: string[] } },
+  assignPayload: AssignPayload
+) {
+  for (const lectureId in preassigned) {
+    for (const role in preassigned[lectureId]) {
+      const lectureToAssign = assignPayload.classes[
+        Number(lectureId)
+      ].subClasses.find((subclass) => {
+        return subclass.role === role;
+      });
+      if (lectureToAssign) {
+        lectureToAssign.num_teachers = preassigned[lectureId][role].length;
+        console.log(lectureToAssign.num_teachers);
+      }
+    }
+  }
 }
 
 async function sendAssignation(

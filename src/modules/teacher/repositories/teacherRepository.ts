@@ -148,31 +148,38 @@ class TeacherRepository {
       ],
     });
 
-    const contactsFilePath = await this.generateContactsTxt(teachers);
+    const contactsFilePath = await this.generateContactsCsv(teachers);
 
     return contactsFilePath;
   }
 
-  generateContactsTxt = async (teachers: Teacher[]) => {
+  generateContactsCsv = async (teachers: Teacher[]) => {
     try {
       const contacts = teachers
         .flatMap(teacher => teacher.contacts || [])
         .map(contact => {
           const { prefered, data } = contact;
           return prefered ? data : undefined;
-        }) // Extract specific fields
-        .filter(Boolean); // Remove undefined/null entries
+        })
+        .filter((contact): contact is string => Boolean(contact)); // Filtrar valores `undefined`
 
-      const contactsString = contacts.join(';');
+      // Convertir los contactos en formato CSV
+      const csvRows = ['Contactos'];
+      contacts.forEach(contact => {
+        csvRows.push(contact); // Añadir cada contacto como una fila
+      });
 
-      // Write the contacts to a TXT file
+      const csvString = csvRows.join('\n');
+
+      // Escribir el archivo CSV
       const date = new Date().toISOString().replace(/:/g, '-');
-      const filePath = `./contacts-${date}.txt`;
-      fs.writeFileSync(filePath, contactsString, 'utf8');
+      const filePath = `./contacts-${date}.csv`;
+      fs.writeFileSync(filePath, csvString, 'utf8');
+
       const absoluteFilePath = path.resolve(filePath);
       return absoluteFilePath;
     } catch (error) {
-      console.error('Error generating contacts TXT file:', error);
+      console.error('Error generating contacts CSV file:', error);
     }
   };
 

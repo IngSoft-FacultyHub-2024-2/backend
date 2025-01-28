@@ -85,7 +85,7 @@ class TeacherController {
         return res.status(404).json({ message: 'Hubo un problema al generar el archivo' });
       }
 
-      res.download(teachersContactsFilePath, 'contactos.txt', (err) => {
+      res.download(teachersContactsFilePath, 'contactos.csv', (err) => {
         if (err) {
           console.error('Error sending file:', err);
           res.status(500).json({ message: 'Hubo un problema al enviar el archivo' });

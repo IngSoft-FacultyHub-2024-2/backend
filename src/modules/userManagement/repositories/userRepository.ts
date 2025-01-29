@@ -59,6 +59,14 @@ class userRepository {
       }
     );
   }
+
+  async getUserByEmployeeNumber(employee_number: number) {
+    return await User.findOne({
+      where: {
+        teacher_employee_number: employee_number,
+      },
+    });
+  }
 }
 
 export default new userRepository();

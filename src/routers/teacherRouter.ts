@@ -2,11 +2,12 @@ import { Router } from 'express';
 import benefitController from '../controllers/benefitController';
 import categoryController from '../controllers/categoryController';
 import teacherController from '../controllers/teacherController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 router.post('/', teacherController.addTeacher);
-router.get('/', teacherController.getTeachers);
+router.get('/', authMiddleware, teacherController.getTeachers);
 router.get('/names', teacherController.getAllTeachersNames);
 
 router.get('/benefits', benefitController.getBenefits);

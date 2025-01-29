@@ -1,8 +1,15 @@
 import {
   createUser,
+  getUserByEmployeeNumber,
   getUserById,
   getUsers,
   updatePassword,
 } from './services/userManagementService';
 
-export { createUser, getUserById, getUsers, updatePassword };
+export {
+  createUser,
+  getUserByEmployeeNumber,
+  getUserById,
+  getUsers,
+  updatePassword,
+};

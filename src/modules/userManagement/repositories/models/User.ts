@@ -8,6 +8,7 @@ import RolePermission from './RolePermission';
 class User extends Model {
   public id!: number;
   public teacher_id!: number;
+  public teacher_employee_number!: number;
   public password!: string;
   public is_active!: boolean;
   public role_id!: number;
@@ -33,6 +34,10 @@ User.init(
         model: 'Teachers',
         key: 'id',
       },
+    },
+    teacher_employee_number: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
@@ -69,7 +74,7 @@ Role.hasMany(User, {
   as: 'users',
 });
 
-User.belongsTo(Role, {
+User.hasOne(Role, {
   foreignKey: 'role_id',
   as: 'role',
 });

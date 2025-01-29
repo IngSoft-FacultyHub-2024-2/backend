@@ -4,8 +4,8 @@ import User from '../repositories/models/User';
 import userRepository from '../repositories/userRepository';
 
 export async function createUser(user: Partial<User>) {
-  const teacherExist = await getTeacherById(user.teacher_id!);
-  if (!teacherExist) {
+  const teacher = await getTeacherById(user.teacher_id!);
+  if (!teacher) {
     throw new Error('El docente no existe');
   }
 
@@ -16,6 +16,7 @@ export async function createUser(user: Partial<User>) {
 
   const hashedPassword = await bcrypt.hash(user.password!, 10);
   user.password = hashedPassword;
+  user.teacher_employee_number = teacher.employee_number!;
   console.log(user);
 
   return await userRepository.createUser(user);
@@ -56,4 +57,8 @@ async function comparePasswords(
   if (!isPasswordValid) {
     throw new Error('old password is incorrect');
   }
+}
+
+export async function getUserByEmployeeNumber(employee_number: number) {
+  return await userRepository.getUserByEmployeeNumber(employee_number);
 }

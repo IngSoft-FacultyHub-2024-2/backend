@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import sequelize from './config/database';
 import assignTeachersToLecturesRouter from './routers/assignTeachersToLecturesRouter';
+import authRouter from './routers/authRouter';
 import degreeRouter from './routers/degreeRouter';
 import eventRouter from './routers/eventRouter';
 import fileProcessorRouter from './routers/fileProcessorRouter';
@@ -39,6 +40,7 @@ app.use('/api/semesters', semesterRouter);
 app.use('/api/degrees', degreeRouter);
 app.use('/api/assignTeachersToLectures', assignTeachersToLecturesRouter);
 app.use('/api/users', userManagementRouter);
+app.use('/api/auth', authRouter);
 
 const PORT = process.env.PORT || 3000;
 

@@ -20,6 +20,11 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      teacher_employee_number: {
+        type: Sequelize.NUMBER,
+        allowNull: false,
+        unique: true,
+      },
       password: {
         type: Sequelize.STRING,
         allowNull: false,

@@ -6,26 +6,35 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/', teacherController.addTeacher);
+router.post('/', authMiddleware, teacherController.addTeacher);
 router.get('/', authMiddleware, teacherController.getTeachers);
-router.get('/names', teacherController.getAllTeachersNames);
+router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
 
-router.get('/benefits', benefitController.getBenefits);
-router.post('/benefits', benefitController.addBenefit);
-router.put('/benefits/:id', benefitController.updateBenefit);
-router.delete('/benefits/:id', benefitController.deleteBenefit);
+router.get('/benefits', authMiddleware, benefitController.getBenefits);
+router.post('/benefits', authMiddleware, benefitController.addBenefit);
+router.put('/benefits/:id', authMiddleware, benefitController.updateBenefit);
+router.delete('/benefits/:id', authMiddleware, benefitController.deleteBenefit);
 
-router.get('/categories', categoryController.getCategories);
-router.post('/categories', categoryController.addCategory);
-router.put('/categories/:id', categoryController.updateCategory);
-router.delete('/categories/:id', categoryController.deleteCategory);
+router.get('/categories', authMiddleware, categoryController.getCategories);
+router.post('/categories', authMiddleware, categoryController.addCategory);
+router.put(
+  '/categories/:id',
+  authMiddleware,
+  categoryController.updateCategory
+);
+router.delete(
+  '/categories/:id',
+  authMiddleware,
+  categoryController.deleteCategory
+);
 
-router.get('/:id', teacherController.getTeacherById);
-router.delete('/:id', teacherController.dismissTeacher);
+router.get('/:id', authMiddleware, teacherController.getTeacherById);
+router.delete('/:id', authMiddleware, teacherController.dismissTeacher);
 router.patch(
   '/:id/temporary-dismiss',
+  authMiddleware,
   teacherController.temporaryDismissTeacher
 );
-router.put('/:id', teacherController.updateTeacher);
+router.put('/:id', authMiddleware, teacherController.updateTeacher);
 
 export default router;

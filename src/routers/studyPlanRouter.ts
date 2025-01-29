@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import StudyPlanController from '../controllers/studyPlanController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/', StudyPlanController.addStudyPlan);
-router.get('/', StudyPlanController.getStudyPlans);
-router.put('/:id', StudyPlanController.updateStudyPlan);
-router.delete('/:id', StudyPlanController.deleteStudyPlan);
+router.post('/', authMiddleware, StudyPlanController.addStudyPlan);
+router.get('/', authMiddleware, StudyPlanController.getStudyPlans);
+router.put('/:id', authMiddleware, StudyPlanController.updateStudyPlan);
+router.delete('/:id', authMiddleware, StudyPlanController.deleteStudyPlan);
 
 export default router;

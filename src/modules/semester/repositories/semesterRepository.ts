@@ -1,14 +1,15 @@
 import { Op, Sequelize, Transaction } from 'sequelize';
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
+import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
+import StudyPlan from '../../subject/repositories/models/StudyPlan';
+import { TeacherResponseDto } from '../../teacher';
+import TeacherAvailableModule from '../../teacher/repositories/models/TeacherAvailableModules';
 import Lecture from './models/Lecture';
 import LectureGroup from './models/LectureGroup';
 import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
-import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
-import { TeacherResponseDto } from '../../teacher';
-import TeacherAvailableModule from '../../teacher/repositories/models/TeacherAvailableModules';
-import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -61,6 +62,12 @@ class SemesterRepository {
           ],
         ],
       },
+      include: [
+        {
+          model: StudyPlan,
+          as: 'study_plan',
+        },
+      ],
     });
   }
 

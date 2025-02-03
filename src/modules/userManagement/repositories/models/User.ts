@@ -1,4 +1,4 @@
-import { DataTypes, HasOne, Model } from 'sequelize';
+import { BelongsToMany, DataTypes, HasOne, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
 import Teacher from '../../../teacher/repositories/models/Teacher';
 import Permission from './Permission';
@@ -14,7 +14,7 @@ class User extends Model {
   public role_id!: number;
 
   public static associations: {
-    role: HasOne<User, Role>;
+    role: BelongsToMany<User, Role>;
     teacher: HasOne<User, Teacher>;
   };
 }
@@ -69,12 +69,11 @@ User.init(
 
 export default User;
 
-Role.hasMany(User, {
+Role.belongsTo(User, {
   foreignKey: 'role_id',
-  as: 'users',
+  as: 'role',
 });
-
-User.hasOne(Role, {
+User.belongsTo(Role, {
   foreignKey: 'role_id',
   as: 'role',
 });

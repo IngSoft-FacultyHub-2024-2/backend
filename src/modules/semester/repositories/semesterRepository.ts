@@ -270,9 +270,7 @@ class SemesterRepository {
 
         // Create new roles
         for (const lectureRole of lectureData.lecture_roles) {
-          if (lectureRole.is_lecture_locked) {
-            lockingAction = true;
-          }
+          lockingAction = lectureRole.is_lecture_locked;
 
           const newRole = await LectureRole.create(
             { ...lectureRole, lecture_id: lectureId },
@@ -298,11 +296,15 @@ class SemesterRepository {
             }));
             await LectureTeacher.bulkCreate(newTeachers, { transaction });
           }
+          if (lockingAction) {
+            console.log('lockingAction:', lockingAction, lectureRole.role);
+            await this.validateLockedLectures(
+              teachers,
+              lecture,
+              lectureRole.role
+            );
+          }
         }
-      }
-
-      if (lockingAction) {
-        await this.validateLockedLectures(teachers, lecture);
       }
 
       // Commit transaction
@@ -351,18 +353,30 @@ class SemesterRepository {
 
   async validateLockedLectures(
     teachers: TeacherResponseDto[],
-    updateLectureData: Lecture
+    updateLectureData: Lecture,
+    role: string
   ) {
+    const lectureRole = updateLectureData.lecture_roles.find(
+      (lectureRole) => lectureRole.role === role
+    );
+    // 0. Validate if a teacher was assigned to the locked lecture
+    if (!lectureRole || lectureRole.teachers.length === 0) {
+      throw new Error('No se puede lockear un dictado sin profesores.');
+    }
+    // see if teacher is twice in the same lecture
+    const teacherIds = lectureRole.teachers.map(
+      (teacher) => teacher.teacher_id
+    );
+    if (teacherIds.length !== new Set(teacherIds).size) {
+      throw new Error(
+        'No se puede lockear un dictado con profesores repetidos.'
+      );
+    }
+
     for (const teacher of teachers) {
       // 1. Validate if the teacher has available hours
       const availableModules = teacher.teacher_available_modules;
-      if (
-        !this.matchesLectureTime(
-          availableModules,
-          updateLectureData,
-          teacher.id
-        )
-      ) {
+      if (!this.matchesLectureTime(availableModules, lectureRole, teacher.id)) {
         throw new Error(
           `Docente ${teacher.name} ${teacher.surname} no tiene horas disponibles para dar este dictado.`
         );
@@ -370,11 +384,7 @@ class SemesterRepository {
 
       // 2. Validate if the teacher has taught the subject before
       const subjectHistory = teacher.subjects_history || [];
-      let roleHeIsAssigned = updateLectureData.lecture_roles.find((role) =>
-        role.teachers.find(
-          (t) => t.teacher_id == teacher.id && !t.is_technology_teacher
-        )
-      )?.role;
+      let roleHeIsAssigned = lectureRole.role;
       if (this.isRoleTechnologyForThatTeacher(teacher, updateLectureData)) {
         roleHeIsAssigned = SubjectRoles.TECHNOLOGY;
       }
@@ -404,7 +414,7 @@ class SemesterRepository {
           id: { [Op.ne]: updateLectureData.id },
         },
       });
-      console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
+      //console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
         throw new Error(
           `Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`
@@ -466,21 +476,18 @@ class SemesterRepository {
   // Helper function to match lecture time
   matchesLectureTime(
     teacherHourConfig: TeacherAvailableModule[],
-    lecture: Lecture,
+    lectureRole: LectureRole,
     teacherId: number
   ): boolean {
     let isMatch = true;
-    // console.log('lecture roles:', JSON.stringify(lecture.lecture_roles, null, 2));
 
-    const leactureAssignedToTeacher = lecture.lecture_roles?.find((row) =>
-      row.teachers?.find((teacher) => teacher.teacher_id == teacherId)
-    );
-
-    if (!leactureAssignedToTeacher) {
+    if (
+      !lectureRole.teachers?.find((teacher) => teacher.teacher_id == teacherId)
+    ) {
       throw new Error(`Teacher ${teacherId} is not assigned to the lecture.`);
     }
 
-    const lectureHoursConfig = leactureAssignedToTeacher?.hour_configs;
+    const lectureHoursConfig = lectureRole.hour_configs;
 
     if (lectureHoursConfig) {
       for (const config of lectureHoursConfig) {

@@ -39,7 +39,6 @@ class userRepository {
     role?: string,
     is_active?: string
   ) {
-    console.log(search);
     const searchQuery = search
       ? {
           [Op.or]: [
@@ -59,10 +58,18 @@ class userRepository {
               { [Op.iLike]: `%${search}%` }
             ),
           ],
-          [Op.and]: [
-            //if is_active is not null then filter by is_active
-            is_active ? { is_active } : {},
-          ],
+        }
+      : {};
+
+    const roleQuery = role
+      ? {
+          role_id: role,
+        }
+      : {};
+
+    const isActiveQuery = is_active
+      ? {
+          is_active,
         }
       : {};
 
@@ -71,6 +78,8 @@ class userRepository {
     const users = await User.findAndCountAll({
       where: {
         ...searchQuery,
+        ...roleQuery,
+        ...isActiveQuery,
       },
       include: [
         {

@@ -4,6 +4,8 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
+router.get('/roles', authMiddleware, userManagmentController.getRoles);
+
 router.get('/', authMiddleware, userManagmentController.getUsers);
 router.post('/', authMiddleware, userManagmentController.createUser);
 router.put('/:id', authMiddleware, userManagmentController.updatePassword);

@@ -69,13 +69,13 @@ User.init(
 
 export default User;
 
-Role.belongsTo(User, {
-  foreignKey: 'role_id',
-  as: 'role',
-});
 User.belongsTo(Role, {
   foreignKey: 'role_id',
   as: 'role',
+});
+Role.hasMany(User, {
+  foreignKey: 'role_id',
+  as: 'users',
 });
 
 Teacher.hasOne(User, {

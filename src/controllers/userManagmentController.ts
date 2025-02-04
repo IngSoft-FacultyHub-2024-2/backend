@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
   createUser,
+  getRoles,
   getUserById,
   getUsers,
   updatePassword,
@@ -22,10 +23,22 @@ class userManagementController {
     }
   }
 
-  async getUsers(req: Request, res: Response) {
+  async getUsers(req: any, res: Response) {
     try {
-      const users = await getUsers();
+      const { search, role, is_active, page } = req.query;
+      const users = await getUsers(search, role, is_active, page);
       res.status(200).json(users);
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getRoles(req: any, res: any) {
+    try {
+      const roles = await getRoles();
+      res.status(200).json(roles);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

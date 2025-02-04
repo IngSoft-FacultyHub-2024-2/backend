@@ -9,10 +9,14 @@ import {
   getAllTeachersNames,
   getTeacherById,
   getTeachers,
+  getTeachersToAssignLectures,
   temporaryDismissTeacher,
   updateTeacher,
-  getTeachersToAssignLectures,
 } from '../../src/modules/teacher/services/teacherService';
+import {
+  getUserByTeacherId,
+  unsubscribeUser,
+} from '../../src/modules/userManagement';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
 
 // Mocking the necessary modules
@@ -20,6 +24,10 @@ jest.mock('../../src/modules/teacher/repositories/teacherRepository');
 jest.mock('../../src/modules/subject', () => ({
   getSubjectById: jest.fn(),
   teacherCoordinatorSubjects: jest.fn(),
+}));
+jest.mock('../../src/modules/userManagement', () => ({
+  getUserByTeacherId: jest.fn(),
+  unsubscribeUser: jest.fn(),
 }));
 
 // Helper function to clean undefined and empty arrays from objects
@@ -297,6 +305,8 @@ describe('Teacher Service', () => {
         teacherRepository.deleteTeacherSubjectGroups as jest.Mock
       ).mockResolvedValue(null);
       (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
+      (getUserByTeacherId as jest.Mock).mockResolvedValue({ id: 1 });
+      (unsubscribeUser as jest.Mock).mockResolvedValue(null);
 
       const result = await dismissTeacher(1);
 
@@ -343,6 +353,8 @@ describe('Teacher Service', () => {
         teacherRepository.deleteTeacherSubjectGroups as jest.Mock
       ).mockResolvedValue(null);
       (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue([]);
+      (getUserByTeacherId as jest.Mock).mockResolvedValue({ id: 1 });
+      (unsubscribeUser as jest.Mock).mockResolvedValue(null);
 
       const result = await temporaryDismissTeacher(1, new Date());
 

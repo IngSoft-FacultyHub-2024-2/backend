@@ -1,3 +1,4 @@
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
@@ -9,6 +10,7 @@ import Lecture from '../repositories/models/Lecture';
 import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
+import { getSubjectsIdsWithTecTeoAtSameTime } from '../../subject';
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
@@ -96,7 +98,10 @@ export async function getSemesterLectures(
             'No se encontró el profesor con id ' + teacher.teacher_id
           );
         }
-        return teacherData;
+        return {
+          ...teacherData,
+          is_technology_teacher: teacher.is_technology_teacher,
+        };
       });
 
       const teachers = await Promise.all(teachersPromises);
@@ -152,22 +157,28 @@ export async function updateLecture(
 ) {
   const teachers = lecture.lecture_roles
     ? (
-      await Promise.all(
-        lecture.lecture_roles.map(async (role) => {
-          const teachersPromises = role.teachers.map(async (teacher) => {
-            const teacherData = await getTeacherById(teacher.teacher_id, true);
-            if (!teacherData) {
-              throw new ResourceNotFound(
-                'No se encontró el profesor con id ' + teacher.teacher_id
+        await Promise.all(
+          lecture.lecture_roles.map(async (role) => {
+            const teachersPromises = role.teachers.map(async (teacher) => {
+              const teacherData = await getTeacherById(
+                teacher.teacher_id,
+                true
               );
-            }
-            return teacherData;
-          });
+              if (!teacherData) {
+                throw new ResourceNotFound(
+                  'No se encontró el profesor con id ' + teacher.teacher_id
+                );
+              }
+              return {
+                ...teacherData,
+                is_technology_teacher: teacher.is_technology_teacher,
+              };
+            });
 
-          return await Promise.all(teachersPromises);
-        })
-      )
-    ).flat()
+            return await Promise.all(teachersPromises);
+          })
+        )
+      ).flat()
     : [];
   return await semesterRepository.updateLecture(lectureId, lecture, teachers);
 }
@@ -180,9 +191,32 @@ export async function getSemesterLecturesToAssign(
     throw new ResourceNotFound('No se encontraron el semestre');
   }
   const amountOfTeachersPerSubjectDict = await amountOfTeachersPerSubject();
+  const subjects_ids_teo_tec_at_same_time =
+    await getSubjectsIdsWithTecTeoAtSameTime();
 
+  const lecture_for_assignation = semester.lectures.map((lecture: Lecture) => {
+    if (subjects_ids_teo_tec_at_same_time.includes(lecture.subject_id)) {
+      const lectureRoleTheory = lecture.lecture_roles.filter(
+        (role) => role.role === SubjectRoles.THEORY
+      )[0];
+      const lectureRoleTechnology = LectureRole.build({
+        ...lectureRoleTheory,
+        role: SubjectRoles.TECHNOLOGY,
+      }).get({ plain: true });
+      (lectureRoleTechnology.hour_configs =
+        lecture.lecture_roles[0].hour_configs),
+        (lectureRoleTechnology.teachers = lectureRoleTheory.teachers?.filter(
+          (teacher: any) => teacher.is_technology_teacher
+        ));
+      lectureRoleTheory.teachers = lectureRoleTheory.teachers?.filter(
+        (teacher: any) => !teacher.is_technology_teacher
+      );
+      lecture.lecture_roles.push(lectureRoleTechnology);
+    }
+    return lecture;
+  });
   const lectures = await Promise.all(
-    semester.lectures.map(async (lecture: Lecture) => {
+    lecture_for_assignation.map(async (lecture: Lecture) => {
       const lectureRoles = await Promise.all(
         lecture.lecture_roles.map(async (lecture_role) => {
           const amountOfTeacherPerRoleOnSubject =
@@ -233,12 +267,17 @@ export async function getSemesterLecturesToAssign(
 export async function setTeacherToLecture(
   lectureId: number,
   teacherId: number,
-  role: string
+  role: string,
+  is_technology_teacher: boolean
 ) {
+  if (is_technology_teacher) {
+    role = SubjectRoles.THEORY;
+  }
   return await semesterRepository.setTeacherToLecture(
     lectureId,
     teacherId,
-    role
+    role,
+    is_technology_teacher
   );
 }
 
@@ -248,14 +287,20 @@ export async function deleteTeachersAssignations(semesterId: number) {
 
 export async function getPreassignedTeachers(semesterId: number) {
   const semesterLecture = await getSemesterLectures(semesterId);
+
   const preassigned = semesterLecture.reduce(
     (acc: { [lectureId: string]: { [role: string]: string[] } }, lecture) => {
       acc[lecture.id] = {};
       lecture.lecture_roles.forEach((role) => {
         if (role.is_lecture_locked) {
-          acc[lecture.id][role.role] = role.teachers.map((teacher) =>
-            teacher.id.toString()
-          );
+          acc[lecture.id][role.role] = role.teachers
+            .filter((teacher) => !teacher.is_technology_teacher)
+            .map((teacher) => teacher.id.toString());
+          if (lecture.subject.is_teo_tec_at_same_time) {
+            acc[lecture.id][SubjectRoles.TECHNOLOGY] = role.teachers
+              .filter((teacher) => teacher.is_technology_teacher)
+              .map((teacher) => teacher.id.toString());
+          }
         }
       });
       return acc;
@@ -279,4 +324,19 @@ export async function getLecturesWithTeachers(semesterId: number) {
     lecture.lecture_roles.filter((role) => role.teachers.length > 0)
   );
   return semesterLectures;
+}
+
+export async function getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(
+  semesterId: number
+): Promise<number[]> {
+  const semester = await semesterRepository.getSemesterLectures(semesterId);
+  if (!semester) {
+    throw new ResourceNotFound('No se encontraron el semestre');
+  }
+  const subjects_ids_tec_teo_at_same_time =
+    await getSubjectsIdsWithTecTeoAtSameTime();
+  const lectureIds = semester.lectures.filter((lecture) =>
+    subjects_ids_tec_teo_at_same_time.includes(lecture.subject_id)
+  );
+  return lectureIds.map((lecture) => lecture.id);
 }

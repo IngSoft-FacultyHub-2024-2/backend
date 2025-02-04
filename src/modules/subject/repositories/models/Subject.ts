@@ -28,6 +28,7 @@ class Subject extends Model {
   public subject_folder!: string | null;
   public technologies!: string | null;
   public notes!: string | null;
+  public is_teo_tec_at_same_time!: boolean;
   public valid!: boolean;
   public hour_configs!: HourConfig[];
   public needs_notes!: string;
@@ -73,10 +74,6 @@ Subject.init(
     associated_coordinator: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: 'Teachers',
-      //   key: 'id',
-      // },
     },
     study_plan_id: {
       type: DataTypes.INTEGER,
@@ -116,6 +113,10 @@ Subject.init(
     },
     needs_notes: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    is_teo_tec_at_same_time: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
     },
     valid: {

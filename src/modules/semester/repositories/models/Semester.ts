@@ -1,5 +1,6 @@
 import { DataTypes, HasMany, Model } from 'sequelize';
 import sequelize from '../../../../config/database';
+import StudyPlan from '../../../subject/repositories/models/StudyPlan';
 import Lecture from './Lecture';
 
 class Semester extends Model {
@@ -49,9 +50,13 @@ Semester.init(
     },
     study_plan_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+      references: {
+        model: 'StudyPlans',
+        key: 'id',
+      },
     },
   },
   {
@@ -70,6 +75,11 @@ Semester.hasMany(Lecture, {
 Lecture.belongsTo(Semester, {
   foreignKey: 'semester_id',
   as: 'semester',
+});
+
+Semester.belongsTo(StudyPlan, {
+  foreignKey: 'study_plan_id',
+  as: 'study_plan',
 });
 
 export default Semester;

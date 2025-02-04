@@ -16,6 +16,8 @@ import {
 import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
 import { getModules, ModuleResponseDto } from '../../../modules/teacher';
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
+import { getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime } from '../../semester';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
@@ -53,6 +55,8 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     {}
   );
 
+  const lectureIdsOfSubjectsIdsWithTecTeoAtSameTime =
+    await getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(semesterId);
   assignPayload.classes = lecturesToAssign.reduce(
     (acc: { [key: number]: LectureToAssign }, lecture) => {
       acc[lecture.id] = lecture;
@@ -60,6 +64,9 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     },
     {}
   );
+
+  // Set the amount of teachers to assign to each lecture lock as the number of teacher they are there
+  setNumberOfTeacherToLockedLectures(preassigned, assignPayload);
   const response = await sendAssignation(assignPayload);
   console.log(response.status);
   if (response.status === 'Infeasible') {
@@ -72,7 +79,6 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
 
   const matches = response.matches;
   let amount_of_lectures_assigned = 0;
-
   await Promise.all(
     Object.entries(matches).map(async ([lectureId, roles]) => {
       await Promise.all(
@@ -88,10 +94,16 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
                 role
               );
               amount_of_lectures_assigned += 1;
+              const is_technology_teacher =
+                role === SubjectRoles.TECHNOLOGY &&
+                lectureIdsOfSubjectsIdsWithTecTeoAtSameTime.includes(
+                  Number(lectureId)
+                );
               await setTeacherToLecture(
                 Number(lectureId),
                 Number(teacherId),
-                role
+                role,
+                is_technology_teacher
               );
             })
           );
@@ -101,6 +113,25 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   );
   response.amount_of_lectures_assigned = amount_of_lectures_assigned;
   return response;
+}
+
+function setNumberOfTeacherToLockedLectures(
+  preassigned: { [lectureId: string]: { [role: string]: string[] } },
+  assignPayload: AssignPayload
+) {
+  for (const lectureId in preassigned) {
+    for (const role in preassigned[lectureId]) {
+      const lectureToAssign = assignPayload.classes[
+        Number(lectureId)
+      ].subClasses.find((subclass) => {
+        return subclass.role === role;
+      });
+      if (lectureToAssign) {
+        lectureToAssign.num_teachers = preassigned[lectureId][role].length;
+        console.log(lectureToAssign.num_teachers);
+      }
+    }
+  }
 }
 
 async function sendAssignation(
@@ -133,7 +164,7 @@ async function sendAssignation(
       // Throw a custom error with detailed information
       throw new Error(
         `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
-          JSON.stringify(error.response?.data) || 'No additional error details.'
+          JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {
@@ -227,7 +258,11 @@ async function getTeachersLectureConflicts(semesterId: number) {
         if (!isTeacherAvailableAtLectureTime(teacher, role)) {
           teachersBusyAtLectureTime.push(teacher, role);
         }
-        if (!canTeacherTeachLecture(teacher, lecture.subject, role)) {
+        let roleString = role.role;
+        if (t.is_technology_teacher) {
+          roleString = SubjectRoles.TECHNOLOGY;
+        }
+        if (!canTeacherTeachLecture(teacher, lecture.subject, roleString)) {
           teachersDoNotKnowSubject.push(teacher, lecture.subject, role);
         }
       });
@@ -271,7 +306,7 @@ function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
 function canTeacherTeachLecture(
   teacher: TeacherResponseDto,
   subject: any,
-  role: LectureRoleResponseDto
+  role: string
 ) {
   const subjectHeKnowHowToTeach = getSubjectHeKnowHowToTeach(teacher);
   if (!subjectHeKnowHowToTeach) {
@@ -280,7 +315,7 @@ function canTeacherTeachLecture(
   return subjectHeKnowHowToTeach.some((subjectHeKnow) => {
     return (
       subjectHeKnow.subject === subject.id.toString() &&
-      subjectHeKnow.role.includes(role.role)
+      subjectHeKnow.role.includes(role)
     );
   });
 }

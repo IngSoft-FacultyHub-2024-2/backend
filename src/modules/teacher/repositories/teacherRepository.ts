@@ -13,6 +13,8 @@ import TeacherSubjectGroup from './models/TeacherSubjectGroup';
 import TeacherSubjectGroupMember from './models/TeacherSubjectGroupMember';
 import TeacherSubjectHistory from './models/TeacherSubjectHistory';
 import TeacherSubjectOfInterest from './models/TeacherSubjectOfInterest';
+import fs from 'fs';
+import path from 'path';
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -101,6 +103,86 @@ class TeacherRepository {
     }
   }
 
+  async getTeachersContacts(
+    search?: string,
+    state?: TeacherStates,
+    risk?: number,
+    subject_id?: number
+  ) {
+    const searchQuery = search
+      ? {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
+      : {};
+
+    const stateQuery = state ? { state } : {};
+    const riskQuery = risk ? { unsubscribe_risk: risk } : {};
+
+    const subjectInclude = subject_id
+      ? {
+        model: TeacherSubjectHistory,
+        as: 'subjects_history',
+        where: { subject_id },
+        required: true,
+      }
+      : { model: TeacherSubjectHistory, as: 'subjects_history' };
+
+    const whereClause = {
+      ...searchQuery,
+      ...stateQuery,
+      ...riskQuery,
+    };
+
+    const teachers = await Teacher.findAll({
+      where: whereClause,
+      include: [
+        { model: Contact, as: 'contacts' },
+        subjectInclude,
+      ],
+    });
+
+    const contactsFilePath = await this.generateContactsCsv(teachers);
+
+    return contactsFilePath;
+  }
+
+  generateContactsCsv = async (teachers: Teacher[]) => {
+    try {
+      const contacts = teachers
+        .flatMap(teacher => teacher.contacts || [])
+        .map(contact => {
+          const { prefered, data } = contact;
+          return prefered ? data : undefined;
+        })
+        .filter((contact): contact is string => Boolean(contact)); // Filtrar valores `undefined`
+
+      // Convertir los contactos en formato CSV
+      const csvRows = ['Contactos'];
+      contacts.forEach(contact => {
+        csvRows.push(contact); // Añadir cada contacto como una fila
+      });
+
+      const csvString = csvRows.join('\n');
+
+      // Escribir el archivo CSV
+      const date = new Date().toISOString().replace(/:/g, '-');
+      const filePath = `./contacts-${date}.csv`;
+      fs.writeFileSync(filePath, csvString, 'utf8');
+
+      const absoluteFilePath = path.resolve(filePath);
+      return absoluteFilePath;
+    } catch (error) {
+      console.error('Error generating contacts CSV file:', error);
+    }
+  };
+
   async getTeachers(
     limit: number,
     offset: number,
@@ -117,15 +199,15 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${search}%` } },
-            { surname: { [Op.iLike]: `%${search}%` } },
-            sequelize.where(
-              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-          ],
-        }
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -133,11 +215,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-          model: TeacherSubjectHistory,
-          as: 'subjects_history',
-          where: { subject_id },
-          required: true,
-        }
+        model: TeacherSubjectHistory,
+        as: 'subjects_history',
+        where: { subject_id },
+        required: true,
+      }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
     console.log('subjectQuery', subjectInclude);
 

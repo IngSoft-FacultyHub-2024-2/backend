@@ -1,130 +1,186 @@
-import express, { Application } from 'express';
+import { Request, Response } from 'express';
 import userManagementController from '../../src/controllers/userManagmentController';
+import inputUpdatePasswordSchema from '../../src/controllers/validationSchemas/userSchemas/inputUpdatePassworSchema';
 import inputUserSchema from '../../src/controllers/validationSchemas/userSchemas/inputUserSchema';
-import { createUser } from '../../src/modules/userManagement';
+import {
+  createUser,
+  getRoles,
+  getUserById,
+  getUsers,
+  updatePassword,
+} from '../../src/modules/userManagement';
+import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
-// Mock de los módulos usados
-jest.mock('../modules/userManagement');
-jest.mock('../shared/utils/exceptions/handleExceptions');
+jest.mock('../../src/modules/userManagement');
+jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 jest.mock(
-  '../controllers/validationSchemas/userSchemas/inputUpdatePassworSchema'
+  '../../src/controllers/validationSchemas/userSchemas/inputUpdatePassworSchema'
 );
-jest.mock('../controllers/validationSchemas/userSchemas/inputUserSchema');
-
-const app: Application = express();
-app.use(express.json());
-
-app.post('/users', (req, res) => userManagementController.createUser(req, res));
-app.get('/users', (req, res) => userManagementController.getUsers(req, res));
-app.get('/users/:id', (req, res) =>
-  userManagementController.getUserById(req, res)
-);
-app.put('/users/:id/password', (req, res) =>
-    userManagementController.updatePassword(req, res)
+jest.mock(
+  '../../src/controllers/validationSchemas/userSchemas/inputUserSchema'
 );
 
-describe('User Management Controller', () => {
+describe('UserManagementController', () => {
+  const mockRes = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as unknown as Response;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('createUser', () => {
-    it('debería crear un usuario y retornar 201', async () => {
-      const mockUser = { teacherId: 1, password: '123456' };
-      (inputUserSchema.validate as jest.Mock).mockResolvedValue(mockUser);
-      (createUser as jest.Mock).mockResolvedValue({ id: 1, ...mockUser });
+    const mockReq = {
+      body: { username: 'johndoe', password: 'password123', role: 'admin' },
+    } as Request;
 
-      const response = await request(app).post('/users').send(mockUser);
+    it('should create a user successfully', async () => {
+      (inputUserSchema.validate as jest.Mock).mockResolvedValue(mockReq.body);
+      (createUser as jest.Mock).mockResolvedValue({ id: 1, ...mockReq.body });
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual({ id: 1, ...mockUser });
-      expect(inputUserSchema.validate).toHaveBeenCalledWith(mockUser);
-      expect(createUser).toHaveBeenCalledWith(mockUser);
+      await userManagementController.createUser(mockReq, mockRes);
+
+      expect(createUser).toHaveBeenCalledWith(mockReq.body);
+      expect(mockRes.status).toHaveBeenCalledWith(201);
+      expect(mockRes.json).toHaveBeenCalledWith({ id: 1, ...mockReq.body });
     });
 
-    it('debería retornar error 400 si la validación falla', async () => {
-      const validationError = new Error('Invalid input');
-      (inputUserSchema.validate as jest.Mock).mockRejectedValue(
-        validationError
-      );
+    it('should handle validation errors', async () => {
+      const error = new Error('Validation failed');
+      (inputUserSchema.validate as jest.Mock).mockRejectedValue(error);
 
-      const response = await request(app).post('/users').send({});
+      await userManagementController.createUser(mockReq, mockRes);
 
-      expect(response.status).toBe(500);
-      expect(returnError).toHaveBeenCalled();
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
+    });
+
+    it('should handle errors during user creation', async () => {
+      const error = new Error('Database error');
+      (inputUserSchema.validate as jest.Mock).mockResolvedValue(mockReq.body);
+      (createUser as jest.Mock).mockRejectedValue(error);
+
+      await userManagementController.createUser(mockReq, mockRes);
+
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
     });
   });
 
   describe('getUsers', () => {
-    it('debería retornar una lista de usuarios y status 200', async () => {
-      const mockUsers = [{ id: 1 }, { id: 2 }];
+    const mockReq = { query: {} } as Request;
+
+    it('should return a list of users', async () => {
+      const mockUsers = [{ id: 1, username: 'johndoe', role: 'admin' }];
       (getUsers as jest.Mock).mockResolvedValue(mockUsers);
 
-      const response = await request(app).get('/users');
+      await userManagementController.getUsers(mockReq, mockRes);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockUsers);
       expect(getUsers).toHaveBeenCalled();
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockUsers);
     });
 
-    it('debería manejar errores y llamar a returnError', async () => {
+    it('should handle errors when fetching users', async () => {
       const error = new Error('Database error');
       (getUsers as jest.Mock).mockRejectedValue(error);
 
-      const response = await request(app).get('/users');
+      await userManagementController.getUsers(mockReq, mockRes);
 
-      expect(response.status).toBe(500);
-      expect(returnError).toHaveBeenCalled();
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
     });
   });
 
   describe('getUserById', () => {
-    it('debería retornar un usuario existente y status 200', async () => {
-      const mockUser = { id: 1, teacherId: 1 };
+    const mockReq = { params: { id: '1' } } as unknown as Request;
+
+    it('should return user details', async () => {
+      const mockUser = { id: 1, username: 'johndoe', role: 'admin' };
       (getUserById as jest.Mock).mockResolvedValue(mockUser);
 
-      const response = await request(app).get('/users/1');
+      await userManagementController.getUserById(mockReq, mockRes);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockUser);
       expect(getUserById).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockUser);
     });
 
-    it('debería manejar errores si el usuario no existe', async () => {
-      (getUserById as jest.Mock).mockRejectedValue(new Error('User not found'));
+    it('should handle errors when fetching user by ID', async () => {
+      const error = new Error('Database error');
+      (getUserById as jest.Mock).mockRejectedValue(error);
 
-      const response = await request(app).get('/users/99');
+      await userManagementController.getUserById(mockReq, mockRes);
 
-      expect(response.status).toBe(500);
-      expect(returnError).toHaveBeenCalled();
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
     });
   });
 
   describe('updatePassword', () => {
-    it('debería actualizar la contraseña y retornar 200', async () => {
-      (inputUpdatePasswordSchema.validate as jest.Mock).mockResolvedValue({});
-      (updatePassword as jest.Mock).mockResolvedValue();
+    const mockReq = {
+      params: { id: '1' },
+      body: { old_password: 'oldpass', new_password: 'newpass123' },
+    } as any;
 
-      const response = await request(app)
-        .put('/users/1/password')
-        .send({ oldPassword: '123456', newPassword: '654321' });
+    it('should update the password successfully', async () => {
+      (inputUpdatePasswordSchema.validate as jest.Mock).mockResolvedValue(
+        mockReq.body
+      );
+      (updatePassword as jest.Mock).mockResolvedValue(undefined);
 
-      expect(response.status).toBe(200);
-      expect(updatePassword).toHaveBeenCalledWith(1, '123456', '654321');
+      await userManagementController.updatePassword(mockReq, mockRes);
+
+      expect(updatePassword).toHaveBeenCalledWith(
+        1,
+        mockReq.body.old_password,
+        mockReq.body.new_password
+      );
+      expect(mockRes.status).toHaveBeenCalledWith(200);
     });
 
-    it('debería retornar error si la validación de contraseña falla', async () => {
-      const validationError = new Error('Invalid password');
+    it('should handle validation errors', async () => {
+      const error = new Error('Validation failed');
       (inputUpdatePasswordSchema.validate as jest.Mock).mockRejectedValue(
-        validationError
+        error
       );
 
-      const response = await request(app)
-        .put('/users/1/password')
-        .send({ oldPassword: '', newPassword: '654321' });
+      await userManagementController.updatePassword(mockReq, mockRes);
 
-      expect(response.status).toBe(500);
-      expect(returnError).toHaveBeenCalled();
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
+    });
+
+    it('should handle errors during password update', async () => {
+      const error = new Error('Database error');
+      (inputUpdatePasswordSchema.validate as jest.Mock).mockResolvedValue(
+        mockReq.body
+      );
+      (updatePassword as jest.Mock).mockRejectedValue(error);
+
+      await userManagementController.updatePassword(mockReq, mockRes);
+
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
+    });
+  });
+
+  describe('getRoles', () => {
+    const mockReq = {} as Request;
+
+    it('should return a list of roles', async () => {
+      const mockRoles = ['admin', 'user', 'moderator'];
+      (getRoles as jest.Mock).mockResolvedValue(mockRoles);
+
+      await userManagementController.getRoles(mockReq, mockRes);
+
+      expect(getRoles).toHaveBeenCalled();
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockRoles);
+    });
+
+    it('should handle errors when fetching roles', async () => {
+      const error = new Error('Database error');
+      (getRoles as jest.Mock).mockRejectedValue(error);
+
+      await userManagementController.getRoles(mockReq, mockRes);
+
+      expect(returnError).toHaveBeenCalledWith(mockRes, error);
     });
   });
 });

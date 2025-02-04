@@ -13,7 +13,7 @@ export async function createUser(user: Partial<User>) {
   if (userExist) {
     throw new Error('El usuario de este docente ya existe');
   }
-
+  console.log(user);
   const hashedPassword = await bcrypt.hash(user.password!, 10);
   user.password = hashedPassword;
   user.teacher_employee_number = teacher.employee_number!;

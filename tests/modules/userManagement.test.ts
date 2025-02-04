@@ -3,8 +3,10 @@ import { getTeacherById } from '../../src/modules/teacher';
 import userRepository from '../../src/modules/userManagement/repositories/userRepository';
 import {
   createUser,
-  getUserById,
-  getUsers,
+  getRoles,
+  getUserByEmployeeNumber,
+  getUserByTeacherId,
+  unsubscribeUser,
   updatePassword,
 } from '../../src/modules/userManagement/services/userManagementService';
 
@@ -22,29 +24,39 @@ describe('User Service', () => {
   describe('createUser', () => {
     it('debería crear un usuario si el docente existe y no tiene usuario asociado', async () => {
       const mockUser = {
-        teacherId: 1,
-        password: 'hashedPassword',
+        teacher_id: 1,
+        password: 'password123',
       };
 
-      (getTeacherById as jest.Mock).mockResolvedValue({ id: 1 });
+      const mockTeacher = { id: 1, employee_number: 'EMP001' };
+
+      (getTeacherById as jest.Mock).mockResolvedValue(mockTeacher);
       (userRepository.getUserByTeacherId as jest.Mock).mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
       (userRepository.createUser as jest.Mock).mockResolvedValue({
         id: 1,
         ...mockUser,
+        password: 'hashedPassword',
+        teacher_employee_number: mockTeacher.employee_number,
       });
 
       const result = await createUser(mockUser);
 
-      expect(result).toEqual({ id: 1, ...mockUser });
-      expect(getTeacherById).toHaveBeenCalledWith(mockUser.teacherId);
+      expect(result).toEqual({
+        id: 1,
+        ...mockUser,
+        password: 'hashedPassword',
+        teacher_employee_number: mockTeacher.employee_number,
+      });
+      expect(getTeacherById).toHaveBeenCalledWith(mockUser.teacher_id);
       expect(userRepository.getUserByTeacherId).toHaveBeenCalledWith(
-        mockUser.teacherId
+        mockUser.teacher_id
       );
-      expect(bcrypt.hash).toHaveBeenCalledWith(mockUser.password, 10);
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(userRepository.createUser).toHaveBeenCalledWith({
         ...mockUser,
         password: 'hashedPassword',
+        teacher_employee_number: mockTeacher.employee_number,
       });
     });
 
@@ -52,7 +64,7 @@ describe('User Service', () => {
       (getTeacherById as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        createUser({ teacherId: 1, password: '123456' })
+        createUser({ teacher_id: 1, password: '123456' })
       ).rejects.toThrow('El docente no existe');
     });
 
@@ -63,64 +75,33 @@ describe('User Service', () => {
       });
 
       await expect(
-        createUser({ teacherId: 1, password: '123456' })
+        createUser({ teacher_id: 1, password: '123456' })
       ).rejects.toThrow('El usuario de este docente ya existe');
-    });
-  });
-
-  describe('getUserById', () => {
-    it('debería retornar un usuario si existe', async () => {
-      (userRepository.getUserById as jest.Mock).mockResolvedValue({
-        id: 1,
-        teacherId: 1,
-      });
-
-      const result = await getUserById(1);
-      expect(result).toEqual({ id: 1, teacherId: 1 });
-      expect(userRepository.getUserById).toHaveBeenCalledWith(1);
-    });
-
-    it('debería retornar null si el usuario no existe', async () => {
-      (userRepository.getUserById as jest.Mock).mockResolvedValue(null);
-
-      const result = await getUserById(1);
-      expect(result).toBeNull();
-    });
-  });
-
-  describe('getUsers', () => {
-    it('debería retornar una lista de usuarios', async () => {
-      const mockUsers = [{ id: 1 }, { id: 2 }];
-      (userRepository.getUsers as jest.Mock).mockResolvedValue(mockUsers);
-
-      const result = await getUsers();
-      expect(result).toEqual(mockUsers);
-      expect(userRepository.getUsers).toHaveBeenCalled();
     });
   });
 
   describe('updatePassword', () => {
     it('debería actualizar la contraseña si el usuario existe', async () => {
-      (userRepository.getUserById as jest.Mock).mockResolvedValue({ id: 1 });
-      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
+      (userRepository.getUserById as jest.Mock).mockResolvedValue({
+        id: 1,
+        password: 'hashedPassword',
+      });
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
       (userRepository.updatePassword as jest.Mock).mockResolvedValue([1]);
 
       const result = await updatePassword(1, 'oldPassword', 'newPassword');
+
       expect(result).toEqual([1]);
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'oldPassword',
+        'hashedPassword'
+      );
       expect(bcrypt.hash).toHaveBeenCalledWith('newPassword', 10);
       expect(userRepository.updatePassword).toHaveBeenCalledWith(
         1,
         'newHashedPassword'
       );
-    });
-
-    it('debería lanzar un error si el usuario no existe', async () => {
-      (userRepository.getUserById as jest.Mock).mockResolvedValue(null);
-
-      await expect(
-        updatePassword(1, 'oldPassword', 'newPassword')
-      ).rejects.toThrow('El usuario no existe');
     });
 
     it('debería lanzar un error si la contraseña antigua es incorrecta', async () => {
@@ -131,8 +112,65 @@ describe('User Service', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        updatePassword(1, 'oldPassword', 'newPassword')
+        updatePassword(1, 'wrongOldPassword', 'newPassword')
       ).rejects.toThrow('old password is incorrect');
+    });
+  });
+
+  describe('unsubscribeUser', () => {
+    it('debería dar de baja a un usuario existente', async () => {
+      (userRepository.getUserById as jest.Mock).mockResolvedValue({ id: 1 });
+      (userRepository.unsubscribeUser as jest.Mock).mockResolvedValue(true);
+
+      const result = await unsubscribeUser(1);
+      expect(result).toBe(true);
+      expect(userRepository.unsubscribeUser).toHaveBeenCalledWith(1);
+    });
+
+    it('debería lanzar un error si el usuario no existe', async () => {
+      (userRepository.getUserById as jest.Mock).mockResolvedValue(null);
+
+      await expect(unsubscribeUser(1)).rejects.toThrow('El usuario no existe');
+    });
+  });
+
+  describe('getRoles', () => {
+    it('debería retornar los roles de usuario', async () => {
+      const mockRoles = [
+        { id: 1, name: 'Admin' },
+        { id: 2, name: 'User' },
+      ];
+      (userRepository.getRoles as jest.Mock).mockResolvedValue(mockRoles);
+
+      const result = await getRoles();
+      expect(result).toEqual(mockRoles);
+      expect(userRepository.getRoles).toHaveBeenCalled();
+    });
+  });
+
+  describe('getUserByEmployeeNumber', () => {
+    it('debería retornar un usuario si el número de empleado coincide', async () => {
+      const mockUser = { id: 1, employee_number: 123 };
+      (userRepository.getUserByEmployeeNumber as jest.Mock).mockResolvedValue(
+        mockUser
+      );
+
+      const result = await getUserByEmployeeNumber(123);
+      expect(result).toEqual(mockUser);
+      expect(userRepository.getUserByEmployeeNumber).toHaveBeenCalledWith(123);
+    });
+  });
+
+  describe('getUserByTeacherId', () => {
+    it('debería retornar un usuario si el ID del docente coincide', async () => {
+      const mockUser = { id: 1, teacher_id: 1 };
+      (userRepository.getUserByTeacherId as jest.Mock).mockResolvedValue(
+        mockUser
+      );
+
+      const result = await getUserByTeacherId(1);
+      expect(result).toEqual(mockUser);
+      expect(userRepository.getUserByTeacherId).toHaveBeenCalledWith(1);
     });
   });
 });

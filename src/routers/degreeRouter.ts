@@ -5,8 +5,8 @@ import { authMiddleware } from '../middlewares/authMiddleware';
 const router = Router();
 
 router.post('/', authMiddleware, DegreeController.addDegree);
-router.get('/', DegreeController.getDegrees);
-router.put('/:id', DegreeController.updateDegree);
-router.delete('/:id', DegreeController.deleteDegree);
+router.get('/', authMiddleware, DegreeController.getDegrees);
+router.put('/:id', authMiddleware, DegreeController.updateDegree);
+router.delete('/:id', authMiddleware, DegreeController.deleteDegree);
 
 export default router;

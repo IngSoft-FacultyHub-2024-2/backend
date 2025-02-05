@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import DegreeController from '../controllers/degreeController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.post('/', DegreeController.addDegree);
-router.get('/', DegreeController.getDegrees);
-router.put('/:id', DegreeController.updateDegree);
-router.delete('/:id', DegreeController.deleteDegree);
+router.post('/', authMiddleware, DegreeController.addDegree);
+router.get('/', authMiddleware, DegreeController.getDegrees);
+router.put('/:id', authMiddleware, DegreeController.updateDegree);
+router.delete('/:id', authMiddleware, DegreeController.deleteDegree);
 
 export default router;

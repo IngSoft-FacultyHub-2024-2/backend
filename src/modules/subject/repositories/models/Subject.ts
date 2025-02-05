@@ -1,16 +1,16 @@
 import {
-  Model,
+  BelongsTo,
+  BelongsToMany,
   DataTypes,
   HasMany,
-  BelongsToMany,
-  BelongsTo,
   HasManySetAssociationsMixin,
+  Model,
 } from 'sequelize';
 import sequelize from '../../../../config/database';
 import HourConfig from './HourConfig';
 import Need from './Need';
-import SubjectEvent from './SubjectEvent';
 import StudyPlan from './StudyPlan';
+import SubjectEvent from './SubjectEvent';
 
 // TODO: UNCOMMENT THE REFERENCE FOR THE ASSOCIATED TEACHER AND COORDINATOR
 class Subject extends Model {
@@ -141,7 +141,6 @@ Subject.init(
               0
             )
           : 0;
-        console.log(totalHours, hourConfigsTotal);
         if (totalHours !== hourConfigsTotal) {
           throw new Error(
             'La suma de las horas totales docentes debe ser igual a la cantidad de horas totales configuradas que se van a dictar'

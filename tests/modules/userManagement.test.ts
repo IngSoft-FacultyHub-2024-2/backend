@@ -89,6 +89,11 @@ describe('User Service', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
       (userRepository.updatePassword as jest.Mock).mockResolvedValue([1]);
+      (userRepository.getUserByEmployeeNumber as jest.Mock).mockResolvedValue({
+        id: 1,
+        teacher_employee_number: 'EMP001',
+        password: 'hashedPassword',
+      });
 
       const result = await updatePassword(1, 'oldPassword', 'newPassword');
 
@@ -105,7 +110,7 @@ describe('User Service', () => {
     });
 
     it('debería lanzar un error si la contraseña antigua es incorrecta', async () => {
-      (userRepository.getUserById as jest.Mock).mockResolvedValue({
+      (userRepository.getUserByEmployeeNumber as jest.Mock).mockResolvedValue({
         id: 1,
         password: 'hashedPassword',
       });
@@ -113,7 +118,7 @@ describe('User Service', () => {
 
       await expect(
         updatePassword(1, 'wrongOldPassword', 'newPassword')
-      ).rejects.toThrow('old password is incorrect');
+      ).rejects.toThrow('La contraseña ingresada no coincide con la actual');
     });
   });
 

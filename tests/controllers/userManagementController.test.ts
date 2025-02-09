@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import userManagementController from '../../src/controllers/userManagmentController';
-import inputUpdatePasswordSchema from '../../src/controllers/validationSchemas/userSchemas/inputUpdatePassworSchema';
+import inputUpdatePasswordSchema from '../../src/controllers/validationSchemas/userSchemas/inputUpdatePasswordSchema';
 import inputUserSchema from '../../src/controllers/validationSchemas/userSchemas/inputUserSchema';
 import {
   createUser,
@@ -14,7 +14,7 @@ import { returnError } from '../../src/shared/utils/exceptions/handleExceptions'
 jest.mock('../../src/modules/userManagement');
 jest.mock('../../src/shared/utils/exceptions/handleExceptions');
 jest.mock(
-  '../../src/controllers/validationSchemas/userSchemas/inputUpdatePassworSchema'
+  '../../src/controllers/validationSchemas/userSchemas/inputUpdatePasswordSchema'
 );
 jest.mock(
   '../../src/controllers/validationSchemas/userSchemas/inputUserSchema'
@@ -94,7 +94,11 @@ describe('UserManagementController', () => {
     const mockReq = { params: { id: '1' } } as unknown as Request;
 
     it('should return user details', async () => {
-      const mockUser = { id: 1, username: 'johndoe', role: 'admin' };
+      const mockUser = {
+        teacher_employee_number: 1,
+        username: 'johndoe',
+        role: 'admin',
+      };
       (getUserById as jest.Mock).mockResolvedValue(mockUser);
 
       await userManagementController.getUserById(mockReq, mockRes);
@@ -116,8 +120,11 @@ describe('UserManagementController', () => {
 
   describe('updatePassword', () => {
     const mockReq = {
-      params: { id: '1' },
-      body: { old_password: 'oldpass', new_password: 'newpass123' },
+      body: {
+        teacher_employee_number: 1,
+        old_password: 'oldpass',
+        new_password: 'newpass123',
+      },
     } as any;
 
     it('should update the password successfully', async () => {

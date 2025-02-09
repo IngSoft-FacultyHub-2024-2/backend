@@ -155,13 +155,7 @@ class TeacherRepository {
       const contacts = teachers
         .flatMap((teacher) => {
           if (teacher.contacts) {
-            const preferedEmailContact = teacher.contacts.find(
-              (contact) => contact.prefered && contact.mean === 'Mail'
-            );
-            if (preferedEmailContact) {
-              return preferedEmailContact.data;
-            }
-            // prefered contacn mean is not an email, add all emails
+            // Get all emails
             return teacher.contacts
               .filter((contact) => contact.mean === 'Mail')
               .map((contact) => contact.data);

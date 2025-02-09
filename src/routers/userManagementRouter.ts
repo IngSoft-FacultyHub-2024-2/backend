@@ -8,7 +8,8 @@ router.get('/roles', authMiddleware, userManagmentController.getRoles);
 
 router.get('/', authMiddleware, userManagmentController.getUsers);
 router.post('/', userManagmentController.createUser);
-router.put('/:id', authMiddleware, userManagmentController.updatePassword);
+router.put('/update-password', userManagmentController.updatePassword);
 router.get('/:id', authMiddleware, userManagmentController.getUserById);
+router.put('/:id', authMiddleware, userManagmentController.updateUser);
 
 export default router;

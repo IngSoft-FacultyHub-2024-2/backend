@@ -140,6 +140,23 @@ class userRepository {
   async getRoles() {
     return await Role.findAll();
   }
+
+  async updateUser(id: number, role_id: number, password?: string) {
+    // console.log(user);
+    // console.log(id);
+
+    return await User.update(
+      {
+        role_id,
+        password,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  }
 }
 
 export default new userRepository();

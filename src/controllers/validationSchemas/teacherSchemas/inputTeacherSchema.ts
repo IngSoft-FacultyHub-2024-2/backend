@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import inputCaesCourseSchema from './inputCaesCourseSchema';
 import inputContactSchema from './inputContactSchema';
 import inputPrizeSchema from './inputPrizeSchema';
-import inputSubjectSchema from './inputSubjectSchema';
+import subjectsHistorySchema from './inputSubjectSchema';
 import inputTeacherAvailableModuleSchema from './inputTeacherAvailableModuleSchema';
 import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
 
@@ -52,7 +52,7 @@ const inputTeacherSchema = yup.object().shape({
       })
     )
     .nullable(),
-  subjects_history: yup.array().of(inputSubjectSchema).nullable(),
+  subjects_history: subjectsHistorySchema.nullable(),
   subjects_of_interest: yup
     .array()
     .of(

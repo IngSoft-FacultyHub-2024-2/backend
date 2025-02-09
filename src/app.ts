@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import sequelize from './config/database';
+import assignTeachersToLecturesRouter from './routers/assignTeachersToLecturesRouter';
+import authRouter from './routers/authRouter';
 import degreeRouter from './routers/degreeRouter';
 import eventRouter from './routers/eventRouter';
 import fileProcessorRouter from './routers/fileProcessorRouter';
@@ -9,7 +11,7 @@ import semesterRouter from './routers/semesterRouter';
 import studyPlanRouter from './routers/studyPlanRouter';
 import subjectRouter from './routers/subjectRouter';
 import teacherRouter from './routers/teacherRouter';
-import assignTeachersToLecturesRouter from './routers/assignTeachersToLecturesRouter';
+import userManagementRouter from './routers/userManagementRouter';
 
 const logger = require('morgan');
 const cors = require('cors');
@@ -19,11 +21,21 @@ dotenv.config();
 const express = require('express');
 
 const app = express();
-app.use(
-  cors({
-    origin: '*',
-  })
-);
+
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Access-Control-Allow-Credentials',
+  ],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(logger('dev'));
 
@@ -37,6 +49,8 @@ app.use('/api/file-processor', fileProcessorRouter);
 app.use('/api/semesters', semesterRouter);
 app.use('/api/degrees', degreeRouter);
 app.use('/api/assignTeachersToLectures', assignTeachersToLecturesRouter);
+app.use('/api/users', userManagementRouter);
+app.use('/api/auth', authRouter);
 
 const PORT = process.env.PORT || 3000;
 

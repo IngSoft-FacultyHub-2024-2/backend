@@ -157,6 +157,10 @@ class userRepository {
       }
     );
   }
+
+  async getRoleById(id: number) {
+    return await Role.findByPk(id);
+  }
 }
 
 export default new userRepository();

@@ -1,5 +1,6 @@
 import {
   createUser,
+  getRoleById,
   getRoles,
   getUserByEmployeeNumber,
   getUserById,
@@ -12,6 +13,7 @@ import {
 
 export {
   createUser,
+  getRoleById,
   getRoles,
   getUserByEmployeeNumber,
   getUserById,

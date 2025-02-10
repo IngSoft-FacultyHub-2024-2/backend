@@ -97,6 +97,10 @@ export async function getRoles() {
   return await userRepository.getRoles();
 }
 
+export async function getRoleById(id: number) {
+  return await userRepository.getRoleById(id);
+}
+
 export async function getUserByTeacherId(id: number) {
   return await userRepository.getUserByTeacherId(id);
 }

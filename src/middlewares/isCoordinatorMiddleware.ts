@@ -6,7 +6,7 @@ export async function isCoordinatorMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const role = await getRoleById(req.user.role_id);
+  const role = await getRoleById(req.user.role);
 
   if (!role) {
     return res

@@ -6,7 +6,7 @@ export async function isTeacherOwnDataMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const role = await getRoleById(req.user.role_id);
+  const role = await getRoleById(req.user.role);
 
   if (!role) {
     return res
@@ -15,7 +15,7 @@ export async function isTeacherOwnDataMiddleware(
   }
 
   if (role.name == 'teacher') {
-    const teacherId = req.user.teacher_id;
+    const teacherId = req.user.teacher_employee_number;
     const routeId = req.params.id;
 
     if (teacherId != routeId) {

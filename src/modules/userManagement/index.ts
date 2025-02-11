@@ -7,6 +7,7 @@ import {
   getUsers,
   unsubscribeUser,
   updatePassword,
+  updateUser,
 } from './services/userManagementService';
 
 export {
@@ -18,4 +19,5 @@ export {
   getUsers,
   unsubscribeUser,
   updatePassword,
+  updateUser,
 };

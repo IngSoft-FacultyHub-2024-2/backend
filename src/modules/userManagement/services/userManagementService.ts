@@ -13,11 +13,10 @@ export async function createUser(user: Partial<User>) {
   if (userExist) {
     throw new Error('El usuario de este docente ya existe');
   }
-  console.log(user);
+
   const hashedPassword = await bcrypt.hash(user.password!, 10);
   user.password = hashedPassword;
   user.teacher_employee_number = teacher.employee_number!;
-  console.log(user);
 
   return await userRepository.createUser(user);
 }
@@ -51,11 +50,11 @@ export async function getUsers(
 }
 
 export async function updatePassword(
-  id: number,
+  teacher_employee_number: number,
   oldPassword: string,
   newPassword: string
 ) {
-  const user = await getUserById(id);
+  const user = await getUserByEmployeeNumber(teacher_employee_number);
   if (!user) {
     throw new Error('El usuario no existe');
   }
@@ -63,7 +62,7 @@ export async function updatePassword(
   await comparePasswords(oldPassword, user.password);
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  return await userRepository.updatePassword(id, hashedPassword);
+  return await userRepository.updatePassword(user.id, hashedPassword);
 }
 
 async function comparePasswords(
@@ -75,7 +74,7 @@ async function comparePasswords(
     currentHashedPassword
   );
   if (!isPasswordValid) {
-    throw new Error('old password is incorrect');
+    throw new Error('La contraseña ingresada no coincide con la actual');
   }
 }
 
@@ -99,4 +98,28 @@ export async function getRoles() {
 
 export async function getUserByTeacherId(id: number) {
   return await userRepository.getUserByTeacherId(id);
+}
+
+export async function updateUser(
+  userId: number,
+  roleId: number,
+  password?: string
+) {
+  const user = await getUserById(userId);
+
+  if (!user) {
+    throw new Error('El usuario no existe');
+  }
+
+  if (password && password !== '') {
+    password = await bcrypt.hash(password, 10);
+  } else {
+    password = user.password;
+  }
+
+  user.role_id = roleId;
+
+  const resp = await userRepository.updateUser(userId, roleId, password);
+
+  return resp;
 }

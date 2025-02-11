@@ -5,9 +5,10 @@ import {
   getUserById,
   getUsers,
   updatePassword,
+  updateUser,
 } from '../modules/userManagement';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
-import inputUpdatePasswordSchema from './validationSchemas/userSchemas/inputUpdatePassworSchema';
+import inputUpdatePasswordSchema from './validationSchemas/userSchemas/inputUpdatePasswordSchema';
 import inputUserSchema from './validationSchemas/userSchemas/inputUserSchema';
 
 class userManagementController {
@@ -59,15 +60,33 @@ class userManagementController {
   }
 
   async updatePassword(req: Request, res: Response) {
+    console.log('updatePassword');
     try {
-      const userId = parseInt(req.params.id);
       await inputUpdatePasswordSchema.validate(req.body);
 
+      const teacher_employee_number = req.body.teacher_employee_number;
       const oldPassword = req.body.old_password;
       const newPassword = req.body.new_password;
 
-      await updatePassword(userId, oldPassword, newPassword);
+      await updatePassword(teacher_employee_number, oldPassword, newPassword);
       res.status(200).json();
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async updateUser(req: Request, res: Response) {
+    try {
+      await inputUpdatePasswordSchema.validate(req.body);
+
+      const userId = parseInt(req.params.id);
+      const password = req.body.password;
+      const role_id = req.body.role_id;
+
+      const user = await updateUser(userId, role_id, password);
+      res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);

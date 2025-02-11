@@ -15,7 +15,7 @@ export async function login(employee_number: number, password: string) {
   }
 
   const token = jwt.sign({ id: user.id, role: user.role_id }, SECRET_KEY, {
-    expiresIn: '1h', // Expira en 1 hora
+    expiresIn: '24h', // Expira en 1 hora
   });
 
   return { token, user };

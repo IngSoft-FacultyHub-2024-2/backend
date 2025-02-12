@@ -27,6 +27,8 @@ router.patch(
   '/:id/temporary-dismiss',
   teacherController.temporaryDismissTeacher
 );
+router.patch('/:id/rehire',
+  teacherController.rehireTeacher)
 router.put('/:id', teacherController.updateTeacher);
 
 export default router;

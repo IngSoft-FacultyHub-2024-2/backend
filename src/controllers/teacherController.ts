@@ -11,7 +11,7 @@ import {
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
-import { getTeachersContacts } from '../modules/teacher/services/teacherService';
+import { getTeachersContacts, rehireTeacher } from '../modules/teacher/services/teacherService';
 import fs from 'fs';
 
 class TeacherController {
@@ -43,6 +43,18 @@ class TeacherController {
     try {
       const teacherId = parseInt(req.params.id);
       await dismissTeacher(teacherId);
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async rehireTeacher(req: Request, res: Response) {
+    try {
+      const teacherId = parseInt(req.params.id);
+      await rehireTeacher(teacherId);
       res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {

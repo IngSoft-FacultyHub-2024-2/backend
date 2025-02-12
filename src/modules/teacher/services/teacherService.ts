@@ -125,6 +125,10 @@ export async function dismissTeacher(id: number) {
   await teacherRepository.dismissTeacher(id);
 }
 
+export async function rehireTeacher(id: number) {
+  await teacherRepository.rehireTeacher(id);
+}
+
 export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 

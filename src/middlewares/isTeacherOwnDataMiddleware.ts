@@ -15,7 +15,7 @@ export async function isTeacherOwnDataMiddleware(
   }
 
   if (role.name == 'teacher') {
-    const teacherId = req.user.teacher_employee_number;
+    const teacherId = req.user.teacher_id;
     const routeId = req.params.id;
 
     if (teacherId != routeId) {

@@ -15,6 +15,12 @@ router.post(
   teacherController.addTeacher
 );
 router.get(
+  '/:id',
+  authMiddleware,
+  isTeacherOwnDataMiddleware,
+  teacherController.getTeacherById
+);
+router.get(
   '/',
   authMiddleware,
   isCoordinatorMiddleware,
@@ -67,13 +73,6 @@ router.delete(
   authMiddleware,
   isCoordinatorMiddleware,
   categoryController.deleteCategory
-);
-
-router.get(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.getTeacherById
 );
 router.delete(
   '/:id',

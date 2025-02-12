@@ -22,7 +22,7 @@ export async function login(employee_number: number, password: string) {
     {
       id: user.id,
       role: user.role_id,
-      teacher_employee_number: user.teacher_employee_number,
+      teacher_id: user.teacher_id,
     },
     SECRET_KEY,
     {

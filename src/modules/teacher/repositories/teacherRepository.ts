@@ -316,6 +316,13 @@ class TeacherRepository {
     );
   }
 
+  async rehireTeacher(id: number) {
+    await Teacher.update(
+      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null },
+      { where: { id }, paranoid: false }
+    );
+  }
+
   async deleteTeacherSubjectGroups(id: number) {
     const groupsWhereIsMember = await TeacherSubjectGroupMember.findAll({
       where: { teacher_id: id },

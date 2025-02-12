@@ -37,6 +37,11 @@ router.patch(
   authMiddleware,
   teacherController.temporaryDismissTeacher
 );
+
+router.patch('/:id/rehire',
+  authMiddleware,teacherController.rehireTeacher)
+
 router.put('/:id', authMiddleware, teacherController.updateTeacher);
+
 
 export default router;

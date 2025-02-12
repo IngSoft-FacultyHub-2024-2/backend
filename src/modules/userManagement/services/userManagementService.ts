@@ -13,11 +13,10 @@ export async function createUser(user: Partial<User>) {
   if (userExist) {
     throw new Error('El usuario de este docente ya existe');
   }
-  console.log(user);
+
   const hashedPassword = await bcrypt.hash(user.password!, 10);
   user.password = hashedPassword;
   user.teacher_employee_number = teacher.employee_number!;
-  console.log(user);
 
   return await userRepository.createUser(user);
 }
@@ -110,9 +109,8 @@ export async function updateUser(
   roleId: number,
   password?: string
 ) {
-  console.log(userId, roleId, password);
   const user = await getUserById(userId);
-  console.log(userId);
+
   if (!user) {
     throw new Error('El usuario no existe');
   }

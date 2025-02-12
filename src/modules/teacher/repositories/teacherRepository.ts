@@ -111,15 +111,15 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -127,11 +127,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
@@ -142,10 +142,7 @@ class TeacherRepository {
 
     const teachers = await Teacher.findAll({
       where: whereClause,
-      include: [
-        { model: Contact, as: 'contacts' },
-        subjectInclude,
-      ],
+      include: [{ model: Contact, as: 'contacts' }, subjectInclude],
     });
 
     const contactsFilePath = await this.generateContactsCsv(teachers);
@@ -156,16 +153,19 @@ class TeacherRepository {
   generateContactsCsv = async (teachers: Teacher[]) => {
     try {
       const contacts = teachers
-        .flatMap(teacher => teacher.contacts || [])
-        .map(contact => {
-          const { prefered, data } = contact;
-          return prefered ? data : undefined;
+        .flatMap((teacher) => {
+          if (teacher.contacts) {
+            // Get all emails
+            return teacher.contacts
+              .filter((contact) => contact.mean === 'Mail')
+              .map((contact) => contact.data);
+          }
         })
-        .filter((contact): contact is string => Boolean(contact)); // Filtrar valores `undefined`
+        .filter((contact): contact is string => Boolean(contact));
 
       // Convertir los contactos en formato CSV
       const csvRows = ['Contactos'];
-      contacts.forEach(contact => {
+      contacts.forEach((contact) => {
         csvRows.push(contact); // Añadir cada contacto como una fila
       });
 
@@ -199,15 +199,15 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -215,11 +215,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
     console.log('subjectQuery', subjectInclude);
 

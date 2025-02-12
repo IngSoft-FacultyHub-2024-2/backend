@@ -113,6 +113,7 @@ class SubjectRepository {
 
   async getAllSubjectNames() {
     return await Subject.findAll({
+      where: { valid: true },
       attributes: [
         'id',
         'name',

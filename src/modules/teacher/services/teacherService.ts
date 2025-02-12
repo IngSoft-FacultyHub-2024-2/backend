@@ -2,6 +2,7 @@ import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../subject';
+import { getUserByTeacherId, unsubscribeUser } from '../../userManagement';
 import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
@@ -21,7 +22,7 @@ export async function getTeachersContacts(
   search?: string,
   state?: TeacherStates,
   risk?: number,
-  subject_id?: number,
+  subject_id?: number
 ) {
   return await teacherRepository.getTeachersContacts(
     search,
@@ -116,13 +117,19 @@ export async function dismissTeacher(id: number) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
   await teacherRepository.dismissTeacher(id);
+
+  const user = await getUserByTeacherId(id);
+
+  if (user) {
+    await unsubscribeUser(user.id);
+  }
 }
 
 export async function rehireTeacher(id: number) {
@@ -135,13 +142,19 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
+
+  const user = await getUserByTeacherId(id);
+
+  if (user) {
+    await unsubscribeUser(user.id);
+  }
 }
 
 export async function getTeachersToAssignLectures() {

@@ -8,33 +8,7 @@ import { isTeacherOwnDataMiddleware } from '../middlewares/isTeacherOwnDataMiddl
 
 const router = Router();
 
-router.post(
-  '/',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.addTeacher
-);
-router.get(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.getTeacherById
-);
-router.get(
-  '/',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.getTeachers
-);
-router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
-
-router.get(
-  '/contacts',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.getTeachersContacts
-);
-
+// Beneficios
 router.get('/benefits', authMiddleware, benefitController.getBenefits);
 router.post(
   '/benefits',
@@ -55,6 +29,7 @@ router.delete(
   benefitController.deleteBenefit
 );
 
+// Categorías
 router.get('/categories', authMiddleware, categoryController.getCategories);
 router.post(
   '/categories',
@@ -73,6 +48,33 @@ router.delete(
   authMiddleware,
   isCoordinatorMiddleware,
   categoryController.deleteCategory
+);
+
+// Profesores
+router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
+router.get(
+  '/contacts',
+  authMiddleware,
+  isCoordinatorMiddleware,
+  teacherController.getTeachersContacts
+);
+router.post(
+  '/',
+  authMiddleware,
+  isCoordinatorMiddleware,
+  teacherController.addTeacher
+);
+router.get(
+  '/',
+  authMiddleware,
+  isCoordinatorMiddleware,
+  teacherController.getTeachers
+);
+router.get(
+  '/:id',
+  authMiddleware,
+  isTeacherOwnDataMiddleware,
+  teacherController.getTeacherById
 );
 router.delete(
   '/:id',

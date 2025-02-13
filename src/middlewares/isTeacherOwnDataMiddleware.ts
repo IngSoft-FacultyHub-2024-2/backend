@@ -14,7 +14,7 @@ export async function isTeacherOwnDataMiddleware(
       .json({ message: 'Acceso denegado, rol no encontrado' });
   }
 
-  if (role.name == 'teacher') {
+  if (role.dataValues.name == 'teacher') {
     const teacherId = req.user.teacher_id;
     const routeId = req.params.id;
 

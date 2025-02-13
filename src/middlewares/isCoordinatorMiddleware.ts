@@ -14,7 +14,7 @@ export async function isCoordinatorMiddleware(
       .json({ message: 'Acceso denegado, rol no encontrado' });
   }
 
-  if (role.name !== 'coordinator') {
+  if (role.dataValues.name !== 'coordinator') {
     return res
       .status(403)
       .json({ message: 'Acceso denegado, solo coordinadores' });

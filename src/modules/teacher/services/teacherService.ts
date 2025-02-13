@@ -2,7 +2,7 @@ import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../subject';
-import { getUserByTeacherId, unsubscribeUser } from '../../userManagement';
+import { getUserByTeacherId, unsubscribeUser, subscribeUser } from '../../userManagement';
 import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
@@ -117,13 +117,15 @@ export async function dismissTeacher(id: number) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
   await teacherRepository.dismissTeacher(id);
+
+  await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
 
@@ -134,6 +136,12 @@ export async function dismissTeacher(id: number) {
 
 export async function rehireTeacher(id: number) {
   await teacherRepository.rehireTeacher(id);
+
+  const user = await getUserByTeacherId(id);
+
+  if (user) {
+    await subscribeUser(user.id);
+  }
 }
 
 export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
@@ -142,13 +150,15 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
+
+  await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
 

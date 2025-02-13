@@ -28,6 +28,7 @@ export interface TeacherResponseDto {
   graduated: boolean;
   notes: string | null;
   state: 'activo' | 'baja temporal' | 'baja';
+  retention_date: Date | null;
   unsubscribe_risk: number;
   subjects_history: TeacherSubjectHistoryResponseDto[] | null;
   subjects_of_interest: TeacherSubjectOfInterest[];
@@ -59,6 +60,7 @@ export class TeacherResponseDtoHelper {
       graduated: teacher.graduated,
       notes: teacher.notes,
       state: teacher.state,
+      retention_date: teacher.retentionDate,
       unsubscribe_risk: teacher.unsubscribe_risk,
       subjects_history: subjectsHistory,
       subjects_of_interest: teacher.subjects_of_interest,

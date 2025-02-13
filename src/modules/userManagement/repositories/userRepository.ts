@@ -41,36 +41,36 @@ class userRepository {
   ) {
     const searchQuery = search
       ? {
-          [Op.or]: [
-            sequelize.where(
-              sequelize.cast(
-                sequelize.col('teacher_employee_number'),
-                'varchar'
-              ),
-              { [Op.iLike]: `%${search}%` }
+        [Op.or]: [
+          sequelize.where(
+            sequelize.cast(
+              sequelize.col('teacher_employee_number'),
+              'varchar'
             ),
-            sequelize.where(
-              sequelize.cast(sequelize.col('teacher.name'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-            sequelize.where(
-              sequelize.cast(sequelize.col('teacher.surname'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-          ],
-        }
+            { [Op.iLike]: `%${search}%` }
+          ),
+          sequelize.where(
+            sequelize.cast(sequelize.col('teacher.name'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+          sequelize.where(
+            sequelize.cast(sequelize.col('teacher.surname'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
       : {};
 
     const roleQuery = role
       ? {
-          role_id: role,
-        }
+        role_id: role,
+      }
       : {};
 
     const isActiveQuery = is_active
       ? {
-          is_active,
-        }
+        is_active,
+      }
       : {};
 
     console.log(searchQuery);
@@ -128,6 +128,19 @@ class userRepository {
     return await User.update(
       {
         is_active: false,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+  }
+
+  async subscribeUser(id: number) {
+    return await User.update(
+      {
+        is_active: true,
       },
       {
         where: {

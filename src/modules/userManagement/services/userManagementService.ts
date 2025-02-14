@@ -92,6 +92,15 @@ export async function unsubscribeUser(id: number) {
   return await userRepository.unsubscribeUser(id);
 }
 
+export async function subscribeUser(id: number) {
+  const user = await getUserById(id);
+  if (!user) {
+    throw new Error('El usuario no existe');
+  }
+
+  return await userRepository.subscribeUser(id);
+}
+
 export async function getRoles() {
   return await userRepository.getRoles();
 }

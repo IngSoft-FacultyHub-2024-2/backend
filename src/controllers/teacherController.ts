@@ -9,13 +9,13 @@ import {
   temporaryDismissTeacher,
   updateTeacher,
 } from '../modules/teacher';
-import { getTeachersContacts } from '../modules/teacher/services/teacherService';
+import {
+  getTeachersContacts,
+  rehireTeacher,
+} from '../modules/teacher/services/teacherService';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
-import { getTeachersContacts, rehireTeacher } from '../modules/teacher/services/teacherService';
-import fs from 'fs';
-
 
 class TeacherController {
   async addTeacher(req: Request, res: Response) {

@@ -4,6 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fileProcessorController from '../controllers/fileProcessorController';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { isCoordinatorMiddleware } from '../middlewares/isCoordinatorMiddleware';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ const upload = multer({ storage: storage });
 router.post(
   '/',
   authMiddleware,
+  isCoordinatorMiddleware,
   upload.single('file'),
   fileProcessorController.processFile
 );

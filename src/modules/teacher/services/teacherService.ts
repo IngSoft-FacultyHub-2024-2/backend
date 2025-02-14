@@ -2,7 +2,7 @@ import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../subject';
-import { getUserByTeacherId, unsubscribeUser } from '../../userManagement';
+import { getUserByTeacherId, unsubscribeUser, subscribeUser } from '../../userManagement';
 import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
@@ -126,10 +126,22 @@ export async function dismissTeacher(id: number) {
 
   await teacherRepository.dismissTeacher(id);
 
+  await teacherRepository.closeOpenSubjects(id);
+
   const user = await getUserByTeacherId(id);
 
   if (user) {
     await unsubscribeUser(user.id);
+  }
+}
+
+export async function rehireTeacher(id: number) {
+  await teacherRepository.rehireTeacher(id);
+
+  const user = await getUserByTeacherId(id);
+
+  if (user) {
+    await subscribeUser(user.id);
   }
 }
 
@@ -146,6 +158,8 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
+
+  await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
 

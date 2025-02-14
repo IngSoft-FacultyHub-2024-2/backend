@@ -153,12 +153,15 @@ class TeacherRepository {
   generateContactsCsv = async (teachers: Teacher[]) => {
     try {
       const contacts = teachers
-        .flatMap((teacher) => teacher.contacts || [])
-        .map((contact) => {
-          const { prefered, data } = contact;
-          return prefered ? data : undefined;
+        .flatMap((teacher) => {
+          if (teacher.contacts) {
+            // Get all emails
+            return teacher.contacts
+              .filter((contact) => contact.mean === 'Mail')
+              .map((contact) => contact.data);
+          }
         })
-        .filter((contact): contact is string => Boolean(contact)); // Filtrar valores `undefined`
+        .filter((contact): contact is string => Boolean(contact));
 
       // Convertir los contactos en formato CSV
       const csvRows = ['Contactos'];
@@ -309,6 +312,13 @@ class TeacherRepository {
     Teacher.update(
       { state: TeacherStates.TEMPORARY_LEAVE, retentionDate },
       { where: { id } }
+    );
+  }
+
+  async rehireTeacher(id: number) {
+    await Teacher.update(
+      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null },
+      { where: { id }, paranoid: false }
     );
   }
 
@@ -583,6 +593,13 @@ class TeacherRepository {
       ],
     });
     return teachers;
+  }
+
+  async closeOpenSubjects(id: number) {
+    await TeacherSubjectHistory.update(
+      { end_date: new Date() },
+      { where: { teacher_id: id, end_date: null }, paranoid: false }
+    );
   }
 }
 

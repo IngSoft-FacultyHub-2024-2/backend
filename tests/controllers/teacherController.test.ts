@@ -41,7 +41,7 @@ describe('TeacherController', () => {
     ],
     contacts: [
       {
-        mean: 'Email',
+        mean: 'Mail',
         data: 'johndoe@example7.com',
         prefered: true,
       },

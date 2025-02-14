@@ -37,6 +37,7 @@ class Teacher extends Model {
   public subjects_of_interest!: TeacherSubjectOfInterest[];
   public teacher_subject_groups!: TeacherSubjectGroup[];
   public teacher_available_modules!: TeacherAvailableModule[];
+  public deletedAt!: Date | null;
 
   public static associations: {
     prizes: HasMany<Teacher, Prize>;
@@ -146,6 +147,10 @@ Teacher.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {

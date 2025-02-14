@@ -121,18 +121,19 @@ class SemesterRepository {
     semesterId: number,
     degreeId?: number,
     subjectId?: number,
-    group?: string
+    group?: string,
+    teacherId?: number
   ) {
-    // const groupWhere has group and degreeId
     const groupWhere = group ? { group } : {};
     const degreeWhere = degreeId ? { degree_id: degreeId } : {};
     const subjectWhere = subjectId ? { subject_id: subjectId } : {};
+
     const semester = await Semester.findByPk(semesterId, {
       include: [
         {
           model: Lecture,
           as: 'lectures',
-          required: false,
+          required: !!teacherId,
           where: {
             ...subjectWhere,
           },
@@ -156,7 +157,6 @@ class SemesterRepository {
                 {
                   model: LectureTeacher,
                   as: 'teachers',
-                  required: false,
                 },
               ],
             },
@@ -164,6 +164,14 @@ class SemesterRepository {
         },
       ],
     });
+
+    if (semester && teacherId) {
+      semester.lectures = semester.lectures.filter((lecture: any) =>
+        lecture.lecture_roles.some((role: any) =>
+          role.teachers.some((teacher: any) => teacher.teacher_id === teacherId)
+        )
+      );
+    }
 
     semester?.lectures.forEach((lecture: Lecture) => {
       lecture.lecture_roles = lecture.lecture_roles.map((role: any) =>

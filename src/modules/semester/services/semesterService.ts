@@ -2,7 +2,11 @@ import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getDegreeById } from '../../degree';
-import { amountOfTeachersPerSubject, getSubjectById } from '../../subject';
+import {
+  amountOfTeachersPerSubject,
+  getSubjectById,
+  getSubjectsIdsWithTecTeoAtSameTime,
+} from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
 import { lectureToAssignResponseDto } from '../dtos/response/lectureToAssignResponseDto';
@@ -10,7 +14,6 @@ import Lecture from '../repositories/models/Lecture';
 import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
-import { getSubjectsIdsWithTecTeoAtSameTime } from '../../subject';
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
@@ -39,7 +42,8 @@ export async function getSemesterLectures(
   semesterId: number,
   degreeId?: number,
   subjectId?: number,
-  group?: string
+  group?: string,
+  teacherId?: number
 ) {
   const existsDegree = degreeId ? await getDegreeById(degreeId) : true;
   if (!existsDegree) {
@@ -56,11 +60,17 @@ export async function getSemesterLectures(
     );
   }
 
+  const existsTeacher = teacherId ? await getTeacherById(teacherId) : true;
+  if (!existsTeacher) {
+    throw new ResourceNotFound('No se encontró el profesor indicado');
+  }
+
   const semester = await semesterRepository.getSemesterLectures(
     semesterId,
     degreeId,
     subjectId,
-    group
+    group,
+    teacherId
   );
   if (!semester) {
     throw new ResourceNotFound('No se encontraron el semestre');

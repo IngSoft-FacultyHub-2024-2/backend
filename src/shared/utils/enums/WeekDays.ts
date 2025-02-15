@@ -27,4 +27,11 @@ function translateWeekDayToEnglish(weekDay: WeekDays): string {
   }
 }
 
-export { WeekDays, getWeekDays, translateWeekDayToEnglish };
+function weekDaysComparator(weekDaysA: string, weekDayB: string): number {
+  const weekDaysOrder = Object.values(WeekDays);
+  const indexA = weekDaysOrder.indexOf(weekDaysA as WeekDays);
+  const indexB = weekDaysOrder.indexOf(weekDayB as WeekDays);
+  return indexA - indexB;
+}
+
+export { WeekDays, getWeekDays, translateWeekDayToEnglish, weekDaysComparator };

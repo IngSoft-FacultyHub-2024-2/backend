@@ -470,14 +470,16 @@ async function getLectureLine(
     subject,
     modules,
     SubjectRoles.THEORY,
-    amountOfTeachersShouldHaveTheory ?? 1
+    amountOfTeachersShouldHaveTheory ?? 1,
+    lectureGroups
   );
   const technologyLectureLine = await getRoleLectureLine(
     technologyRole,
     subject,
     modules,
     SubjectRoles.TECHNOLOGY,
-    amountOfTeachersShouldHaveTechnology ?? 1
+    amountOfTeachersShouldHaveTechnology ?? 1,
+    lectureGroups
   );
 
   const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryLectureLine} ${technologyLectureLine}`;
@@ -490,7 +492,8 @@ async function getRoleLectureLine(
   subject: SubjectResponseDto,
   modules: ModuleResponseDto[],
   roleType: SubjectRoles,
-  amount_of_teachers_should_have: number
+  amount_of_teachers_should_have: number,
+  lectureGroup: string
 ) {
   let data = '';
   let reminderTeachers = amount_of_teachers_should_have;
@@ -519,6 +522,11 @@ async function getRoleLectureLine(
       data += `${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHours}; ${lectureClassTime};`;
       reminderTeachers--;
     }
+  }
+  if (reminderTeachers < 0) {
+    throw Error(
+      `Se assignaron mas profesores de los que se deberia a ${subject.name} ${roleType} ${lectureGroup}`
+    );
   }
   if (reminderTeachers > 0) {
     for (let i = 0; i < reminderTeachers; i++) {

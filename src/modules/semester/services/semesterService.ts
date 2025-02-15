@@ -11,6 +11,28 @@ import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
 import { getSubjectsIdsWithTecTeoAtSameTime } from '../../subject';
+import { createObjectCsvWriter } from 'csv-writer';
+import fs from 'fs';
+
+interface LectureAssigned {
+  nombreMateria: string;
+  horasMateria: number | undefined;
+  numeroMateria: string;
+  grupo: string;
+  /*nombreDocenteTeorico: string;
+  numeroDocenteTeorico: number;
+  horasAsignadasTeorico: number;
+  diasHorarioTeorico: string;
+  nombreDocenteTec1: string;
+  numeroDocenteTec1: number;
+  horasAsignadasTec1: number;
+  diasHorarioTec1: string;
+  nombreDocenteTec2: string;
+  numeroDocenteTec2: number;
+  horasAsignadasTec2: number;
+  diasHorarioTec2: string;
+  */
+}
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
@@ -339,4 +361,142 @@ export async function getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(
     subjects_ids_tec_teo_at_same_time.includes(lecture.subject_id)
   );
   return lectureIds.map((lecture) => lecture.id);
+}
+
+export async function getAssignedLecturesCsv(semesterId: number) {
+  const semester = await semesterRepository.getSemesterLectures(semesterId);
+  if (!semester) {
+    throw new ResourceNotFound('No se encontraron el semestre');
+  }
+  const subjectIdsOfLectures = [
+    ...new Set(semester.lectures.map((lecture) => lecture.subject_id)),
+  ];
+  const subjects = await Promise.all(
+    subjectIdsOfLectures.map((subjectId) => getSubjectById(subjectId))
+  );
+  subjects.sort((a, b) => a.name.localeCompare(b.name));
+  console.log('AC');
+  const csvWriter = createObjectCsvWriter({
+    path: 'output_Assigned.csv',
+    header: [
+      { id: 'nombreMateria', title: 'Nombre Materia' },
+      { id: 'horasMateria', title: 'Horas Materia' },
+      { id: 'numeroMateria', title: 'Número Materia' },
+      { id: 'grupo', title: 'Grupo' },
+      /*{ id: 'nombreDocenteTeorico', title: 'Nombre - Apellido Docente' },
+      { id: 'numeroDocenteTeorico', title: 'Número de Docente' },
+      { id: 'horasAsignadasTeorico', title: 'Horas asignadas al docente' },
+      { id: 'diasHorarioTeorico', title: 'Días y Horario' },
+      { id: 'nombreDocenteTec1', title: 'Nombre - Apellido Docente' },
+      { id: 'numeroDocenteTec1', title: 'Número de Docente' },
+      { id: 'horasAsignadasTec1', title: 'Horas asignadas al docente' },
+      { id: 'diasHorarioTec1', title: 'Días y Horario' },
+      { id: 'nombreDocenteTec2', title: 'Nombre - Apellido Docente' },
+      { id: 'numeroDocenteTec2', title: 'Número de Docente' },
+      { id: 'horasAsignadasTec2', title: 'Horas asignadas al docente' },
+      { id: 'diasHorarioTec2', title: 'Días y Horario' },*/
+    ],
+  });
+
+  const data: (LectureAssigned | string)[] = [];
+  for (let subject of subjects) {
+    let hourlyLoad = subject.hour_configs?.reduce(
+      (acc, config) => acc + config.total_hours,
+      0
+    );
+    data.push(`${hourlyLoad} horas docente`);
+    const csvString = semester.lectures
+      .filter((lecture) => lecture.subject_id === subject.id)
+      .map((lecture) => {
+        let theoryRole = lecture.lecture_roles.find(
+          (role) => role.role === SubjectRoles.THEORY
+        );
+        let technologyRole = lecture.lecture_roles.find(
+          (role) => role.role === SubjectRoles.TECHNOLOGY
+        );
+        let theoryLectureTeacher = theoryRole?.teachers[0];
+        let theoryTeacher = null;
+        if (theoryLectureTeacher) {
+          theoryTeacher = getTeacherById(theoryLectureTeacher.teacher_id);
+        }
+
+        data.push({
+          nombreMateria: subject.name,
+          horasMateria: subject.hour_configs?.filter(
+            (config) => config.role === SubjectRoles.THEORY
+          )[0].total_hours,
+          numeroMateria: subject.subject_code,
+          // TODO: fix lectureGroup.degree_id do not show the id show the acronym
+          grupo: lecture.lecture_groups.reduce(
+            (acc, lectureGroup) =>
+              `${acc} ${lectureGroup.group} - ${lectureGroup.degree_id}`,
+            ''
+          ),
+          /*nombreDocenteTeorico: theoryTeacher ? `${theoryTeacher.} ${theoryTeacher.surname}` : '',
+          numeroDocenteTeorico: theoryTeacher ? theoryTeacher.id : 0,
+          horasAsignadasTeorico: theoryRole ? theoryRole.hour_configs.reduce((acc, config) => acc + config.modules.length, 0) : 0,
+          diasHorarioTeorico: theoryRole ? theoryRole.hour_configs.map((config) => `${translateWeekDayToEnglish(config.day_of_week)} ${config.modules.join(':')}`).join(', ') : '',
+          nombreDocenteTec1: technologyRole ? `${technologyRole.teachers[0].name} ${technologyRole.teachers[0].surname}` : '',
+          numeroDocenteTec1: technologyRole ? technologyRole.teachers[0].id : 0,
+          horasAsignadasTec1: technologyRole ? technologyRole.hour_configs.reduce((acc, config) => acc + config.modules.length, 0) : 0,
+          diasHorarioTec1: technologyRole ? technologyRole.hour_configs.map((config) => `${translateWeekDayToEnglish(config.day_of_week)} ${config.modules.join(':')}`).join(', ') : '',
+          nombreDocenteTec2: technologyRole && technologyRole.teachers.length > 1 ? `${technologyRole.teachers[1].name} ${technologyRole.teachers[1].surname}` : '',
+          numeroDocenteTec2: technologyRole && technologyRole.teachers.length > 1 ? technologyRole.teachers[1].id : 0,
+          horasAsignadasTec2: technologyRole && technologyRole.teachers.length > 1 ? technologyRole.hour_configs.reduce((acc, config) => acc + config.modules.length, 0) : 0,
+          diasHorarioTec2: technologyRole && technologyRole.teachers.length > 1 ? technologyRole.hour_configs.map((config) => `${translateWeekDayToEnglish(config.day_of_week)} ${config.modules.join(':')}`).join(', ') : ''
+          */
+        });
+      });
+  }
+  writeCsv(data);
+
+  // for (let subject of subjects){
+  //   const csvString = semester.lectures
+  //     .filter((lecture) => lecture.subject_id === subject.id)
+  //     .map((lecture) => {
+  //       return lecture.lecture_roles
+  //         .map((role) => {
+  //           return role.teachers
+  //             .map((teacher) => {
+  //               return `${subject.name},${role.role},${teacher.name},${teacher.surname},${teacher.email}`;
+  //             })
+  //             .join('\n');
+  //         })
+  //         .join('\n');
+  //     })
+  //     .join('\n');
+  // const filePath = path.join(__dirname, `../../../uploads/assigned_lectures_${semesterId}.csv
+
+  // for (const lecture of semester.lectures) {
+  //   const csvString = lecture.lecture_roles
+  //     .map((role) => {
+  //       return role.teachers
+  //         .map((teacher) => {
+  //           return `${lecture.subject.name},${role.role},${teacher.name},${teacher.surname},${teacher.email}`;
+  //         })
+  //         .join('\n');
+  //     })
+  //     .join('\n');
+  // const filePath = path.join(__dirname, `../../../uploads/assigned_lectures_${semesterId}.csv
+  //fs.writeFileSync(filePath, csvString, 'utf8');
+}
+
+async function writeCsv(data: (LectureAssigned | string)[]) {
+  const stringLines: string[] = [];
+
+  for (const item of data) {
+    if (typeof item === 'string') {
+      stringLines.push(item);
+    } else {
+      const csvLine = `"${item.nombreMateria}",${item.horasMateria},${item.numeroMateria},"${item.grupo}"`; //,"${item.nombreDocenteTeorico}",${item.numeroDocenteTeorico},${item.horasAsignadasTeorico},"${item.diasHorarioTeorico}","${item.nombreDocenteTec1}",${item.numeroDocenteTec1},${item.horasAsignadasTec1},"${item.diasHorarioTec1}","${item.nombreDocenteTec2}",${item.numeroDocenteTec2},${item.horasAsignadasTec2},"${item.diasHorarioTec2}"`;
+      stringLines.push(csvLine);
+    }
+  }
+
+  // Write header manually
+  const header = `"Nombre Materia","Horas Materia","Número Materia","Grupo","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario"\n`;
+  console.log('ACA');
+  // Write structured and raw CSV data
+  fs.writeFileSync('output.csv', header + stringLines.join('\n') + '\n');
+  console.log('CSV file created successfully');
 }

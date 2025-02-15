@@ -14,6 +14,7 @@ import {
   setTeacherToLecture,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 } from './services/semesterService';
 
 import {
@@ -39,4 +40,5 @@ export {
   setTeacherToLecture,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 };

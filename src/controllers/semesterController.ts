@@ -9,6 +9,7 @@ import {
   getSemesters,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 } from '../modules/semester';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
@@ -124,6 +125,19 @@ class SemesterController {
     try {
       const lecture = await deleteLecture(parseInt(req.params.id));
       res.status(200).json(lecture);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getAssignedLecturesCsv(req: Request, res: Response) {
+    try {
+      console.log(req.params.semesterId);
+      await getAssignedLecturesCsv(parseInt(req.params.semesterId));
+      res.status(200).json({ message: 'CSV generado' });
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {

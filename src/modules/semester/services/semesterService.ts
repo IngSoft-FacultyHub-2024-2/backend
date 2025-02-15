@@ -443,12 +443,21 @@ async function getLectureLine(
   modules: ModuleResponseDto[]
 ) {
   let hoursStudentsHave = subject.frontal_hours;
+  const lectureGroups = lecture.lecture_groups
+    .map((lectureGroup) => {
+      const degree = degrees.find(
+        (degree) => degree.id === lectureGroup.degree_id
+      );
+      return `${lectureGroup.group} - ${degree?.acronym || ''}`;
+    })
+    .join(' ');
   let theoryRole = lecture.lecture_roles.find(
     (role) => role.role === SubjectRoles.THEORY
   );
   let technologyRole = lecture.lecture_roles.find(
     (role) => role.role === SubjectRoles.TECHNOLOGY
   );
+
   const theoryLectureLine = await getRoleLectureLine(
     theoryRole,
     subject,
@@ -462,7 +471,7 @@ async function getLectureLine(
     SubjectRoles.TECHNOLOGY
   );
 
-  const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${theoryLectureLine}; ${technologyLectureLine}`;
+  const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryLectureLine} ${technologyLectureLine}`;
   console.log(csvLine);
   return csvLine;
 }
@@ -496,7 +505,7 @@ async function getRoleLectureLine(
       const roleHours =
         subject.hour_configs?.find((config) => config.role === roleType)
           ?.total_hours ?? 0;
-      data += `;${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHours}; ${lectureClassTime}`;
+      data += `${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHours}; ${lectureClassTime};`;
     }
   }
   return data;

@@ -457,18 +457,27 @@ async function getLectureLine(
   let technologyRole = lecture.lecture_roles.find(
     (role) => role.role === SubjectRoles.TECHNOLOGY
   );
-
+  // TODO: fix if subject is teo tec at same time
+  // if (subject.is_teo_tec_at_same_time) {}
+  let amountOfTeachersShouldHaveTheory = subject.hour_configs
+    ?.filter((hour_config) => hour_config.role === SubjectRoles.THEORY)
+    .reduce((acc, config) => acc + 1, 0);
+  let amountOfTeachersShouldHaveTechnology = subject.hour_configs
+    ?.filter((hour_config) => hour_config.role === SubjectRoles.TECHNOLOGY)
+    .reduce((acc, config) => acc + 1, 0);
   const theoryLectureLine = await getRoleLectureLine(
     theoryRole,
     subject,
     modules,
-    SubjectRoles.THEORY
+    SubjectRoles.THEORY,
+    amountOfTeachersShouldHaveTheory ?? 1
   );
   const technologyLectureLine = await getRoleLectureLine(
     technologyRole,
     subject,
     modules,
-    SubjectRoles.TECHNOLOGY
+    SubjectRoles.TECHNOLOGY,
+    amountOfTeachersShouldHaveTechnology ?? 1
   );
 
   const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryLectureLine} ${technologyLectureLine}`;
@@ -480,9 +489,11 @@ async function getRoleLectureLine(
   lectureRole: LectureRole | undefined,
   subject: SubjectResponseDto,
   modules: ModuleResponseDto[],
-  roleType: SubjectRoles
+  roleType: SubjectRoles,
+  amount_of_teachers_should_have: number
 ) {
   let data = '';
+  let reminderTeachers = amount_of_teachers_should_have;
   if (lectureRole?.teachers && lectureRole.teachers.length > 0) {
     const lectureClassTime = lectureRole?.hour_configs
       .sort((a, b) => weekDaysComparator(a.day_of_week, b.day_of_week))
@@ -506,6 +517,12 @@ async function getRoleLectureLine(
         subject.hour_configs?.find((config) => config.role === roleType)
           ?.total_hours ?? 0;
       data += `${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHours}; ${lectureClassTime};`;
+      reminderTeachers--;
+    }
+  }
+  if (reminderTeachers > 0) {
+    for (let i = 0; i < reminderTeachers; i++) {
+      data += `; ; ; ;`;
     }
   }
   return data;

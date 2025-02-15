@@ -449,66 +449,33 @@ async function getLectureLine(
   let technologyRole = lecture.lecture_roles.find(
     (role) => role.role === SubjectRoles.TECHNOLOGY
   );
-
-  const theoryHours =
-    subject.hour_configs?.find((config) => config.role === SubjectRoles.THEORY)
-      ?.total_hours ?? 0;
-
-  const lectureGroups = lecture.lecture_groups
-    .map((lectureGroup) => {
-      const degree = degrees.find(
-        (degree) => degree.id === lectureGroup.degree_id
-      );
-      return `${lectureGroup.group} - ${degree?.acronym || ''}`;
-    })
-    .join(' ');
-
-  let theoryLectureTeacher = theoryRole?.teachers[0];
-
-  let theoryTeacher = null;
-  if (theoryLectureTeacher) {
-    theoryTeacher = await getTeacherById(theoryLectureTeacher.teacher_id);
-  }
-
-  const theoryTeacherName = theoryTeacher
-    ? `${theoryTeacher.name} ${theoryTeacher.surname}`
-    : '';
-  const theoryClassTime = theoryRole?.hour_configs
-    .sort((a, b) => weekDaysComparator(a.day_of_week, b.day_of_week))
-    .map((config) => {
-      const lectureModules = config.modules.map((module) => {
-        return modules.find((m) => m.id === module);
-      });
-      if (!lectureModules) {
-        throw Error('Lecture modules not found');
-      }
-      const filteredModules = lectureModules.filter(
-        (module): module is ModuleResponseDto => module !== undefined
-      );
-      const lectureHours = getTimesOfModules(filteredModules);
-      return `${config.day_of_week} ${lectureHours}`;
-    })
-    .join(', ');
-  // Technology
-  const technologyLectureLine = await getTechnologyLectureLine(
+  const theoryLectureLine = await getRoleLectureLine(
+    theoryRole,
+    subject,
+    modules,
+    SubjectRoles.THEORY
+  );
+  const technologyLectureLine = await getRoleLectureLine(
     technologyRole,
     subject,
-    modules
+    modules,
+    SubjectRoles.TECHNOLOGY
   );
 
-  const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryTeacherName}; ${theoryTeacher?.employee_number}; ${theoryHours}; ${theoryClassTime} ${technologyLectureLine}`;
+  const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${theoryLectureLine}; ${technologyLectureLine}`;
   console.log(csvLine);
   return csvLine;
 }
 
-async function getTechnologyLectureLine(
-  technologyRole: LectureRole | undefined,
+async function getRoleLectureLine(
+  lectureRole: LectureRole | undefined,
   subject: SubjectResponseDto,
-  modules: ModuleResponseDto[]
+  modules: ModuleResponseDto[],
+  roleType: SubjectRoles
 ) {
-  let technologyData = '';
-  if (technologyRole?.teachers && technologyRole.teachers.length > 0) {
-    const technologyClassTime = technologyRole?.hour_configs
+  let data = '';
+  if (lectureRole?.teachers && lectureRole.teachers.length > 0) {
+    const lectureClassTime = lectureRole?.hour_configs
       .sort((a, b) => weekDaysComparator(a.day_of_week, b.day_of_week))
       .map((config) => {
         const lectureModules = config.modules.map((module) => {
@@ -524,18 +491,15 @@ async function getTechnologyLectureLine(
         return `${config.day_of_week} ${lectureHours}`;
       })
       .join(', ');
-    for (const technologyLectureTeacher of technologyRole.teachers) {
-      const technologyTeacher = await getTeacherById(
-        technologyLectureTeacher.teacher_id
-      );
-      const technologyHours =
-        subject.hour_configs?.find(
-          (config) => config.role === SubjectRoles.TECHNOLOGY
-        )?.total_hours ?? 0;
-      technologyData += `;${technologyTeacher?.name} ${technologyTeacher?.surname}; ${technologyTeacher?.employee_number}; ${technologyHours}; ${technologyClassTime}`;
+    for (const lectureTeacher of lectureRole.teachers) {
+      const teacher = await getTeacherById(lectureTeacher.teacher_id);
+      const roleHours =
+        subject.hour_configs?.find((config) => config.role === roleType)
+          ?.total_hours ?? 0;
+      data += `;${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHours}; ${lectureClassTime}`;
     }
   }
-  return technologyData;
+  return data;
 }
 
 async function writeCsv(data: (LectureAssigned | string)[]) {

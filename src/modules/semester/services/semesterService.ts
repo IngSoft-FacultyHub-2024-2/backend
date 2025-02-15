@@ -457,31 +457,41 @@ async function getLectureLine(
   let technologyRole = lecture.lecture_roles.find(
     (role) => role.role === SubjectRoles.TECHNOLOGY
   );
-  // TODO: fix if subject is teo tec at same time
-  // if (subject.is_teo_tec_at_same_time) {}
   let amountOfTeachersShouldHaveTheory = subject.hour_configs
     ?.filter((hour_config) => hour_config.role === SubjectRoles.THEORY)
     .reduce((acc, config) => acc + 1, 0);
   let amountOfTeachersShouldHaveTechnology = subject.hour_configs
     ?.filter((hour_config) => hour_config.role === SubjectRoles.TECHNOLOGY)
     .reduce((acc, config) => acc + 1, 0);
-  const theoryLectureLine = await getRoleLectureLine(
-    theoryRole,
-    subject,
-    modules,
-    SubjectRoles.THEORY,
-    amountOfTeachersShouldHaveTheory ?? 1,
-    lectureGroups
-  );
-  const technologyLectureLine = await getRoleLectureLine(
-    technologyRole,
-    subject,
-    modules,
-    SubjectRoles.TECHNOLOGY,
-    amountOfTeachersShouldHaveTechnology ?? 1,
-    lectureGroups
-  );
-
+  let theoryLectureLine = '';
+  let technologyLectureLine = '';
+  if (subject.is_teo_tec_at_same_time) {
+    theoryLectureLine = await getRoleLectureLineIsTeoTecAtSameTime(
+      theoryRole,
+      subject,
+      modules,
+      amountOfTeachersShouldHaveTheory ?? 1,
+      amountOfTeachersShouldHaveTechnology ?? 1,
+      lectureGroups
+    );
+  } else {
+    theoryLectureLine = await getRoleLectureLine(
+      theoryRole,
+      subject,
+      modules,
+      SubjectRoles.THEORY,
+      amountOfTeachersShouldHaveTheory ?? 1,
+      lectureGroups
+    );
+    technologyLectureLine = await getRoleLectureLine(
+      technologyRole,
+      subject,
+      modules,
+      SubjectRoles.TECHNOLOGY,
+      amountOfTeachersShouldHaveTechnology ?? 1,
+      lectureGroups
+    );
+  }
   const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryLectureLine} ${technologyLectureLine}`;
   console.log(csvLine);
   return csvLine;
@@ -492,11 +502,11 @@ async function getRoleLectureLine(
   subject: SubjectResponseDto,
   modules: ModuleResponseDto[],
   roleType: SubjectRoles,
-  amount_of_teachers_should_have: number,
+  amountOfTeachersShouldHave: number,
   lectureGroup: string
 ) {
   let data = '';
-  let reminderTeachers = amount_of_teachers_should_have;
+  let reminderTeachers = amountOfTeachersShouldHave;
   if (lectureRole?.teachers && lectureRole.teachers.length > 0) {
     const lectureClassTime = lectureRole?.hour_configs
       .sort((a, b) => weekDaysComparator(a.day_of_week, b.day_of_week))
@@ -536,6 +546,77 @@ async function getRoleLectureLine(
   return data;
 }
 
+async function getRoleLectureLineIsTeoTecAtSameTime(
+  lectureRole: LectureRole | undefined,
+  subject: SubjectResponseDto,
+  modules: ModuleResponseDto[],
+  amountOfTeachersShouldHaveTheory: number,
+  amountOfTeachersShouldHaveTechnology: number,
+  lectureGroup: string
+) {
+  let data = '';
+  let reminderTeachersTheory = amountOfTeachersShouldHaveTheory;
+  let reminderTeachersTechnology = amountOfTeachersShouldHaveTechnology;
+  if (lectureRole?.teachers && lectureRole.teachers.length > 0) {
+    const lectureClassTime = lectureRole?.hour_configs
+      .sort((a, b) => weekDaysComparator(a.day_of_week, b.day_of_week))
+      .map((config) => {
+        const lectureModules = config.modules.map((module) => {
+          return modules.find((m) => m.id === module);
+        });
+        if (!lectureModules) {
+          throw Error('Lecture modules not found');
+        }
+        const filteredModules = lectureModules.filter(
+          (module): module is ModuleResponseDto => module !== undefined
+        );
+        const lectureHours = getTimesOfModules(filteredModules);
+        return `${config.day_of_week} ${lectureHours}`;
+      })
+      .join(', ');
+    const theoryLectureTeachers = lectureRole.teachers.filter(
+      (teacher) => !teacher.is_technology_teacher
+    );
+    const technologyLectureTeachers = lectureRole.teachers.filter(
+      (teacher) => teacher.is_technology_teacher
+    );
+    for (const lectureTeacher of theoryLectureTeachers) {
+      const teacher = await getTeacherById(lectureTeacher.teacher_id);
+      const roleHoursTheory =
+        subject.hour_configs?.find(
+          (config) => config.role === SubjectRoles.THEORY
+        )?.total_hours ?? 0;
+      data += `${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHoursTheory}; ${lectureClassTime};`;
+      reminderTeachersTheory--;
+    }
+    for (const lectureTeacher of technologyLectureTeachers) {
+      const teacher = await getTeacherById(lectureTeacher.teacher_id);
+      const roleHoursTechnology =
+        subject.hour_configs?.find(
+          (config) => config.role === SubjectRoles.TECHNOLOGY
+        )?.total_hours ?? 0;
+      data += `${teacher?.name} ${teacher?.surname}; ${teacher?.employee_number}; ${roleHoursTechnology}; ${lectureClassTime};`;
+      reminderTeachersTechnology--;
+    }
+  }
+  if (reminderTeachersTheory < 0 || reminderTeachersTechnology < 0) {
+    throw Error(
+      `Se assignaron mas profesores de los que se deberia a ${subject.name} ${lectureGroup}`
+    );
+  }
+  if (reminderTeachersTheory > 0) {
+    for (let i = 0; i < reminderTeachersTheory; i++) {
+      data += `; ; ; ;`;
+    }
+  }
+
+  if (reminderTeachersTechnology > 0) {
+    for (let i = 0; i < reminderTeachersTechnology; i++) {
+      data += `; ; ; ;`;
+    }
+  }
+  return data;
+}
 async function writeCsv(data: (LectureAssigned | string)[]) {
   const stringLines: string[] = [];
 

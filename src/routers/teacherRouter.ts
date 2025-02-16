@@ -97,7 +97,13 @@ router.put(
 );
 
 router.patch('/:id/rehire',
-  authMiddleware,teacherController.rehireTeacher)
+  authMiddleware,isCoordinatorMiddleware,teacherController.rehireTeacher)
 
+router.put(
+  '/:id',
+  authMiddleware,
+  isTeacherOwnDataMiddleware,
+  teacherController.updateTeacher
+);
 
 export default router;

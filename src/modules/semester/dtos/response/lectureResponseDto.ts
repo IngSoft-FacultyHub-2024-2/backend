@@ -6,6 +6,7 @@ export interface LectureResponseDto {
     acronym: string;
     valid: boolean;
     is_teo_tec_at_same_time: boolean;
+    study_plan_year: number;
   };
   lecture_groups: LectureGroupResponseDto[];
   lecture_roles: LectureRoleResponseDto[];
@@ -47,6 +48,7 @@ export class LectureResponseDtoHelper {
         acronym: lecture.subject.acronym,
         valid: lecture.subject.valid,
         is_teo_tec_at_same_time: lecture.subject.is_teo_tec_at_same_time,
+        study_plan_year: lecture.subject.study_plan.year,
       },
       lecture_groups: lecture.lecture_groups.map((group: any) => ({
         group: group.group,

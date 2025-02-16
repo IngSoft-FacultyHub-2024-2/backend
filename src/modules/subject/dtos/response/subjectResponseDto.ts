@@ -1,15 +1,15 @@
+import { TeacherResponseDto } from '../../../teacher';
+import StudyPlan from '../../repositories/models/StudyPlan';
+import Subject from '../../repositories/models/Subject';
 import {
   HourConfigResponseDto,
   HourConfigResponseDtoHelper,
 } from './hourConfigResponseDto';
 import { NeedResponseDto, NeedResponseDtoHelper } from './needResponseDto';
-import Subject from '../../repositories/models/Subject';
 import {
   SubjectEventResponseDto,
   SubjectEventResponseDtoHelper,
 } from './subjectEventResponseDto';
-import { TeacherResponseDto } from '../../../teacher';
-import StudyPlan from '../../repositories/models/StudyPlan';
 
 export interface SubjectResponseDto {
   id: number;

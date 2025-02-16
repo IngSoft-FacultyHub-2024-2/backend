@@ -9,6 +9,7 @@ import {
   amountOfTeachersPerSubject,
   getSubjectById,
   SubjectResponseDto,
+  getSubjectsIdsWithTecTeoAtSameTime,
 } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
@@ -17,33 +18,11 @@ import Lecture from '../repositories/models/Lecture';
 import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
-import { getSubjectsIdsWithTecTeoAtSameTime } from '../../subject';
-import { createObjectCsvWriter } from 'csv-writer';
 import fs from 'fs';
 import Degree from '../../degree/repositories/models/Degree';
 import { getModules, ModuleResponseDto } from '../../../modules/teacher';
 import { getTimesOfModules } from '../../../shared/utils/modules';
 import path from 'path';
-
-interface LectureAssigned {
-  nombreMateria: string;
-  horasMateria: number | undefined;
-  numeroMateria: string;
-  grupo: string;
-  /*nombreDocenteTeorico: string;
-  numeroDocenteTeorico: number;
-  horasAsignadasTeorico: number;
-  diasHorarioTeorico: string;
-  nombreDocenteTec1: string;
-  numeroDocenteTec1: number;
-  horasAsignadasTec1: number;
-  diasHorarioTec1: string;
-  nombreDocenteTec2: string;
-  numeroDocenteTec2: number;
-  horasAsignadasTec2: number;
-  diasHorarioTec2: string;
-  */
-}
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
@@ -72,7 +51,8 @@ export async function getSemesterLectures(
   semesterId: number,
   degreeId?: number,
   subjectId?: number,
-  group?: string
+  group?: string,
+  teacherId?: number
 ) {
   const existsDegree = degreeId ? await getDegreeById(degreeId) : true;
   if (!existsDegree) {
@@ -89,11 +69,17 @@ export async function getSemesterLectures(
     );
   }
 
+  const existsTeacher = teacherId ? await getTeacherById(teacherId) : true;
+  if (!existsTeacher) {
+    throw new ResourceNotFound('No se encontró el profesor indicado');
+  }
+
   const semester = await semesterRepository.getSemesterLectures(
     semesterId,
     degreeId,
     subjectId,
-    group
+    group,
+    teacherId
   );
   if (!semester) {
     throw new ResourceNotFound('No se encontraron el semestre');

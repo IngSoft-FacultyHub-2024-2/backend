@@ -5,12 +5,13 @@ import inputSemesterSchema from '../../src/controllers/validationSchemas/semeste
 import {
   addLecture,
   addSemester,
-  getSemesterLectures,
-  getSemesters,
-  getSemesterLecturesGroups,
-  updateLecture,
   deleteLecture,
+  getSemesterLectures,
+  getSemesterLecturesGroups,
+  getSemesters,
+  updateLecture,
 } from '../../src/modules/semester';
+import { getRoleById } from '../../src/modules/userManagement';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
 jest.mock('../../src/modules/semester');
@@ -21,6 +22,7 @@ jest.mock(
 jest.mock(
   '../../src/controllers/validationSchemas/semesterSchemas/inputSemesterSchema'
 );
+jest.mock('../../src/modules/userManagement');
 
 describe('SemesterController', () => {
   let mockReq = {} as Request;
@@ -131,16 +133,51 @@ describe('SemesterController', () => {
     expect(addLecture).toHaveBeenCalledWith(mockReq.body);
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
   });
+});
 
-  it('retrieves lectures for a semester successfully', async () => {
+describe('SemesterController.getLectures', () => {
+  let mockReq = {} as any;
+  const mockRes = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as unknown as Response;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('retrieves lectures for a semester successfully as a teacher', async () => {
     const mockLectures = [{ id: 1, name: 'Lecture 1' }];
     mockReq.params = { semesterId: '1' };
     mockReq.query = { degreeId: '2', subjectId: '3', group: 'A' };
+    mockReq.user = { role: 2, teacher_id: 10 }; // Simulamos un usuario con rol de teacher
+
+    const mockTeacherRole = { id: 2, name: 'teacher' };
+    (getRoleById as jest.Mock).mockResolvedValue(mockTeacherRole);
     (getSemesterLectures as jest.Mock).mockResolvedValue(mockLectures);
 
     await SemesterController.getLectures(mockReq, mockRes);
 
-    expect(getSemesterLectures).toHaveBeenCalledWith('1', '2', '3', 'A');
+    expect(getRoleById).toHaveBeenCalledWith(2);
+    expect(getSemesterLectures).toHaveBeenCalledWith('1', '2', '3', 'A', 10);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockLectures);
+  });
+
+  it('retrieves lectures for a semester successfully as a coordinator', async () => {
+    const mockLectures = [{ id: 1, name: 'Lecture 1' }];
+    mockReq.params = { semesterId: '1' };
+    mockReq.query = { degreeId: '2', subjectId: '3', group: 'A' };
+    mockReq.user = { role: 1 }; // Simulamos un usuario con rol de coordinator
+
+    const mockCoordinatorRole = { id: 1, name: 'coordinator' };
+    (getRoleById as jest.Mock).mockResolvedValue(mockCoordinatorRole);
+    (getSemesterLectures as jest.Mock).mockResolvedValue(mockLectures);
+
+    await SemesterController.getLectures(mockReq, mockRes);
+
+    expect(getRoleById).toHaveBeenCalledWith(1);
+    expect(getSemesterLectures).toHaveBeenCalledWith('1', '2', '3', 'A'); // Sin teacher_id
     expect(mockRes.status).toHaveBeenCalledWith(200);
     expect(mockRes.json).toHaveBeenCalledWith(mockLectures);
   });
@@ -149,10 +186,15 @@ describe('SemesterController', () => {
     const mockError = new Error('Failed to retrieve lectures');
     mockReq.params = { semesterId: '1' };
     mockReq.query = { degreeId: '2', subjectId: '3', group: 'A' };
+    mockReq.user = { role: 1 };
+
+    const mockCoordinatorRole = { id: 1, name: 'coordinator' };
+    (getRoleById as jest.Mock).mockResolvedValue(mockCoordinatorRole);
     (getSemesterLectures as jest.Mock).mockRejectedValue(mockError);
 
     await SemesterController.getLectures(mockReq, mockRes);
 
+    expect(getRoleById).toHaveBeenCalledWith(1);
     expect(getSemesterLectures).toHaveBeenCalledWith('1', '2', '3', 'A');
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
   });

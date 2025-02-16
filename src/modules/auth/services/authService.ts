@@ -30,7 +30,9 @@ export async function login(employee_number: number, password: string) {
     }
   );
 
-  return { token, user };
+  const userWithoutPassword = { ...user, password: undefined };
+
+  return { token, user: userWithoutPassword.dataValues };
 }
 
 export function verifyToken(token: string) {

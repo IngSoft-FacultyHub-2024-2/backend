@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { Op, Order, Transaction } from 'sequelize';
 import sequelize from '../../../config/database';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
@@ -13,8 +15,6 @@ import TeacherSubjectGroup from './models/TeacherSubjectGroup';
 import TeacherSubjectGroupMember from './models/TeacherSubjectGroupMember';
 import TeacherSubjectHistory from './models/TeacherSubjectHistory';
 import TeacherSubjectOfInterest from './models/TeacherSubjectOfInterest';
-import fs from 'fs';
-import path from 'path';
 
 class TeacherRepository {
   async addTeacher(teacher: Partial<Teacher>) {
@@ -111,15 +111,15 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -127,11 +127,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
@@ -199,36 +199,27 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
     const riskQuery = risk ? { unsubscribe_risk: risk } : {};
-
-    const subjectInclude = subject_id
-      ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
-      : { model: TeacherSubjectHistory, as: 'subjects_history' };
-    console.log('subjectQuery', subjectInclude);
+    const subjectQuery = subject_id ? { subject_id } : {};
 
     const whereClause = {
       ...searchQuery,
       ...stateQuery,
       ...riskQuery,
     };
-    console.log(whereClause);
+
     return await Teacher.findAndCountAll({
       where: whereClause,
       order: orderOption,
@@ -240,7 +231,12 @@ class TeacherRepository {
         { model: CaesCourse, as: 'caes_courses' },
         { model: Contact, as: 'contacts' },
         { model: Prize, as: 'prizes' },
-        subjectInclude,
+        {
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          required: !!subject_id,
+          where: subjectQuery,
+        },
         { model: TeacherCategory, as: 'categories' },
         { model: TeacherBenefit, as: 'benefits' },
         { model: TeacherAvailableModule, as: 'teacher_available_modules' },
@@ -255,7 +251,7 @@ class TeacherRepository {
   }
 
   async getTeacherById(id: number) {
-    return await Teacher.findByPk(id, {
+    const teacher = await Teacher.findByPk(id, {
       paranoid: false,
       include: [
         { model: CaesCourse, as: 'caes_courses' },
@@ -273,6 +269,9 @@ class TeacherRepository {
         { model: TeacherSubjectOfInterest, as: 'subjects_of_interest' },
       ],
     });
+
+    console.log('teacher', teacher);
+    return teacher;
   }
 
   async getAllTeachersNames() {

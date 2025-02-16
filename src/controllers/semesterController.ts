@@ -7,9 +7,11 @@ import {
   getSemesterLectures,
   getSemesterLecturesGroups,
   getSemesters,
+  LectureResponseDto,
   updateLecture,
   updateSemester,
 } from '../modules/semester';
+import { getRoleById } from '../modules/userManagement';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
 import inputSemesterSchema from './validationSchemas/semesterSchemas/inputSemesterSchema';
@@ -50,7 +52,7 @@ class SemesterController {
     }
   }
 
-  async getSemesters(req: Request, res: Response) {
+  async getSemesters(req: any, res: Response) {
     try {
       const semesters = await getSemesters();
       res.status(200).json(semesters);
@@ -76,14 +78,26 @@ class SemesterController {
 
   async getLectures(req: any, res: Response) {
     try {
+      const role = await getRoleById(req.user.role);
       const semesterId = req.params.semesterId;
       const { degreeId, subjectId, group } = req.query;
-      const semester = await getSemesterLectures(
-        semesterId,
-        degreeId,
-        subjectId,
-        group
-      );
+      let semester: LectureResponseDto[];
+      if (role?.name === 'teacher') {
+        semester = await getSemesterLectures(
+          semesterId,
+          degreeId,
+          subjectId,
+          group,
+          req.user.teacher_id
+        );
+      } else {
+        semester = await getSemesterLectures(
+          semesterId,
+          degreeId,
+          subjectId,
+          group
+        );
+      }
       res.status(200).json(semester);
     } catch (error) {
       console.log(error);

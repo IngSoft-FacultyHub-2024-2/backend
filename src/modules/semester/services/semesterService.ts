@@ -23,6 +23,7 @@ import fs from 'fs';
 import Degree from '../../degree/repositories/models/Degree';
 import { getModules, ModuleResponseDto } from '../../../modules/teacher';
 import { getTimesOfModules } from '../../../shared/utils/modules';
+import path from 'path';
 
 interface LectureAssigned {
   nombreMateria: string;
@@ -409,9 +410,8 @@ export async function getAssignedLecturesCsv(semesterId: number) {
     data.push(...csvString);
     data.push('');
   }
-  console.log('ACA22');
-  console.log(data);
-  writeCsv(data);
+  const filePath = await writeCsv(data);
+  return filePath;
 }
 
 function getSubjectHeader(subject: SubjectResponseDto) {
@@ -432,7 +432,6 @@ function getSubjectHeader(subject: SubjectResponseDto) {
       subjectHeader += ';' + technologyTeacherHeader;
     }
   }
-  console.log(subjectHeader);
   return subjectHeader;
 }
 
@@ -493,7 +492,6 @@ async function getLectureLine(
     );
   }
   const csvLine = `${subject.name}; ${hoursStudentsHave}; ${subject.subject_code}; ${lectureGroups}; ${theoryLectureLine} ${technologyLectureLine}`;
-  console.log(csvLine);
   return csvLine;
 }
 
@@ -617,22 +615,16 @@ async function getRoleLectureLineIsTeoTecAtSameTime(
   }
   return data;
 }
-async function writeCsv(data: (LectureAssigned | string)[]) {
-  const stringLines: string[] = [];
-
-  for (const item of data) {
-    if (typeof item === 'string') {
-      stringLines.push(item);
-    } else {
-      const csvLine = `"${item.nombreMateria}",${item.horasMateria},${item.numeroMateria},"${item.grupo}"`; //,"${item.nombreDocenteTeorico}",${item.numeroDocenteTeorico},${item.horasAsignadasTeorico},"${item.diasHorarioTeorico}","${item.nombreDocenteTec1}",${item.numeroDocenteTec1},${item.horasAsignadasTec1},"${item.diasHorarioTec1}","${item.nombreDocenteTec2}",${item.numeroDocenteTec2},${item.horasAsignadasTec2},"${item.diasHorarioTec2}"`;
-      stringLines.push(csvLine);
-    }
+async function writeCsv(data: string[]) {
+  try {
+    const date = new Date().toISOString().replace(/:/g, '-');
+    // Write structured and raw CSV data
+    const filePath = `./assignedTeachers-${date}.csv`;
+    fs.writeFileSync(filePath, data.join('\n') + '\n', 'utf8');
+    console.log('CSV file for assigned teachers created successfully');
+    const absoluteFilePath = path.resolve(filePath);
+    return absoluteFilePath;
+  } catch (error) {
+    console.error('Error generating CSV file for assigned teachers:', error);
   }
-
-  // Write header manually
-  const header = `"Nombre Materia","Horas Materia","Número Materia","Grupo","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario","Nombre - Apellido Docente","Número de Docente","Horas asignadas al docente","Días y Horario"\n`;
-  console.log('ACA');
-  // Write structured and raw CSV data
-  fs.writeFileSync('output.csv', stringLines.join('\n') + '\n');
-  console.log('CSV file created successfully');
 }

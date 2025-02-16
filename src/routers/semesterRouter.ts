@@ -27,7 +27,7 @@ router.get(
 );
 router.get(
   '/:semesterId/getAssignedLecturesCsv',
-  //authMiddleware,
+  authMiddleware,
   semesterController.getAssignedLecturesCsv
 );
 

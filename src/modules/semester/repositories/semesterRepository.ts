@@ -10,6 +10,7 @@ import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
+import { getSubjectById } from '../../subject';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -75,9 +76,12 @@ class SemesterRepository {
     return await Semester.findByPk(semesterId);
   }
 
-  async addLecture(lecture: Partial<Lecture>) {
+  async addLecture(lecture: Partial<Lecture>, applyValidation = true) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
     try {
+      if (applyValidation) {
+        await this.checkAmountOfHoursOfLectureCorrect(lecture);
+      }
       const newLecture = await Lecture.create(lecture, {
         include: [
           {
@@ -114,6 +118,65 @@ class SemesterRepository {
       // Roll back the transaction if any operation fails
       await transaction.rollback();
       throw error;
+    }
+  }
+
+  async checkAmountOfHoursOfLectureCorrect(lecture: Partial<Lecture>) {
+    if (!lecture.subject_id) {
+      throw new Error('Seleccionar la materia es requerido');
+    }
+    const subject = await getSubjectById(lecture.subject_id);
+    const amountOfWeeksInSemester = 16;
+    if (!subject) {
+      throw new ResourceNotFound(
+        `Subject with ID ${lecture.subject_id} not found`
+      );
+    }
+    const theoryHours = subject.hour_configs
+      ?.filter((config) => config.role === SubjectRoles.THEORY)
+      .reduce((acc, config) => acc + config.total_hours, 0);
+    const technologyHours = subject.hour_configs
+      ?.filter((config) => config.role === SubjectRoles.TECHNOLOGY)
+      .reduce((acc, config) => acc + config.total_hours, 0);
+    if (subject.is_teo_tec_at_same_time) {
+      // TODO: Implement this
+    } else {
+      const theoryLectureHours = lecture.lecture_roles
+        ?.filter((role) => role.role === SubjectRoles.THEORY)[0]
+        .hour_configs.reduce((acc, config) => acc + config.modules.length, 0);
+      const technologyRole = lecture.lecture_roles?.filter(
+        (role) => role.role === SubjectRoles.TECHNOLOGY
+      )[0];
+      let technologyLectureHours = 0;
+      if (technologyRole) {
+        technologyLectureHours = technologyRole.hour_configs.reduce(
+          (acc, config) => acc + config.modules.length,
+          0
+        );
+      }
+
+      if (!theoryHours) {
+        throw new Error('Theory or technology hours not found for subject');
+      }
+      console.log(
+        theoryLectureHours,
+        theoryHours,
+        theoryHours / amountOfWeeksInSemester
+      );
+      if (theoryLectureHours !== theoryHours / amountOfWeeksInSemester) {
+        throw new Error(
+          'El dictado no tiene asignadas la cantidad correcta de horas'
+        );
+      }
+      console.log(technologyLectureHours, technologyHours);
+      if (
+        technologyHours &&
+        technologyLectureHours !== technologyHours / amountOfWeeksInSemester
+      ) {
+        throw new Error(
+          'El dictado no tiene asignadas la cantidad correcta de horas en tecnologia'
+        );
+      }
     }
   }
 

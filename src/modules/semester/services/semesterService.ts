@@ -144,8 +144,11 @@ export async function getSemesterLectures(
   return await Promise.all(lecturesPromises);
 }
 
-export async function addLecture(lecture: Partial<Lecture>) {
-  return await semesterRepository.addLecture(lecture);
+export async function addLecture(
+  lecture: Partial<Lecture>,
+  applyValidation = true
+) {
+  return await semesterRepository.addLecture(lecture, applyValidation);
 }
 
 export async function deleteLecture(lectureId: number) {

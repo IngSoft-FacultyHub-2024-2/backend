@@ -118,7 +118,7 @@ export async function processLectures(
     }
   }
   for (const lecture of result) {
-    await addLecture(lecture as any);
+    await addLecture(lecture as any, false);
   }
 
   return generateResultLectures(result, relevantSubjects);

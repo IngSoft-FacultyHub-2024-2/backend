@@ -57,5 +57,10 @@ router.get(
   authMiddleware,
   semesterController.getAssignedLecturesCsv
 );
+router.patch(
+  '/lectures/:lectureId/teacher-review',
+  authMiddleware,
+  semesterController.teacherReviewLecture
+);
 
 export default router;

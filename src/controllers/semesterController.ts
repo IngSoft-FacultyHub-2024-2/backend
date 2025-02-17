@@ -1,22 +1,24 @@
 import { Request, Response } from 'express';
+import fs from 'fs';
 import {
   addLecture,
   addSemester,
   deleteLecture,
   deleteSemester,
+  getAssignedLecturesCsv,
   getSemesterLectures,
   getSemesterLecturesGroups,
   getSemesters,
   LectureResponseDto,
+  submitTeacherReview,
   updateLecture,
   updateSemester,
-  getAssignedLecturesCsv,
 } from '../modules/semester';
 import { getRoleById } from '../modules/userManagement';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
 import inputSemesterSchema from './validationSchemas/semesterSchemas/inputSemesterSchema';
-import fs from 'fs';
+import inputTeacherReviewLectureSchema from './validationSchemas/semesterSchemas/inputTeacherReviewLectureSchema';
 
 class SemesterController {
   async addSemester(req: Request, res: Response) {
@@ -179,6 +181,27 @@ class SemesterController {
         }
       );
     } catch (error) {
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async teacherReviewLecture(req: any, res: Response) {
+    try {
+      await inputTeacherReviewLectureSchema.validate(req.body);
+      const lectureId = parseInt(req.params.lectureId);
+      const teacherId = req.user.teacher_id;
+      const { approved, reason } = req.body;
+      const lecture = await submitTeacherReview(
+        lectureId,
+        teacherId,
+        approved,
+        reason
+      );
+      res.status(200).json(lecture);
+    } catch (error) {
+      console.log(error);
       if (error instanceof Error) {
         returnError(res, error);
       }

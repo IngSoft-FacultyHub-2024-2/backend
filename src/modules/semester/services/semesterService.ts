@@ -626,11 +626,8 @@ export async function submitTeacherReview(
   if (!existsTeacher) {
     throw new ResourceNotFound('No se encontró el profesor indicado');
   }
-  console.log('reason', reason);
-  console.log('approved', approved);
 
   const reviewData = approved ? 'approved' : reason;
-  console.log('reviewData', reviewData);
 
   return await semesterRepository.submitTeacherReview(
     lectureId,

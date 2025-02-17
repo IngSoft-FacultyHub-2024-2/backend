@@ -81,15 +81,13 @@ describe('processLectures Service', () => {
   it('should process lectures and return them', async () => {
     const sheetName = 'IS-2024';
     (getSemesterById as jest.Mock).mockResolvedValue(mockSemester);
-    (getSubjectNamesByStudyPlan as jest.Mock).mockResolvedValue(mockSubjects);
+    (getAllSubjectNames as jest.Mock).mockResolvedValue(mockSubjects);
 
     const result = await processLectures(mockFileData, mockData, sheetName);
 
     expect(getSemesterById).toHaveBeenCalledWith(mockSemester.id);
     expect(getDegreeByAcronym).toHaveBeenCalledWith('IS');
-    expect(getSubjectNamesByStudyPlan).toHaveBeenCalledWith(
-      mockSemester.study_plan_id
-    );
+    expect(getAllSubjectNames).toHaveBeenCalledWith();
     expect(getModules).toHaveBeenCalled();
     expect(addLecture).toHaveBeenCalledTimes(2); // Asegura que se llamaron las veces correctas
     expect(result).toEqual(mockResult);

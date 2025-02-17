@@ -1,24 +1,28 @@
 import "tsarch/dist/jest";
 
 import { filesOfProject } from "tsarch";
+import path from "path"
 
 describe("architecture", () => {
     jest.setTimeout(60000);
 
   it("controllers should only be placed on controllers folder ", async () => {
+    const folder = path.join(__dirname, "src")
     const rule = filesOfProject()
-      .inFolder("controllers")
+      .inFolder(folder + "/controllers")
       .should()
-      .beInFolder("controllers")
+      .beInFolder(folder + "/controllers")
      await expect(rule).toPassAsync();
   });
 
   it("modules should only depend on other modules", async () => {
+    const configFile = path.resolve('.', 'tsconfig.json');
+    const folderPath = path.dirname(configFile);
     const rule = filesOfProject()
-      .inFolder("modules")
+      .inFolder(folderPath + "/modules")
       .should()
       .dependOnFiles()
-      .inFolder("modules")
+      .inFolder(folderPath + "/modules")
      await expect(rule).toPassAsync();
 
   });

@@ -66,6 +66,12 @@ export class LectureResponseDtoHelper {
           name: teacher.name,
           surname: teacher.surname,
           is_technology_teacher: teacher.is_technology_teacher,
+          review: teacher.review
+            ? {
+                approved: teacher.review === 'approved',
+                reason: teacher.review !== 'approved' ? teacher.review : null,
+              }
+            : null,
         })),
         is_lecture_locked: role.is_lecture_locked,
         hour_configs: role.hour_configs.map((config: any) => ({

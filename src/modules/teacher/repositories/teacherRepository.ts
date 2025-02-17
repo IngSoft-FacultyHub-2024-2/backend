@@ -270,7 +270,6 @@ class TeacherRepository {
       ],
     });
 
-    console.log('teacher', teacher);
     return teacher;
   }
 
@@ -560,7 +559,6 @@ class TeacherRepository {
     teacherData: Partial<Teacher>,
     transaction: Transaction
   ) {
-    console.log('teacherData', teacherData);
     const { teacher_available_modules = [] } = teacherData;
     await TeacherAvailableModule.destroy({
       where: { teacher_id: teacherId },

@@ -8,6 +8,7 @@ import {
   getSemesterLectures,
   getSemesterLecturesGroups,
   getSemesters,
+  submitTeacherReview,
   updateLecture,
 } from '../../src/modules/semester';
 import semesterRepository from '../../src/modules/semester/repositories/semesterRepository';
@@ -286,6 +287,101 @@ describe('Semester Service', () => {
 
       expect(semesterRepository.deleteLecture).toHaveBeenCalledWith(
         mockLectureId
+      );
+    });
+  });
+
+  describe('submitTeacherReview', () => {
+    const mockLectureId = 1;
+    const mockTeacherId = 2;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('debería aprobar la revisión cuando el profesor existe', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockResolvedValue({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: 'approved',
+      });
+
+      const result = await submitTeacherReview(
+        mockLectureId,
+        mockTeacherId,
+        true,
+        null
+      );
+
+      expect(result).toEqual({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: 'approved',
+      });
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        'approved'
+      );
+    });
+
+    it('debería rechazar la revisión cuando el profesor existe y proporciona una razón', async () => {
+      const rejectionReason = 'Falta de información';
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockResolvedValue({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: rejectionReason,
+      });
+
+      const result = await submitTeacherReview(
+        mockLectureId,
+        mockTeacherId,
+        false,
+        rejectionReason
+      );
+
+      expect(result).toEqual({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: rejectionReason,
+      });
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        rejectionReason
+      );
+    });
+
+    it('debería lanzar un error si el profesor no existe', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        submitTeacherReview(mockLectureId, mockTeacherId, true, null)
+      ).rejects.toThrow(ResourceNotFound);
+
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).not.toHaveBeenCalled();
+    });
+
+    it('debería lanzar un error si `semesterRepository.submitTeacherReview` falla', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockRejectedValue(
+        new Error('DB Error')
+      );
+
+      await expect(
+        submitTeacherReview(mockLectureId, mockTeacherId, true, null)
+      ).rejects.toThrow('DB Error');
+
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        'approved'
       );
     });
   });

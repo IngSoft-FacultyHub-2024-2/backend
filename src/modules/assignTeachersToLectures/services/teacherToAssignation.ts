@@ -163,8 +163,7 @@ async function sendAssignation(
 
       // Throw a custom error with detailed information
       throw new Error(
-        `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
-          JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
+        `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {
@@ -235,8 +234,9 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
 }
 
 async function getTeachersLectureConflicts(semesterId: number) {
-  const teachersBusyAtLectureTime: any[] = [];
-  const teachersDoNotKnowSubject: any[] = [];
+  const teachersBusyAtLectureTime: { teacher: TeacherResponseDto, lectureRole: LectureRoleResponseDto, subject: any, hoursConfig: any }[] = [];
+  const teachersDoNotKnowSubject: { teacher: TeacherResponseDto, lectureRole: LectureRoleResponseDto, subject: any }[] = [];
+
   const semesterLectures = await getSemesterLectures(semesterId);
   const teacherTeaching2LectureAtSameTime =
     teachersTeaching2LecturesAtSameTime(semesterLectures);
@@ -255,15 +255,19 @@ async function getTeachersLectureConflicts(semesterId: number) {
     lecture.lecture_roles.forEach((role) => {
       role.teachers.forEach(async (t) => {
         const teacher = teachers[t.id];
-        if (!isTeacherAvailableAtLectureTime(teacher, role)) {
-          teachersBusyAtLectureTime.push(teacher, role);
+        const isTeacherAvailableAtLectureTimeResult = isTeacherAvailableAtLectureTime(
+          teacher,
+          role
+        );
+        if (isTeacherAvailableAtLectureTimeResult.length > 0) {
+          teachersBusyAtLectureTime.push({ teacher: teacher, subject: lecture.subject, lectureRole: role, hoursConfig: isTeacherAvailableAtLectureTimeResult });
         }
         let roleString = role.role;
         if (t.is_technology_teacher) {
           roleString = SubjectRoles.TECHNOLOGY;
         }
         if (!canTeacherTeachLecture(teacher, lecture.subject, roleString)) {
-          teachersDoNotKnowSubject.push(teacher, lecture.subject, role);
+          teachersDoNotKnowSubject.push({ teacher: teacher, subject: lecture.subject, lectureRole: role });
         }
       });
     });
@@ -279,22 +283,26 @@ function isTeacherAvailableAtLectureTime(
   teacher: TeacherResponseDto,
   role: LectureRoleResponseDto
 ) {
-  const isAvailable = role.hour_configs.every((config) => {
-    return config.modules.every((module) => {
+  const notAvailableDates: { day_of_week: string; module_id: number }[] = [];
+
+  role.hour_configs.forEach((config) => {
+    config.modules.forEach((module) => {
       const isModuleAvailable = teacher.teacher_available_modules.some(
-        (teacherModule) => {
-          return (
-            teacherModule.day_of_week === config.day_of_week &&
-            teacherModule.module_id === module
-          );
-        }
+        (teacherModule) =>
+          teacherModule.day_of_week === config.day_of_week &&
+          teacherModule.module_id === module
       );
-      return isModuleAvailable;
+
+      if (!isModuleAvailable) {
+        // Solo agregamos si el módulo NO está disponible
+        notAvailableDates.push({ day_of_week: config.day_of_week, module_id: module });
+      }
     });
   });
 
-  return isAvailable;
+  return notAvailableDates;
 }
+
 
 function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
   return teacher.subjects_history?.map((history) => ({
@@ -322,15 +330,16 @@ function canTeacherTeachLecture(
 
 function teachersTeaching2LecturesAtSameTime(
   semesterLectures: LectureResponseDto[]
-): { teacherId: number; conflictingLectures: LectureResponseDto[] }[] {
+): { teacherName: string; conflictingLectures: { first: LectureResponseDto, second: LectureResponseDto }[] }[] {
+
   const teacherSchedule: Record<
     number,
-    { day: string; modules: Set<number> }[]
+    { day: string; modules: Set<number>; lecture: LectureResponseDto }[]
   > = {};
 
   const conflictingTeachers: {
-    teacherId: number;
-    conflictingLectures: LectureResponseDto[];
+    teacherName: string;
+    conflictingLectures: { first: LectureResponseDto, second: LectureResponseDto, modules: number[], day_of_week: string }[];
   }[] = [];
 
   for (const lecture of semesterLectures) {
@@ -350,10 +359,9 @@ function teachersTeaching2LecturesAtSameTime(
               if (overlappingModules.length > 0) {
                 // Add the teacher and conflicting lecture to the result
                 conflictingTeachers.push({
-                  teacherId: teacher.id,
-                  conflictingLectures: [lecture],
+                  teacherName: teacher.name + ' ' + teacher.surname,
+                  conflictingLectures: [{ first: lecture, second: schedule.lecture, modules: overlappingModules, day_of_week: hourConfig.day_of_week }],
                 });
-                return conflictingTeachers;
               }
             }
           }
@@ -362,11 +370,11 @@ function teachersTeaching2LecturesAtSameTime(
           teacherSchedule[teacher.id].push({
             day: hourConfig.day_of_week,
             modules: new Set(hourConfig.modules),
+            lecture: lecture,
           });
         }
       }
     }
   }
-
-  return conflictingTeachers; // Return the list of teachers with conflicting lectures
+  return conflictingTeachers;
 }

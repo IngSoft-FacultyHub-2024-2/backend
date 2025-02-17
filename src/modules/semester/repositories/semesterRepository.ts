@@ -121,18 +121,19 @@ class SemesterRepository {
     semesterId: number,
     degreeId?: number,
     subjectId?: number,
-    group?: string
+    group?: string,
+    teacherId?: number
   ) {
-    // const groupWhere has group and degreeId
     const groupWhere = group ? { group } : {};
     const degreeWhere = degreeId ? { degree_id: degreeId } : {};
     const subjectWhere = subjectId ? { subject_id: subjectId } : {};
+
     const semester = await Semester.findByPk(semesterId, {
       include: [
         {
           model: Lecture,
           as: 'lectures',
-          required: false,
+          required: !!teacherId,
           where: {
             ...subjectWhere,
           },
@@ -156,7 +157,6 @@ class SemesterRepository {
                 {
                   model: LectureTeacher,
                   as: 'teachers',
-                  required: false,
                 },
               ],
             },
@@ -164,6 +164,14 @@ class SemesterRepository {
         },
       ],
     });
+
+    if (semester && teacherId) {
+      semester.lectures = semester.lectures.filter((lecture: any) =>
+        lecture.lecture_roles.some((role: any) =>
+          role.teachers.some((teacher: any) => teacher.teacher_id === teacherId)
+        )
+      );
+    }
 
     semester?.lectures.forEach((lecture: Lecture) => {
       lecture.lecture_roles = lecture.lecture_roles.map((role: any) =>
@@ -293,6 +301,7 @@ class SemesterRepository {
               lecture_role_id: newRole.id,
               teacher_id: teacher.teacher_id,
               is_technology_teacher: teacher.is_technology_teacher,
+              reason: null,
             }));
             await LectureTeacher.bulkCreate(newTeachers, { transaction });
           }
@@ -558,9 +567,6 @@ class SemesterRepository {
           id: lectureTeacherIds,
         },
       });
-      console.log(
-        `Deleted ${lectureTeacherIds.length} LectureTeacher entries.`
-      );
     } else {
       console.log('No LectureTeacher entries found for the given semester.');
     }
@@ -642,6 +648,46 @@ class SemesterRepository {
       return true;
     }
     return false;
+  }
+
+  async submitTeacherReview(
+    lectureId: number,
+    teacherId: number,
+    review: string | null
+  ) {
+    const lecture = await Lecture.findOne({
+      where: { id: lectureId },
+      include: [
+        {
+          model: LectureRole,
+          as: 'lecture_roles',
+          include: [
+            {
+              model: LectureTeacher,
+              as: 'teachers',
+              where: { teacher_id: teacherId },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!lecture) {
+      throw new ResourceNotFound('El dictado no existe.');
+    }
+
+    const lectureTeacher =
+      lecture.lecture_roles.length > 0 &&
+      lecture.lecture_roles[0].teachers &&
+      lecture.lecture_roles[0].teachers[0];
+
+    if (!lectureTeacher) {
+      throw new ResourceNotFound(
+        `El docente no está asignado al dictado seleccionado.`
+      );
+    }
+
+    return await lectureTeacher.update({ review: review });
   }
 }
 

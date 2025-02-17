@@ -132,51 +132,19 @@ class SemesterRepository {
         `Subject with ID ${lecture.subject_id} not found`
       );
     }
-    const theoryHours = subject.hour_configs
-      ?.filter((config) => config.role === SubjectRoles.THEORY)
-      .reduce((acc, config) => acc + config.total_hours, 0);
-    const technologyHours = subject.hour_configs
-      ?.filter((config) => config.role === SubjectRoles.TECHNOLOGY)
-      .reduce((acc, config) => acc + config.total_hours, 0);
-    if (subject.is_teo_tec_at_same_time) {
-      // TODO: Implement this
-    } else {
-      const theoryLectureHours = lecture.lecture_roles
-        ?.filter((role) => role.role === SubjectRoles.THEORY)[0]
-        .hour_configs.reduce((acc, config) => acc + config.modules.length, 0);
-      const technologyRole = lecture.lecture_roles?.filter(
-        (role) => role.role === SubjectRoles.TECHNOLOGY
-      )[0];
-      let technologyLectureHours = 0;
-      if (technologyRole) {
-        technologyLectureHours = technologyRole.hour_configs.reduce(
-          (acc, config) => acc + config.modules.length,
-          0
-        );
-      }
-
-      if (!theoryHours) {
-        throw new Error('Theory or technology hours not found for subject');
-      }
-      console.log(
-        theoryLectureHours,
-        theoryHours,
-        theoryHours / amountOfWeeksInSemester
+    const weeklyHours = Math.floor(
+      subject.frontal_hours / amountOfWeeksInSemester
+    );
+    const lectureHours = lecture.lecture_roles?.map((role) => {
+      return role.hour_configs.reduce(
+        (acc, config) => acc + config.modules.length,
+        0
       );
-      if (theoryLectureHours !== theoryHours / amountOfWeeksInSemester) {
-        throw new Error(
-          'El dictado no tiene asignadas la cantidad correcta de horas'
-        );
-      }
-      console.log(technologyLectureHours, technologyHours);
-      if (
-        technologyHours &&
-        technologyLectureHours !== technologyHours / amountOfWeeksInSemester
-      ) {
-        throw new Error(
-          'El dictado no tiene asignadas la cantidad correcta de horas en tecnologia'
-        );
-      }
+    }, 0);
+    if (lectureHours || lectureHours !== weeklyHours) {
+      throw new Error(
+        'El dictado no tiene asignadas la cantidad correcta de horas'
+      );
     }
   }
 
@@ -271,6 +239,7 @@ class SemesterRepository {
     lectureData: Partial<Lecture>,
     teachers: TeacherResponseDto[]
   ) {
+    await this.checkAmountOfHoursOfLectureCorrect(lectureData);
     const transaction: Transaction = await Lecture.sequelize!.transaction();
 
     try {

@@ -30,7 +30,14 @@ describe('Semester Service', () => {
     lecture_roles: [],
   };
   const mockDegree = { id: 1, name: 'Computer Science', acronym: 'CS' };
-  const mockSubject = { id: 1, name: 'Software Engineering' };
+  const mockSubject = {
+    id: 1,
+    name: 'Software Engineering',
+    study_plan: {
+      id: 1,
+      year: 2024,
+    },
+  };
   const mockTeacher = { id: 1, name: 'Dr. Smith' };
 
   afterEach(() => {

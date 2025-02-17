@@ -52,5 +52,10 @@ router.get(
   authMiddleware,
   semesterController.getLecturesGroups
 );
+router.get(
+  '/:semesterId/getAssignedLecturesCsv',
+  authMiddleware,
+  semesterController.getAssignedLecturesCsv
+);
 
 export default router;

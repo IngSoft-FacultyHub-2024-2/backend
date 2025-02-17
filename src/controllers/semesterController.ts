@@ -10,11 +10,13 @@ import {
   LectureResponseDto,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 } from '../modules/semester';
 import { getRoleById } from '../modules/userManagement';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputLectureSchema from './validationSchemas/lectureSchemas/inputLectureSchema';
 import inputSemesterSchema from './validationSchemas/semesterSchemas/inputSemesterSchema';
+import fs from 'fs';
 
 class SemesterController {
   async addSemester(req: Request, res: Response) {
@@ -140,6 +142,43 @@ class SemesterController {
       res.status(200).json(lecture);
     } catch (error) {
       console.log(error);
+      if (error instanceof Error) {
+        returnError(res, error);
+      }
+    }
+  }
+
+  async getAssignedLecturesCsv(req: Request, res: Response) {
+    try {
+      const assignedTeacherFilePath = await getAssignedLecturesCsv(
+        parseInt(req.params.semesterId)
+      );
+      if (!assignedTeacherFilePath) {
+        return res.status(404).json({
+          message: 'Hubo un problema al generar el archivo de assignación',
+        });
+      }
+      res.download(
+        assignedTeacherFilePath,
+        'profesoresAsignados.csv',
+        (err) => {
+          if (err) {
+            console.error('Error sending file:', err);
+            res
+              .status(500)
+              .json({ message: 'Hubo un problema al enviar el archivo' });
+          } else {
+            fs.unlink(assignedTeacherFilePath, (unlinkErr) => {
+              if (unlinkErr) {
+                console.error('Error deleting file:', unlinkErr);
+              } else {
+                console.log('File deleted successfully');
+              }
+            });
+          }
+        }
+      );
+    } catch (error) {
       if (error instanceof Error) {
         returnError(res, error);
       }

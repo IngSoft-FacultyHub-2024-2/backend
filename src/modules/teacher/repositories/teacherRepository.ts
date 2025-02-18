@@ -111,15 +111,15 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${search}%` } },
-            { surname: { [Op.iLike]: `%${search}%` } },
-            sequelize.where(
-              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-          ],
-        }
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -127,11 +127,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-          model: TeacherSubjectHistory,
-          as: 'subjects_history',
-          where: { subject_id },
-          required: true,
-        }
+        model: TeacherSubjectHistory,
+        as: 'subjects_history',
+        where: { subject_id },
+        required: true,
+      }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
@@ -199,15 +199,15 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-          [Op.or]: [
-            { name: { [Op.iLike]: `%${search}%` } },
-            { surname: { [Op.iLike]: `%${search}%` } },
-            sequelize.where(
-              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-              { [Op.iLike]: `%${search}%` }
-            ),
-          ],
-        }
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { surname: { [Op.iLike]: `%${search}%` } },
+          sequelize.where(
+            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+            { [Op.iLike]: `%${search}%` }
+          ),
+        ],
+      }
       : {};
 
     const stateQuery = state ? { state } : {};

@@ -135,15 +135,17 @@ class SemesterRepository {
     const weeklyHours = Math.floor(
       subject.frontal_hours / amountOfWeeksInSemester
     );
-    const lectureHours = lecture.lecture_roles?.map((role) => {
-      return role.hour_configs.reduce(
-        (acc, config) => acc + config.modules.length,
-        0
-      );
-    }, 0);
-    if (lectureHours || lectureHours !== weeklyHours) {
+    const lectureHours = lecture.lecture_roles?.reduce(
+      (acc_role, role) =>
+        acc_role +
+        role.hour_configs.reduce((acc, config) => {
+          return acc + config.modules.length;
+        }, 0),
+      0
+    );
+    if (!lectureHours || lectureHours !== weeklyHours) {
       throw new Error(
-        'El dictado no tiene asignadas la cantidad correcta de horas'
+        `La materia ${subject.name} tiene ${weeklyHours} horas semanales y a este dictado se estan asignando ${lectureHours} horas`
       );
     }
   }

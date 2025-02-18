@@ -128,7 +128,8 @@ describe('processLectures Service', () => {
         lecture_roles: expect.arrayContaining([
           expect.objectContaining({ role: SubjectRoles.THEORY }),
         ]),
-      })
+      }),
+      false
     );
   });
 

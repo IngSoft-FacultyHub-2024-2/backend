@@ -186,8 +186,6 @@ class SemesterController {
       }
     }
   }
-<<<<<<< HEAD
-=======
 
   async teacherReviewLecture(req: any, res: Response) {
     try {
@@ -209,7 +207,6 @@ class SemesterController {
       }
     }
   }
->>>>>>> 72da67e815e80e05685c66cfd6994749c5350bf3
 }
 
 export default new SemesterController();

@@ -1,10 +1,14 @@
+import fs from 'fs';
+import path from 'path';
+import { getModules, ModuleResponseDto } from '../../../modules/teacher';
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import {
   translateWeekDayToEnglish,
   weekDaysComparator,
 } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
-import { getDegreeById, getDegrees } from '../../degree';
+import { getTimesOfModules } from '../../../shared/utils/modules';
+import { getDegreeById, getDegrees, Degree } from '../../degree';
 import {
   amountOfTeachersPerSubject,
   getSubjectById,
@@ -18,11 +22,6 @@ import Lecture from '../repositories/models/Lecture';
 import LectureRole from '../repositories/models/LectureRole';
 import Semester from '../repositories/models/Semester';
 import semesterRepository from '../repositories/semesterRepository';
-import fs from 'fs';
-import Degree from '../../degree/repositories/models/Degree';
-import { getModules, ModuleResponseDto } from '../../../modules/teacher';
-import { getTimesOfModules } from '../../../shared/utils/modules';
-import path from 'path';
 
 export async function addSemester(semester: Partial<Semester>) {
   return await semesterRepository.addSemster(semester);
@@ -120,6 +119,7 @@ export async function getSemesterLectures(
         return {
           ...teacherData,
           is_technology_teacher: teacher.is_technology_teacher,
+          review: teacher.review,
         };
       });
 
@@ -616,4 +616,24 @@ async function writeCsv(data: string[]) {
   } catch (error) {
     console.error('Error generating CSV file for assigned teachers:', error);
   }
+}
+
+export async function submitTeacherReview(
+  lectureId: number,
+  teacherId: number,
+  approved: boolean,
+  reason: string | null
+) {
+  const existsTeacher = await getTeacherById(teacherId);
+  if (!existsTeacher) {
+    throw new ResourceNotFound('No se encontró el profesor indicado');
+  }
+
+  const reviewData = approved ? 'approved' : reason;
+
+  return await semesterRepository.submitTeacherReview(
+    lectureId,
+    teacherId,
+    reviewData
+  );
 }

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import SemesterController from '../../src/controllers/semesterController';
 import inputLectureSchema from '../../src/controllers/validationSchemas/lectureSchemas/inputLectureSchema';
 import inputSemesterSchema from '../../src/controllers/validationSchemas/semesterSchemas/inputSemesterSchema';
+import inputTeacherReviewLectureSchema from '../../src/controllers/validationSchemas/semesterSchemas/inputTeacherReviewLectureSchema';
 import {
   addLecture,
   addSemester,
@@ -9,6 +10,7 @@ import {
   getSemesterLectures,
   getSemesterLecturesGroups,
   getSemesters,
+  submitTeacherReview,
   updateLecture,
 } from '../../src/modules/semester';
 import { getRoleById } from '../../src/modules/userManagement';
@@ -21,6 +23,9 @@ jest.mock(
 );
 jest.mock(
   '../../src/controllers/validationSchemas/semesterSchemas/inputSemesterSchema'
+);
+jest.mock(
+  '../../src/controllers/validationSchemas/semesterSchemas/inputTeacherReviewLectureSchema'
 );
 jest.mock('../../src/modules/userManagement');
 
@@ -337,5 +342,79 @@ describe('deleteLecture', () => {
 
     expect(deleteLecture).toHaveBeenCalledWith(1);
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
+  });
+});
+
+describe('SemesterController.teacherReviewLecture', () => {
+  let mockRequest: any;
+  let mockResponse: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockRequest = {
+      params: { lectureId: '1' },
+      user: { teacher_id: 10 },
+      body: { approved: true, reason: 'Valid reason' },
+    };
+
+    mockResponse = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it('debería aprobar o rechazar una revisión de clase correctamente', async () => {
+    (inputTeacherReviewLectureSchema.validate as jest.Mock).mockResolvedValue(
+      true
+    );
+    (submitTeacherReview as jest.Mock).mockResolvedValue({ success: true });
+
+    // await request(app).post('/teacher/review/1').send(mockRequest.body);
+    await SemesterController.teacherReviewLecture(
+      mockRequest as Request,
+      mockResponse as Response
+    );
+
+    expect(inputTeacherReviewLectureSchema.validate).toHaveBeenCalledWith(
+      mockRequest.body
+    );
+    expect(submitTeacherReview).toHaveBeenCalledWith(
+      1,
+      10,
+      true,
+      'Valid reason'
+    );
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith({ success: true });
+  });
+
+  it('debería manejar errores de validación', async () => {
+    const validationError = new Error('Validation failed');
+    (inputTeacherReviewLectureSchema.validate as jest.Mock).mockRejectedValue(
+      validationError
+    );
+
+    await SemesterController.teacherReviewLecture(
+      mockRequest as Request,
+      mockResponse as Response
+    );
+
+    expect(returnError).toHaveBeenCalledWith(mockResponse, validationError);
+  });
+
+  it('debería manejar errores internos', async () => {
+    const internalError = new Error('Internal Server Error');
+    (inputTeacherReviewLectureSchema.validate as jest.Mock).mockResolvedValue(
+      true
+    );
+    (submitTeacherReview as jest.Mock).mockRejectedValue(internalError);
+
+    await SemesterController.teacherReviewLecture(
+      mockRequest as Request,
+      mockResponse as Response
+    );
+
+    expect(returnError).toHaveBeenCalledWith(mockResponse, internalError);
   });
 });

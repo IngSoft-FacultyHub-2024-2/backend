@@ -454,7 +454,7 @@ class SemesterRepository {
                 for (const existingHourConfig of existingHoursConfig) {
                   if (
                     newHourConfig.day_of_week ==
-                      existingHourConfig.day_of_week &&
+                    existingHourConfig.day_of_week &&
                     newHourConfig.modules.some((module) =>
                       existingHourConfig.modules.includes(module)
                     )

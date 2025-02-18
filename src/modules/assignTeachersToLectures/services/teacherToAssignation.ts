@@ -255,12 +255,12 @@ async function getTeachersLectureConflicts(semesterId: number) {
     lecture.lecture_roles.forEach((role) => {
       role.teachers.forEach(async (t) => {
         const teacher = teachers[t.id];
-        const isTeacherAvailableAtLectureTimeResult = isTeacherAvailableAtLectureTime(
+        const modulesWhenBusy = busyTeacherModulesAtLectureTime(
           teacher,
           role
         );
-        if (isTeacherAvailableAtLectureTimeResult.length > 0) {
-          teachersBusyAtLectureTime.push({ teacher: teacher, subject: lecture.subject, lectureRole: role, hoursConfig: isTeacherAvailableAtLectureTimeResult });
+        if (modulesWhenBusy.length > 0) {
+          teachersBusyAtLectureTime.push({ teacher: teacher, subject: lecture.subject, lectureRole: role, hoursConfig: modulesWhenBusy });
         }
         let roleString = role.role;
         if (t.is_technology_teacher) {
@@ -279,7 +279,7 @@ async function getTeachersLectureConflicts(semesterId: number) {
   };
 }
 
-function isTeacherAvailableAtLectureTime(
+function busyTeacherModulesAtLectureTime(
   teacher: TeacherResponseDto,
   role: LectureRoleResponseDto
 ) {

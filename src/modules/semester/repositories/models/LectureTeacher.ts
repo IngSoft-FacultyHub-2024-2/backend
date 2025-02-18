@@ -7,6 +7,7 @@ class LectureTeacher extends Model {
   public lecture_role_id!: number;
   public teacher_id!: number;
   public is_technology_teacher!: boolean;
+  public review!: string;
 
   public static associations: {
     lecture_role: BelongsTo<LectureTeacher, LectureRole>;
@@ -39,6 +40,10 @@ LectureTeacher.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
+    },
+    review: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

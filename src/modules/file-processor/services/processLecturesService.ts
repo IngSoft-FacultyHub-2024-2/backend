@@ -6,7 +6,8 @@ import {
   getSemesterById,
   getSemesterLectures,
 } from '../../semester';
-import { getAllSubjectNames, getSubjectNamesByStudyPlan } from '../../subject';
+import { getAllSubjectNames } from '../../subject';
+import Subject from '../../subject/repositories/models/Subject';
 import { getModules } from '../../teacher';
 import { FileDataDto } from '../dtos/FileDataDto';
 import { LectureDto } from '../dtos/LecturesReturnDto';
@@ -79,9 +80,10 @@ export async function processLectures(
   const result: SemesterLectures[] = [];
   let currentGroup = '';
 
-  const relevantSubjects = semester.study_plan_id
-    ? await getSubjectNamesByStudyPlan(semester.study_plan_id)
-    : await getAllSubjectNames();
+  const subjectNames = await getAllSubjectNames();
+  const relevantSubjects: Subject[] = [];
+
+  console.log('subjectNames', subjectNames);
 
   const modules = await getModules();
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
@@ -98,11 +100,17 @@ export async function processLectures(
       if (!module) continue;
       for (let j = 1; j <= days.length; j++) {
         const subject = normalizeString(row[j] || '').toUpperCase();
-        const matchingSubject = relevantSubjects.find((subj) =>
+        const matchingSubject = subjectNames.find((subj) =>
           normalizeString(subject).includes(normalizeString(subj.name))
         );
 
         if (matchingSubject) {
+          if (
+            !relevantSubjects.find((subj) => subj.id === matchingSubject.id)
+          ) {
+            relevantSubjects.push(matchingSubject);
+          }
+
           updateLecture(
             result,
             fileData,
@@ -120,6 +128,7 @@ export async function processLectures(
   for (const lecture of result) {
     await addLecture(lecture as any);
   }
+  console.log('relevantSubjects', relevantSubjects);
 
   return generateResultLectures(result, relevantSubjects);
 }

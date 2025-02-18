@@ -12,8 +12,10 @@ import {
   getSemesterLecturesToAssign,
   getSemesters,
   setTeacherToLecture,
+  submitTeacherReview,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 } from './services/semesterService';
 
 import {
@@ -37,6 +39,8 @@ export {
   LectureResponseDto,
   LectureRoleResponseDto,
   setTeacherToLecture,
+  submitTeacherReview,
   updateLecture,
   updateSemester,
+  getAssignedLecturesCsv,
 };

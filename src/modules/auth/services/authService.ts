@@ -9,16 +9,30 @@ export async function login(employee_number: number, password: string) {
     throw new Error('Credenciales inválidas');
   }
 
+  if (!user.is_active) {
+    throw new Error('Usuario inactivo');
+  }
+
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
     throw new Error('Credenciales inválidas');
   }
 
-  const token = jwt.sign({ id: user.id, role: user.role_id }, SECRET_KEY, {
-    expiresIn: '24h', // Expira en 1 hora
-  });
+  const token = jwt.sign(
+    {
+      id: user.id,
+      role: user.role_id,
+      teacher_id: user.teacher_id,
+    },
+    SECRET_KEY,
+    {
+      expiresIn: '24h', // Expira en 1 hora
+    }
+  );
 
-  return { token, user };
+  const userWithoutPassword = { ...user, password: undefined };
+
+  return { token, user: userWithoutPassword.dataValues };
 }
 
 export function verifyToken(token: string) {

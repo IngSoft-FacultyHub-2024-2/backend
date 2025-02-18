@@ -1,8 +1,17 @@
 // tests/semesterService.test.ts
 
 import { getDegreeById } from '../../src/modules/degree';
+import {
+  addLecture,
+  addSemester,
+  deleteLecture,
+  getSemesterLectures,
+  getSemesterLecturesGroups,
+  getSemesters,
+  submitTeacherReview,
+  updateLecture,
+} from '../../src/modules/semester';
 import semesterRepository from '../../src/modules/semester/repositories/semesterRepository';
-import * as semesterService from '../../src/modules/semester/services/semesterService';
 import { getSubjectById } from '../../src/modules/subject';
 import { getTeacherById } from '../../src/modules/teacher';
 import { ResourceNotFound } from '../../src/shared/utils/exceptions/customExceptions';
@@ -22,7 +31,14 @@ describe('Semester Service', () => {
     lecture_roles: [],
   };
   const mockDegree = { id: 1, name: 'Computer Science', acronym: 'CS' };
-  const mockSubject = { id: 1, name: 'Software Engineering' };
+  const mockSubject = {
+    id: 1,
+    name: 'Software Engineering',
+    study_plan: {
+      id: 1,
+      year: 2024,
+    },
+  };
   const mockTeacher = { id: 1, name: 'Dr. Smith' };
 
   afterEach(() => {
@@ -35,7 +51,7 @@ describe('Semester Service', () => {
         mockSemester
       );
 
-      const result = await semesterService.addSemester(mockSemester);
+      const result = await addSemester(mockSemester);
 
       expect(semesterRepository.addSemster).toHaveBeenCalledWith(mockSemester);
       expect(result).toEqual(mockSemester);
@@ -48,7 +64,7 @@ describe('Semester Service', () => {
         mockSemester,
       ]);
 
-      const result = await semesterService.getSemesters();
+      const result = await getSemesters();
 
       expect(semesterRepository.getSemesters).toHaveBeenCalled();
       expect(result).toEqual([mockSemester]);
@@ -59,7 +75,7 @@ describe('Semester Service', () => {
     it('should throw ResourceNotFound if degree does not exist', async () => {
       (getDegreeById as jest.Mock).mockResolvedValue(null);
 
-      await expect(semesterService.getSemesterLectures(1, 999)).rejects.toThrow(
+      await expect(getSemesterLectures(1, 999)).rejects.toThrow(
         ResourceNotFound
       );
 
@@ -70,9 +86,9 @@ describe('Semester Service', () => {
       (getDegreeById as jest.Mock).mockResolvedValue(mockDegree);
       (getSubjectById as jest.Mock).mockResolvedValue(null);
 
-      await expect(
-        semesterService.getSemesterLectures(1, 1, 999)
-      ).rejects.toThrow(ResourceNotFound);
+      await expect(getSemesterLectures(1, 1, 999)).rejects.toThrow(
+        ResourceNotFound
+      );
 
       expect(getSubjectById).toHaveBeenCalledWith(999);
     });
@@ -84,14 +100,15 @@ describe('Semester Service', () => {
         null
       );
 
-      await expect(
-        semesterService.getSemesterLectures(1, 1, 1)
-      ).rejects.toThrow(ResourceNotFound);
+      await expect(getSemesterLectures(1, 1, 1)).rejects.toThrow(
+        ResourceNotFound
+      );
 
       expect(semesterRepository.getSemesterLectures).toHaveBeenCalledWith(
         1,
         1,
         1,
+        undefined,
         undefined
       );
     });
@@ -105,15 +122,16 @@ describe('Semester Service', () => {
         lectures: [mockLecture],
       });
 
-      const result = await semesterService.getSemesterLectures(1);
+      const result = await getSemesterLectures(1);
 
       expect(semesterRepository.getSemesterLectures).toHaveBeenCalledWith(
         1,
         undefined,
         undefined,
+        undefined,
         undefined
       );
-      expect(result).toBeInstanceOf(Array); // Verifica que el resultado sea un array de objetos LectureResponseDto
+      expect(result).toBeInstanceOf(Array);
     });
   });
 
@@ -123,7 +141,7 @@ describe('Semester Service', () => {
         mockLecture
       );
 
-      const result = await semesterService.addLecture(mockLecture);
+      const result = await addLecture(mockLecture);
 
       expect(semesterRepository.addLecture).toHaveBeenCalledWith(mockLecture);
       expect(result).toEqual(mockLecture);
@@ -148,7 +166,7 @@ describe('Semester Service', () => {
         semesterRepository.getSemesterLecturesGroups as jest.Mock
       ).mockResolvedValue(mockLectureGroups);
 
-      const result = await semesterService.getSemesterLecturesGroups(
+      const result = await getSemesterLecturesGroups(
         mockSemesterId,
         mockDegreeId
       );
@@ -166,8 +184,7 @@ describe('Semester Service', () => {
         semesterRepository.getSemesterLecturesGroups as jest.Mock
       ).mockResolvedValue(mockLectureGroups);
 
-      const result =
-        await semesterService.getSemesterLecturesGroups(mockSemesterId);
+      const result = await getSemesterLecturesGroups(mockSemesterId);
 
       expect(getDegreeById).not.toHaveBeenCalled();
       expect(semesterRepository.getSemesterLecturesGroups).toHaveBeenCalledWith(
@@ -181,7 +198,7 @@ describe('Semester Service', () => {
       (getDegreeById as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        semesterService.getSemesterLecturesGroups(mockSemesterId, mockDegreeId)
+        getSemesterLecturesGroups(mockSemesterId, mockDegreeId)
       ).rejects.toThrow(
         new ResourceNotFound('No se encontró la carrera por la que se filtró')
       );
@@ -214,10 +231,7 @@ describe('Semester Service', () => {
         mockUpdatedLecture
       );
 
-      const result = await semesterService.updateLecture(
-        mockLectureId,
-        mockLectureData,
-      );
+      const result = await updateLecture(mockLectureId, mockLectureData);
 
       expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
         mockLectureId,
@@ -234,7 +248,7 @@ describe('Semester Service', () => {
       );
 
       await expect(
-        semesterService.updateLecture(mockLectureId, mockLectureData)
+        updateLecture(mockLectureId, mockLectureData)
       ).rejects.toThrow(mockError);
 
       expect(semesterRepository.updateLecture).toHaveBeenCalledWith(
@@ -255,7 +269,7 @@ describe('Semester Service', () => {
     it('should call semesterRepository.deleteLecture with the correct parameters', async () => {
       (semesterRepository.deleteLecture as jest.Mock).mockResolvedValue(true);
 
-      const result = await semesterService.deleteLecture(mockLectureId);
+      const result = await deleteLecture(mockLectureId);
 
       expect(semesterRepository.deleteLecture).toHaveBeenCalledWith(
         mockLectureId
@@ -269,12 +283,105 @@ describe('Semester Service', () => {
         mockError
       );
 
-      await expect(
-        semesterService.deleteLecture(mockLectureId)
-      ).rejects.toThrow(mockError);
+      await expect(deleteLecture(mockLectureId)).rejects.toThrow(mockError);
 
       expect(semesterRepository.deleteLecture).toHaveBeenCalledWith(
         mockLectureId
+      );
+    });
+  });
+
+  describe('submitTeacherReview', () => {
+    const mockLectureId = 1;
+    const mockTeacherId = 2;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('debería aprobar la revisión cuando el profesor existe', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockResolvedValue({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: 'approved',
+      });
+
+      const result = await submitTeacherReview(
+        mockLectureId,
+        mockTeacherId,
+        true,
+        null
+      );
+
+      expect(result).toEqual({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: 'approved',
+      });
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        'approved'
+      );
+    });
+
+    it('debería rechazar la revisión cuando el profesor existe y proporciona una razón', async () => {
+      const rejectionReason = 'Falta de información';
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockResolvedValue({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: rejectionReason,
+      });
+
+      const result = await submitTeacherReview(
+        mockLectureId,
+        mockTeacherId,
+        false,
+        rejectionReason
+      );
+
+      expect(result).toEqual({
+        lectureId: mockLectureId,
+        teacherId: mockTeacherId,
+        reviewData: rejectionReason,
+      });
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        rejectionReason
+      );
+    });
+
+    it('debería lanzar un error si el profesor no existe', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        submitTeacherReview(mockLectureId, mockTeacherId, true, null)
+      ).rejects.toThrow(ResourceNotFound);
+
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).not.toHaveBeenCalled();
+    });
+
+    it('debería lanzar un error si `semesterRepository.submitTeacherReview` falla', async () => {
+      (getTeacherById as jest.Mock).mockResolvedValue({ id: mockTeacherId });
+      (semesterRepository.submitTeacherReview as jest.Mock).mockRejectedValue(
+        new Error('DB Error')
+      );
+
+      await expect(
+        submitTeacherReview(mockLectureId, mockTeacherId, true, null)
+      ).rejects.toThrow('DB Error');
+
+      expect(getTeacherById).toHaveBeenCalledWith(mockTeacherId);
+      expect(semesterRepository.submitTeacherReview).toHaveBeenCalledWith(
+        mockLectureId,
+        mockTeacherId,
+        'approved'
       );
     });
   });

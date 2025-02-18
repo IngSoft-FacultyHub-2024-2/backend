@@ -90,6 +90,7 @@ export async function getTeacherById(
     throw new ResourceNotFound(`El docente con ID ${id} no existe`);
   }
   let teacherDto: TeacherResponseDto;
+
   if (includeOtherInfo) {
     let subjectsHistory: TeacherSubjectHistoryResponseDto[] = await Promise.all(
       teacher.subjects_history.map(async (subjectsHistory) =>

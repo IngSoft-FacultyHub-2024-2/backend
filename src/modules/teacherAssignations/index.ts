@@ -1,6 +1,6 @@
 import {
   assignTeachersToSemesterLectures,
   getAssignationsConflicts,
-} from './services/teacherAssignatios';
+} from './services/teacherAssignationsService';
 
 export { assignTeachersToSemesterLectures, getAssignationsConflicts };

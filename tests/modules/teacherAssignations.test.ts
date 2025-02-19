@@ -1,12 +1,12 @@
-import { getAssignationsConflicts } from '../../src/modules/assignTeachersToLectures';
 import {
   getSemesterLectures,
   getSemesterLecturesToAssign,
 } from '../../src/modules/semester';
 import {
-  getTeachersToAssignLectures,
   getTeacherById,
+  getTeachersToAssignLectures,
 } from '../../src/modules/teacher';
+import { getAssignationsConflicts } from '../../src/modules/teacherAssignations';
 
 // Mock the dependency functions
 jest.mock('../../src/modules/semester', () => ({
@@ -62,9 +62,13 @@ describe('getAssignationsConflicts', () => {
       },
     ];
 
-    (getTeachersToAssignLectures as jest.Mock).mockResolvedValue(teachersToAssign);
+    (getTeachersToAssignLectures as jest.Mock).mockResolvedValue(
+      teachersToAssign
+    );
     (getSemesterLectures as jest.Mock).mockResolvedValue(semesterLectures);
-    (getSemesterLecturesToAssign as jest.Mock).mockResolvedValue(lecturesToAssign);
+    (getSemesterLecturesToAssign as jest.Mock).mockResolvedValue(
+      lecturesToAssign
+    );
     (getTeacherById as jest.Mock).mockImplementation((id) =>
       teachersToAssign.find((t) => t.id === id)
     );
@@ -135,9 +139,13 @@ describe('getAssignationsConflicts', () => {
   });
 
   it('should throw an error if a dependency fails', async () => {
-    (getTeachersToAssignLectures as jest.Mock).mockRejectedValue(new Error('Failed to fetch teachers'));
+    (getTeachersToAssignLectures as jest.Mock).mockRejectedValue(
+      new Error('Failed to fetch teachers')
+    );
 
-    await expect(getAssignationsConflicts(mockSemesterId)).rejects.toThrow('Failed to fetch teachers');
+    await expect(getAssignationsConflicts(mockSemesterId)).rejects.toThrow(
+      'Failed to fetch teachers'
+    );
 
     expect(getTeachersToAssignLectures).toHaveBeenCalledTimes(1);
     expect(getSemesterLectures).not.toHaveBeenCalled();

@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import {
   assignTeachersToSemesterLectures,
   getAssignationsConflicts,
-} from '../modules/teacherAssignatios';
+} from '../modules/teacherAssignations';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 
-class teacherAssignatiosController {
+class TeacherAssignationsController {
   async assignTeachersToSemesterLectures(req: Request, res: Response) {
     try {
       const { semesterId } = req.body;
@@ -39,4 +39,4 @@ class teacherAssignatiosController {
   }
 }
 
-export default new teacherAssignatiosController();
+export default new TeacherAssignationsController();

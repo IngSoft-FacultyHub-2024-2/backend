@@ -270,22 +270,6 @@ async function getTeachersLectureConflicts(semesterId: number) {
     }
   }
   semesterLectures.forEach((lecture) => {
-    // const isRejected = lecture.lecture_roles.some((role) => {
-    //   return role.teachers.some((t) => t.review?.approved === false);
-    // });
-
-    // if (isRejected) {
-    //   lecture.lecture_roles.forEach((role) => {
-    //     role.teachers.forEach(async (t) => {
-    //       const teacher = teachers[t.id];
-    //       teachersRejectedLectures.push({
-    //         teacher: teacher,
-    //         lectureGroups: lecture.lecture_groups,
-    //         subject: lecture.subject,
-    //       });
-    //     });
-    //   });
-    // }
     lecture.lecture_roles.forEach((role) => {
       role.teachers.forEach(async (t) => {
         const teacher = teachers[t.id];

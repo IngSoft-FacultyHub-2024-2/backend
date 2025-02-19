@@ -1,20 +1,18 @@
+import { Request, Response } from 'express';
 import {
   assignTeachersToSemesterLectures,
   getAssignationsConflicts,
-} from '../modules/assignTeachersToLectures';
-import { Response, Request } from 'express';
+} from '../modules/teacherAssignatios';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 
-class AssignTeachersToLecturesController {
+class teacherAssignatiosController {
   async assignTeachersToSemesterLectures(req: Request, res: Response) {
     try {
       const { semesterId } = req.body;
       if (!semesterId || isNaN(Number(semesterId))) {
         throw new Error('El semetreId es invalido');
       }
-      const result = await assignTeachersToSemesterLectures(
-        semesterId
-      );
+      const result = await assignTeachersToSemesterLectures(semesterId);
       res.status(200).json(result);
     } catch (error) {
       if (error instanceof Error) {
@@ -41,4 +39,4 @@ class AssignTeachersToLecturesController {
   }
 }
 
-export default new AssignTeachersToLecturesController();
+export default new teacherAssignatiosController();

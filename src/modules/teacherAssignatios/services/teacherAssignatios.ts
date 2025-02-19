@@ -1,23 +1,25 @@
 import axios from 'axios';
+import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import {
-  getSemesterLecturesToAssign,
-  setTeacherToLecture,
-  getSemesterLectures,
   deleteTeachersAssignations,
-  LectureRoleResponseDto,
-  LectureResponseDto,
+  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
   getPreassignedTeachers,
+  getSemesterLectures,
+  getSemesterLecturesToAssign,
+  LectureResponseDto,
+  LectureRoleResponseDto,
+  setTeacherToLecture,
 } from '../../semester';
+import { LectureGroupResponseDto } from '../../semester/dtos/response/lectureResponseDto';
 import {
+  getModules,
   getTeacherById,
   getTeachersToAssignLectures,
+  ModuleResponseDto,
   TeacherResponseDto,
 } from '../../teacher';
-import { TeacherToAssign } from '../models/teacherToAssign';
 import { LectureToAssign } from '../models/lectureToAssign';
-import { getModules, ModuleResponseDto } from '../../../modules/teacher';
-import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
-import { getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime } from '../../semester';
+import { TeacherToAssign } from '../models/teacherToAssign';
 
 interface AssignPayload {
   teachers: { [key: string]: TeacherToAssign };
@@ -163,7 +165,8 @@ async function sendAssignation(
 
       // Throw a custom error with detailed information
       throw new Error(
-        `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
+        `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
+          JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {
@@ -183,6 +186,7 @@ export async function getAssignationsConflicts(semesterId: number) {
     await getUnassignedLecturesRolesIds(semesterId);
   const teachersLectureConflicts =
     await getTeachersLectureConflicts(semesterId);
+  console.log(teachersLectureConflicts);
   return {
     ...teachersLectureConflicts,
     unassignedTeachers: unassignedTeachers,
@@ -234,8 +238,22 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
 }
 
 async function getTeachersLectureConflicts(semesterId: number) {
-  const teachersBusyAtLectureTime: { teacher: TeacherResponseDto, lectureRole: LectureRoleResponseDto, subject: any, hoursConfig: any }[] = [];
-  const teachersDoNotKnowSubject: { teacher: TeacherResponseDto, lectureRole: LectureRoleResponseDto, subject: any }[] = [];
+  const teachersBusyAtLectureTime: {
+    teacher: TeacherResponseDto;
+    lectureRole: LectureRoleResponseDto;
+    subject: any;
+    hoursConfig: any;
+  }[] = [];
+  const teachersDoNotKnowSubject: {
+    teacher: TeacherResponseDto;
+    lectureRole: LectureRoleResponseDto;
+    subject: any;
+  }[] = [];
+  const teachersRejectedLectures: {
+    teacher: TeacherResponseDto;
+    lectureGroups: LectureGroupResponseDto[];
+    subject: any;
+  }[] = [];
 
   const semesterLectures = await getSemesterLectures(semesterId);
   const teacherTeaching2LectureAtSameTime =
@@ -252,22 +270,64 @@ async function getTeachersLectureConflicts(semesterId: number) {
     }
   }
   semesterLectures.forEach((lecture) => {
+    // const isRejected = lecture.lecture_roles.some((role) => {
+    //   return role.teachers.some((t) => t.review?.approved === false);
+    // });
+
+    // if (isRejected) {
+    //   lecture.lecture_roles.forEach((role) => {
+    //     role.teachers.forEach(async (t) => {
+    //       const teacher = teachers[t.id];
+    //       teachersRejectedLectures.push({
+    //         teacher: teacher,
+    //         lectureGroups: lecture.lecture_groups,
+    //         subject: lecture.subject,
+    //       });
+    //     });
+    //   });
+    // }
     lecture.lecture_roles.forEach((role) => {
       role.teachers.forEach(async (t) => {
         const teacher = teachers[t.id];
-        const modulesWhenBusy = busyTeacherModulesAtLectureTime(
-          teacher,
-          role
-        );
+        const modulesWhenBusy = busyTeacherModulesAtLectureTime(teacher, role);
         if (modulesWhenBusy.length > 0) {
-          teachersBusyAtLectureTime.push({ teacher: teacher, subject: lecture.subject, lectureRole: role, hoursConfig: modulesWhenBusy });
+          teachersBusyAtLectureTime.push({
+            teacher: teacher,
+            subject: lecture.subject,
+            lectureRole: role,
+            hoursConfig: modulesWhenBusy,
+          });
         }
         let roleString = role.role;
         if (t.is_technology_teacher) {
           roleString = SubjectRoles.TECHNOLOGY;
         }
         if (!canTeacherTeachLecture(teacher, lecture.subject, roleString)) {
-          teachersDoNotKnowSubject.push({ teacher: teacher, subject: lecture.subject, lectureRole: role });
+          teachersDoNotKnowSubject.push({
+            teacher: teacher,
+            subject: lecture.subject,
+            lectureRole: role,
+          });
+        }
+        if (t.review?.approved === false) {
+          //si no esta en la lista, pusheamos
+          const teacherReject = {
+            teacher: teacher,
+            lectureGroups: lecture.lecture_groups,
+            subject: lecture.subject,
+          };
+
+          const isAlreadyListed = teachersRejectedLectures.some((teacher) => {
+            return (
+              teacher.teacher.id === teacherReject.teacher.id &&
+              teacher.subject.id === teacherReject.subject.id &&
+              teacher.lectureGroups === teacherReject.lectureGroups
+            );
+          });
+
+          if (!isAlreadyListed) {
+            teachersRejectedLectures.push(teacherReject);
+          }
         }
       });
     });
@@ -276,6 +336,7 @@ async function getTeachersLectureConflicts(semesterId: number) {
     teachersBusyAtLectureTime,
     teachersDoNotKnowSubject,
     teacherTeaching2LectureAtSameTime,
+    teachersRejectedLectures,
   };
 }
 
@@ -295,14 +356,16 @@ function busyTeacherModulesAtLectureTime(
 
       if (!isModuleAvailable) {
         // Solo agregamos si el módulo NO está disponible
-        notAvailableDates.push({ day_of_week: config.day_of_week, module_id: module });
+        notAvailableDates.push({
+          day_of_week: config.day_of_week,
+          module_id: module,
+        });
       }
     });
   });
 
   return notAvailableDates;
 }
-
 
 function getSubjectHeKnowHowToTeach(teacher: TeacherResponseDto) {
   return teacher.subjects_history?.map((history) => ({
@@ -330,8 +393,13 @@ function canTeacherTeachLecture(
 
 function teachersTeaching2LecturesAtSameTime(
   semesterLectures: LectureResponseDto[]
-): { teacherName: string; conflictingLectures: { first: LectureResponseDto, second: LectureResponseDto }[] }[] {
-
+): {
+  teacherName: string;
+  conflictingLectures: {
+    first: LectureResponseDto;
+    second: LectureResponseDto;
+  }[];
+}[] {
   const teacherSchedule: Record<
     number,
     { day: string; modules: Set<number>; lecture: LectureResponseDto }[]
@@ -339,7 +407,12 @@ function teachersTeaching2LecturesAtSameTime(
 
   const conflictingTeachers: {
     teacherName: string;
-    conflictingLectures: { first: LectureResponseDto, second: LectureResponseDto, modules: number[], day_of_week: string }[];
+    conflictingLectures: {
+      first: LectureResponseDto;
+      second: LectureResponseDto;
+      modules: number[];
+      day_of_week: string;
+    }[];
   }[] = [];
 
   for (const lecture of semesterLectures) {
@@ -360,7 +433,14 @@ function teachersTeaching2LecturesAtSameTime(
                 // Add the teacher and conflicting lecture to the result
                 conflictingTeachers.push({
                   teacherName: teacher.name + ' ' + teacher.surname,
-                  conflictingLectures: [{ first: lecture, second: schedule.lecture, modules: overlappingModules, day_of_week: hourConfig.day_of_week }],
+                  conflictingLectures: [
+                    {
+                      first: lecture,
+                      second: schedule.lecture,
+                      modules: overlappingModules,
+                      day_of_week: hourConfig.day_of_week,
+                    },
+                  ],
                 });
               }
             }

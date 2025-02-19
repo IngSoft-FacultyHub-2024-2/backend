@@ -177,28 +177,28 @@ export async function updateLecture(
 ) {
   const teachers = lecture.lecture_roles
     ? (
-      await Promise.all(
-        lecture.lecture_roles.map(async (role) => {
-          const teachersPromises = role.teachers.map(async (teacher) => {
-            const teacherData = await getTeacherById(
-              teacher.teacher_id,
-              true
-            );
-            if (!teacherData) {
-              throw new ResourceNotFound(
-                'No se encontró el profesor con id ' + teacher.teacher_id
+        await Promise.all(
+          lecture.lecture_roles.map(async (role) => {
+            const teachersPromises = role.teachers.map(async (teacher) => {
+              const teacherData = await getTeacherById(
+                teacher.teacher_id,
+                true
               );
-            }
-            return {
-              ...teacherData,
-              is_technology_teacher: teacher.is_technology_teacher,
-            };
-          });
+              if (!teacherData) {
+                throw new ResourceNotFound(
+                  'No se encontró el profesor con id ' + teacher.teacher_id
+                );
+              }
+              return {
+                ...teacherData,
+                is_technology_teacher: teacher.is_technology_teacher,
+              };
+            });
 
-          return await Promise.all(teachersPromises);
-        })
-      )
-    ).flat()
+            return await Promise.all(teachersPromises);
+          })
+        )
+      ).flat()
     : [];
   return await semesterRepository.updateLecture(lectureId, lecture, teachers);
 }

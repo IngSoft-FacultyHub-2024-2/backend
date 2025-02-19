@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import sequelize from './config/database';
-import assignTeachersToLecturesRouter from './routers/assignTeachersToLecturesRouter';
 import authRouter from './routers/authRouter';
 import degreeRouter from './routers/degreeRouter';
 import eventRouter from './routers/eventRouter';
@@ -11,6 +10,7 @@ import semesterRouter from './routers/semesterRouter';
 import studyPlanRouter from './routers/studyPlanRouter';
 import subjectRouter from './routers/subjectRouter';
 import teacherRouter from './routers/teacherRouter';
+import teachersAssignationsRouter from './routers/teachersAssignationsRouter';
 import userManagementRouter from './routers/userManagementRouter';
 
 const logger = require('morgan');
@@ -48,7 +48,7 @@ app.use('/api/modules', moduleRouter);
 app.use('/api/file-processor', fileProcessorRouter);
 app.use('/api/semesters', semesterRouter);
 app.use('/api/degrees', degreeRouter);
-app.use('/api/assignTeachersToLectures', assignTeachersToLecturesRouter);
+app.use('/api/teachers-assignations', teachersAssignationsRouter);
 app.use('/api/users', userManagementRouter);
 app.use('/api/auth', authRouter);
 

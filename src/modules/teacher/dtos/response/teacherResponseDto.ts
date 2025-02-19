@@ -1,7 +1,4 @@
-import Teacher from '../../repositories/models/Teacher';
-import { SubjectResponseDto } from '../../../subject';
-import TeacherSubjectHistory from '../../repositories/models/TeacherSubjectHistory';
-import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
+import Teacher from '../../repositories/models/Teacher';import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
 import Prize from '../../repositories/models/Prize';
 import CaesCourse from '../../repositories/models/CaesCourse';
 import Contact from '../../repositories/models/Contact';
@@ -10,7 +7,6 @@ import TeacherBenefit from '../../repositories/models/TeacherBenefit';
 import TeacherSubjectGroup from '../../repositories/models/TeacherSubjectGroup';
 import TeacherAvailableModule from '../../repositories/models/TeacherAvailableModules';
 import {
-  TeacherSubjectHistoryResponseDtoHelper,
   TeacherSubjectHistoryResponseDto,
 } from './teacherSubjectHistoryResponseDto';
 
@@ -39,6 +35,7 @@ export interface TeacherResponseDto {
   benefits: TeacherBenefit[];
   teacher_subject_groups: TeacherSubjectGroup[];
   teacher_available_modules: TeacherAvailableModule[];
+  dismiss_motive?: string | null;
 }
 
 export class TeacherResponseDtoHelper {
@@ -71,6 +68,7 @@ export class TeacherResponseDtoHelper {
       benefits: teacher.benefits,
       teacher_subject_groups: teacher.teacher_subject_groups,
       teacher_available_modules: teacher.teacher_available_modules,
+      dismiss_motive: teacher.dismiss_motive,
     };
   }
 }

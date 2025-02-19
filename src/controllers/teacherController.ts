@@ -45,7 +45,9 @@ class TeacherController {
   async dismissTeacher(req: Request, res: Response) {
     try {
       const teacherId = parseInt(req.params.id);
-      await dismissTeacher(teacherId);
+      const motive = req.body.dismissMotive;
+      
+      await dismissTeacher(teacherId, motive);
       res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {
@@ -71,7 +73,8 @@ class TeacherController {
       await inputTemporaryDismissSchema.validate(req.body);
       const teacherId = parseInt(req.params.id);
       const retentionDate = req.body.retentionDate;
-      temporaryDismissTeacher(teacherId, retentionDate);
+      const motive = req.body.dismissMotive;
+      temporaryDismissTeacher(teacherId, retentionDate, motive);
       res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {

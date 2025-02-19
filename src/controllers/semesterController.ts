@@ -58,7 +58,8 @@ class SemesterController {
 
   async getSemesters(req: any, res: Response) {
     try {
-      const semesters = await getSemesters();
+      const teacherId = req.user.teacher_id;
+      const semesters = await getSemesters(teacherId);
       res.status(200).json(semesters);
     } catch (error) {
       if (error instanceof Error) {

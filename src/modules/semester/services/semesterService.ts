@@ -39,8 +39,8 @@ export async function updateSemester(
   return await semesterRepository.updateSemester(semesterId, semester);
 }
 
-export async function getSemesters() {
-  return await semesterRepository.getSemesters();
+export async function getSemesters(teacherId?: number) {
+  return await semesterRepository.getSemesters(teacherId);
 }
 
 export async function getSemesterById(semesterId: number) {
@@ -81,8 +81,10 @@ export async function getSemesterLectures(
     group,
     teacherId
   );
+  console.log(semester);
   if (!semester) {
-    throw new ResourceNotFound('No se encontraron el semestre');
+    console.log('No se encontro el semestre');
+    throw new ResourceNotFound('No se encontro el semestre');
   }
 
   const lecturesPromises = semester.lectures.map(async (lecture: Lecture) => {

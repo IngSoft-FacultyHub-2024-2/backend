@@ -260,7 +260,9 @@ describe('TeacherController', () => {
     let jsonMock: jest.Mock;
 
     beforeEach(() => {
-      req = { params: { id: '1' } };
+      req = {
+        params: { id: '1' }, body: { dismissMotive: 'no cumplia con los objetivos' }
+      };
       statusMock = jest.fn().mockReturnThis();
       jsonMock = jest.fn();
       res = { status: statusMock, json: jsonMock };
@@ -272,7 +274,7 @@ describe('TeacherController', () => {
 
       await teacherController.dismissTeacher(req as Request, res as Response);
 
-      expect(dismissTeacher).toHaveBeenCalledWith(1);
+      expect(dismissTeacher).toHaveBeenCalledWith(1, 'no cumplia con los objetivos');
       expect(statusMock).toHaveBeenCalledWith(204);
     });
 
@@ -284,7 +286,7 @@ describe('TeacherController', () => {
 
       await teacherController.dismissTeacher(req as Request, res as Response);
 
-      expect(dismissTeacher).toHaveBeenCalledWith(1);
+      expect(dismissTeacher).toHaveBeenCalledWith(1, 'no cumplia con los objetivos');
       expect(returnError).toHaveBeenCalledWith(res, error);
     });
   });

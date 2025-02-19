@@ -112,7 +112,7 @@ export async function getAllTeachersNames() {
   return teacherNames;
 }
 
-export async function dismissTeacher(id: number) {
+export async function dismissTeacher(id: number, motive: string) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {
@@ -124,11 +124,14 @@ export async function dismissTeacher(id: number) {
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
+  await teacherRepository.addDismissalMotive(id, motive);
+
   await teacherRepository.dismissTeacher(id);
 
   await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
+
 
   if (user) {
     await unsubscribeUser(user.id);
@@ -145,7 +148,7 @@ export async function rehireTeacher(id: number) {
   }
 }
 
-export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
+export async function temporaryDismissTeacher(id: number, retentionDate: Date, motive: string) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {
@@ -156,6 +159,8 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
+
+  await teacherRepository.addDismissalMotive(id, motive);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
 

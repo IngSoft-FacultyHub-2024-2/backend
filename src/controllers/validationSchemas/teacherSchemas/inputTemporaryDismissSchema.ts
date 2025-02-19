@@ -9,6 +9,7 @@ const inputTemporaryDismissSchema = yup.object().shape({
       new Date(),
       'El día de retención tiene que ser posterior al día de hoy'
     ),
+  dismissMotive: yup.string().required(),
 });
 
 export default inputTemporaryDismissSchema;

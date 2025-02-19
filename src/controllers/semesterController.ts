@@ -58,8 +58,15 @@ class SemesterController {
 
   async getSemesters(req: any, res: Response) {
     try {
-      const teacherId = req.user.teacher_id;
-      const semesters = await getSemesters(teacherId);
+      const role = await getRoleById(req.user.role);
+      let semesters;
+
+      if (role?.name === 'coordinator') {
+        semesters = await getSemesters();
+      } else {
+        semesters = await getSemesters(req.user.teacher_id);
+      }
+
       res.status(200).json(semesters);
     } catch (error) {
       if (error instanceof Error) {

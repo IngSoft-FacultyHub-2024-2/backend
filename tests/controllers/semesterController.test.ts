@@ -79,25 +79,63 @@ describe('SemesterController', () => {
     expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
   });
 
-  it('retrieves semesters successfully', async () => {
-    const mockSemesters = [{ id: 1, name: 'Fall 2023' }];
-    (getSemesters as jest.Mock).mockResolvedValue(mockSemesters);
+  describe('SemesterController.getSemesters', () => {
+    let mockReq: any;
+    let mockRes: any;
 
-    await SemesterController.getSemesters(mockReq, mockRes);
+    beforeEach(() => {
+      mockReq = {
+        user: {
+          role: 2, // Simulando un ID de rol
+          teacher_id: 123, // ID de profesor simulado
+        },
+      };
 
-    expect(getSemesters).toHaveBeenCalled();
-    expect(mockRes.status).toHaveBeenCalledWith(200);
-    expect(mockRes.json).toHaveBeenCalledWith(mockSemesters);
-  });
+      mockRes = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-  it('handles error when retrieving semesters', async () => {
-    const mockError = new Error('Failed to retrieve semesters');
-    (getSemesters as jest.Mock).mockRejectedValue(mockError);
+      jest.clearAllMocks();
+    });
 
-    await SemesterController.getSemesters(mockReq, mockRes);
+    it('retrieves semesters successfully for coordinator', async () => {
+      const mockSemesters = [{ id: 1, name: 'Fall 2023' }];
+      (getRoleById as jest.Mock).mockResolvedValue({ name: 'coordinator' });
+      (getSemesters as jest.Mock).mockResolvedValue(mockSemesters);
 
-    expect(getSemesters).toHaveBeenCalled();
-    expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
+      await SemesterController.getSemesters(mockReq, mockRes);
+
+      expect(getRoleById).toHaveBeenCalledWith(mockReq.user.role);
+      expect(getSemesters).toHaveBeenCalledWith(); // No debe recibir argumentos
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockSemesters);
+    });
+
+    it('retrieves semesters successfully for non-coordinator teacher', async () => {
+      const mockSemesters = [{ id: 2, name: 'Spring 2024' }];
+      (getRoleById as jest.Mock).mockResolvedValue({ name: 'teacher' });
+      (getSemesters as jest.Mock).mockResolvedValue(mockSemesters);
+
+      await SemesterController.getSemesters(mockReq, mockRes);
+
+      expect(getRoleById).toHaveBeenCalledWith(mockReq.user.role);
+      expect(getSemesters).toHaveBeenCalledWith(mockReq.user.teacher_id); // Debe recibir el ID del profesor
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(mockSemesters);
+    });
+
+    it('handles error when retrieving semesters', async () => {
+      const mockError = new Error('Failed to retrieve semesters');
+      (getRoleById as jest.Mock).mockResolvedValue({ name: 'coordinator' });
+      (getSemesters as jest.Mock).mockRejectedValue(mockError);
+
+      await SemesterController.getSemesters(mockReq, mockRes);
+
+      expect(getRoleById).toHaveBeenCalledWith(mockReq.user.role);
+      expect(getSemesters).toHaveBeenCalledWith();
+      expect(returnError).toHaveBeenCalledWith(mockRes, mockError);
+    });
   });
 
   it('creates a lecture successfully', async () => {

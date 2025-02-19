@@ -39,8 +39,8 @@ export async function updateSemester(
   return await semesterRepository.updateSemester(semesterId, semester);
 }
 
-export async function getSemesters() {
-  return await semesterRepository.getSemesters();
+export async function getSemesters(teacherId?: number) {
+  return await semesterRepository.getSemesters(teacherId);
 }
 
 export async function getSemesterById(semesterId: number) {
@@ -81,8 +81,10 @@ export async function getSemesterLectures(
     group,
     teacherId
   );
+  console.log(semester);
   if (!semester) {
-    throw new ResourceNotFound('No se encontraron el semestre');
+    console.log('No se encontro el semestre');
+    throw new ResourceNotFound('No se encontro el semestre');
   }
 
   const lecturesPromises = semester.lectures.map(async (lecture: Lecture) => {
@@ -177,28 +179,28 @@ export async function updateLecture(
 ) {
   const teachers = lecture.lecture_roles
     ? (
-      await Promise.all(
-        lecture.lecture_roles.map(async (role) => {
-          const teachersPromises = role.teachers.map(async (teacher) => {
-            const teacherData = await getTeacherById(
-              teacher.teacher_id,
-              true
-            );
-            if (!teacherData) {
-              throw new ResourceNotFound(
-                'No se encontró el profesor con id ' + teacher.teacher_id
+        await Promise.all(
+          lecture.lecture_roles.map(async (role) => {
+            const teachersPromises = role.teachers.map(async (teacher) => {
+              const teacherData = await getTeacherById(
+                teacher.teacher_id,
+                true
               );
-            }
-            return {
-              ...teacherData,
-              is_technology_teacher: teacher.is_technology_teacher,
-            };
-          });
+              if (!teacherData) {
+                throw new ResourceNotFound(
+                  'No se encontró el profesor con id ' + teacher.teacher_id
+                );
+              }
+              return {
+                ...teacherData,
+                is_technology_teacher: teacher.is_technology_teacher,
+              };
+            });
 
-          return await Promise.all(teachersPromises);
-        })
-      )
-    ).flat()
+            return await Promise.all(teachersPromises);
+          })
+        )
+      ).flat()
     : [];
   return await semesterRepository.updateLecture(lectureId, lecture, teachers);
 }

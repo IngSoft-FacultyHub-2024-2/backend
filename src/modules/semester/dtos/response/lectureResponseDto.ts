@@ -29,6 +29,10 @@ export interface LectureRoleResponseDto {
     name: string;
     surname: string;
     is_technology_teacher: boolean;
+    review: {
+      approved: boolean;
+      reason: string | null;
+    } | null;
   }[];
   hour_configs: {
     id: number;

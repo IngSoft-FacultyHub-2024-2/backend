@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { getAssignationsConflicts } from '../../src/modules/assignTeachersToLectures';
-import AssignTeachersToLecturesController from '../../src/controllers/assignTeachersToLecturesController';
+import TeacherAssignationsController from '../../src/controllers/teacherAssignationsController';
+import { getAssignationsConflicts } from '../../src/modules/teacherAssignations';
 import { returnError } from '../../src/shared/utils/exceptions/handleExceptions';
 
-jest.mock('../../src/modules/assignTeachersToLectures', () => ({
+jest.mock('../../src/modules/teacherAssignations', () => ({
   getAssignationsConflicts: jest.fn(),
 }));
 
@@ -11,7 +11,7 @@ jest.mock('../../src/shared/utils/exceptions/handleExceptions', () => ({
   returnError: jest.fn(),
 }));
 
-describe('AssignTeachersToLecturesController - getAssignationsConflicts', () => {
+describe('teacherAssignationsController - getAssignationsConflicts', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
 
@@ -32,7 +32,7 @@ describe('AssignTeachersToLecturesController - getAssignationsConflicts', () => 
 
     req.params = { semesterId: '123' };
 
-    await AssignTeachersToLecturesController.getAssignationsConflicts(
+    await TeacherAssignationsController.getAssignationsConflicts(
       req as Request,
       res as Response
     );
@@ -45,7 +45,7 @@ describe('AssignTeachersToLecturesController - getAssignationsConflicts', () => 
   it('should return 400 for invalid semesterId', async () => {
     req.params = { semesterId: 'invalid' };
 
-    await AssignTeachersToLecturesController.getAssignationsConflicts(
+    await TeacherAssignationsController.getAssignationsConflicts(
       req as Request,
       res as Response
     );
@@ -61,7 +61,7 @@ describe('AssignTeachersToLecturesController - getAssignationsConflicts', () => 
 
     req.params = { semesterId: '123' };
 
-    await AssignTeachersToLecturesController.getAssignationsConflicts(
+    await TeacherAssignationsController.getAssignationsConflicts(
       req as Request,
       res as Response
     );

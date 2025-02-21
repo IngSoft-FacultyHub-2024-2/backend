@@ -8,13 +8,12 @@ import {
 } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getTimesOfModules } from '../../../shared/utils/modules';
-import { getDegreeById, getDegrees } from '../../degree';
-import Degree from '../../degree/repositories/models/Degree';
+import { getDegreeById, getDegrees, Degree } from '../../degree';
 import {
   amountOfTeachersPerSubject,
   getSubjectById,
-  getSubjectsIdsWithTecTeoAtSameTime,
   SubjectResponseDto,
+  getSubjectsIdsWithTecTeoAtSameTime,
 } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
@@ -147,8 +146,11 @@ export async function getSemesterLectures(
   return await Promise.all(lecturesPromises);
 }
 
-export async function addLecture(lecture: Partial<Lecture>) {
-  return await semesterRepository.addLecture(lecture);
+export async function addLecture(
+  lecture: Partial<Lecture>,
+  applyValidation = true
+) {
+  return await semesterRepository.addLecture(lecture, applyValidation);
 }
 
 export async function deleteLecture(lectureId: number) {
@@ -188,8 +190,6 @@ export async function updateLecture(
     ? (
         await Promise.all(
           lecture.lecture_roles.map(async (role) => {
-            // if(role.role === SubjectRoles.TECHNOLOGY){
-
             if (subject.is_teo_tec_at_same_time) {
               const expectedTeoTeachers =
                 subject.hour_configs

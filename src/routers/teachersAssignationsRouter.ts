@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import assignTeachersToLecturesController from '../controllers/assignTeachersToLecturesController';
+import TeacherAssignationsController from '../controllers/teacherAssignationsController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { isCoordinatorMiddleware } from '../middlewares/isCoordinatorMiddleware';
 
@@ -9,13 +9,13 @@ router.post(
   '/',
   authMiddleware,
   isCoordinatorMiddleware,
-  assignTeachersToLecturesController.assignTeachersToSemesterLectures
+  TeacherAssignationsController.assignTeachersToSemesterLectures
 );
 router.get(
   '/conflicts/:semesterId',
   authMiddleware,
   isCoordinatorMiddleware,
-  assignTeachersToLecturesController.getAssignationsConflicts
+  TeacherAssignationsController.getAssignationsConflicts
 );
 
 export default router;

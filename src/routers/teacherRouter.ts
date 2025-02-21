@@ -74,9 +74,9 @@ router.get(
   '/:id',
   authMiddleware,
   isTeacherOwnDataMiddleware,
-  teacherController.getTeacherById
+  teacherController.getTeacherOwnData
 );
-router.delete(
+router.patch(
   '/:id',
   authMiddleware,
   isCoordinatorMiddleware,
@@ -96,8 +96,12 @@ router.put(
   teacherController.updateTeacher
 );
 
-router.patch('/:id/rehire',
-  authMiddleware,isCoordinatorMiddleware,teacherController.rehireTeacher)
+router.patch(
+  '/:id/rehire',
+  authMiddleware,
+  isCoordinatorMiddleware,
+  teacherController.rehireTeacher
+);
 
 router.put(
   '/:id',

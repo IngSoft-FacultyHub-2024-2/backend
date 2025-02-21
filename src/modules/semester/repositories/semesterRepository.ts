@@ -50,14 +50,30 @@ class SemesterRepository {
     return await semester.update(semesterData);
   }
 
-  async getSemesters() {
+  async getSemesters(teacherId?: number) {
+    console.log('teacherId:', teacherId);
+    const whereClause = teacherId
+      ? {
+          id: {
+            [Op.in]: Sequelize.literal(`
+              (SELECT DISTINCT "Lectures"."semester_id"
+              FROM "Lectures"
+              INNER JOIN "LectureRoles" ON "Lectures"."id" = "LectureRoles"."lecture_id"
+              INNER JOIN "LectureTeachers" ON "LectureRoles"."id" = "LectureTeachers"."lecture_role_id"
+              WHERE "LectureTeachers"."teacher_id" = ${teacherId})
+            `),
+          },
+        }
+      : {};
+
     return await Semester.findAll({
       order: [['start_date', 'DESC']],
+      where: whereClause,
       attributes: {
         include: [
           [
             Sequelize.literal(
-              `(SELECT COUNT(*) FROM "Lectures" WHERE "Semester"."id" = "Lectures"."semester_id")`
+              `(SELECT COUNT(*) FROM "Lectures" WHERE "Lectures"."semester_id" = "Semester"."id")`
             ),
             'lectures_count',
           ],
@@ -166,7 +182,7 @@ class SemesterRepository {
         {
           model: Lecture,
           as: 'lectures',
-          required: !!teacherId,
+          required: false,
           where: {
             ...subjectWhere,
           },
@@ -497,7 +513,7 @@ class SemesterRepository {
                 for (const existingHourConfig of existingHoursConfig) {
                   if (
                     newHourConfig.day_of_week ==
-                    existingHourConfig.day_of_week &&
+                      existingHourConfig.day_of_week &&
                     newHourConfig.modules.some((module) =>
                       existingHourConfig.modules.includes(module)
                     )

@@ -53,7 +53,7 @@ router.get(
   semesterController.getLecturesGroups
 );
 router.get(
-  '/:semesterId/getAssignedLecturesCsv',
+  '/:semesterId/assigned-lectures-csv',
   authMiddleware,
   semesterController.getAssignedLecturesCsv
 );

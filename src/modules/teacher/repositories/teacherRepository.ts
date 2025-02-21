@@ -307,7 +307,7 @@ class TeacherRepository {
     }
   }
 
-  temporaryDismissTeacher(id: number, retentionDate: Date) {
+  async temporaryDismissTeacher(id: number, retentionDate: Date) {
     Teacher.update(
       { state: TeacherStates.TEMPORARY_LEAVE, retentionDate },
       { where: { id } }
@@ -316,7 +316,7 @@ class TeacherRepository {
 
   async rehireTeacher(id: number) {
     await Teacher.update(
-      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null },
+      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null, dismiss_motive: null },
       { where: { id }, paranoid: false }
     );
   }
@@ -598,6 +598,11 @@ class TeacherRepository {
       { end_date: new Date() },
       { where: { teacher_id: id, end_date: null }, paranoid: false }
     );
+  }
+
+  async addDismissalMotive(id: number, dismissalMotive: string) {
+    console.log('motive', dismissalMotive);
+    await Teacher.update({ dismiss_motive: dismissalMotive }, { where: { id } });
   }
 }
 

@@ -308,7 +308,7 @@ describe('Teacher Service', () => {
       (getUserByTeacherId as jest.Mock).mockResolvedValue({ id: 1 });
       (unsubscribeUser as jest.Mock).mockResolvedValue(null);
 
-      const result = await dismissTeacher(1);
+      const result = await dismissTeacher(1, 'no cumplia con los objetivos');
 
       expect(teacherRepository.dismissTeacher).toHaveBeenCalledWith(1);
       expect(teacherRepository.deleteTeacherSubjectGroups).toHaveBeenCalledWith(
@@ -319,11 +319,11 @@ describe('Teacher Service', () => {
     it('should throw an error if teacher is a coordinator', async () => {
       const mockError = new Error(
         'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-          mockSubject.map((subject) => subject.name).join(', ')
+        mockSubject.map((subject) => subject.name).join(', ')
       );
       (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(mockSubject);
 
-      await expect(dismissTeacher(1)).rejects.toThrow(mockError);
+      await expect(dismissTeacher(1, 'no cumplia con los objetivos')).rejects.toThrow(mockError);
       expect(teacherCoordinatorSubjects).toHaveBeenCalledWith(1);
     });
 
@@ -334,7 +334,7 @@ describe('Teacher Service', () => {
         mockError
       );
 
-      await expect(dismissTeacher(1)).rejects.toThrow(
+      await expect(dismissTeacher(1, 'no cumplia con los objetivos')).rejects.toThrow(
         'Failed to dismiss teacher'
       );
       expect(teacherRepository.dismissTeacher).toHaveBeenCalledWith(1);
@@ -356,7 +356,7 @@ describe('Teacher Service', () => {
       (getUserByTeacherId as jest.Mock).mockResolvedValue({ id: 1 });
       (unsubscribeUser as jest.Mock).mockResolvedValue(null);
 
-      const result = await temporaryDismissTeacher(1, new Date());
+      const result = await temporaryDismissTeacher(1, new Date(), 'no cumplia con los objetivos');
 
       expect(teacherRepository.temporaryDismissTeacher).toHaveBeenCalledWith(
         1,
@@ -370,11 +370,11 @@ describe('Teacher Service', () => {
     it('should throw an error if teacher is a coordinator', async () => {
       const mockError = new Error(
         'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-          mockSubject.map((subject) => subject.name).join(', ')
+        mockSubject.map((subject) => subject.name).join(', ')
       );
       (teacherCoordinatorSubjects as jest.Mock).mockResolvedValue(mockSubject);
 
-      await expect(temporaryDismissTeacher(1, new Date())).rejects.toThrow(
+      await expect(temporaryDismissTeacher(1, new Date(), 'no cumplia con los objetivos')).rejects.toThrow(
         mockError
       );
       expect(teacherCoordinatorSubjects).toHaveBeenCalledWith(1);
@@ -387,7 +387,7 @@ describe('Teacher Service', () => {
         teacherRepository.temporaryDismissTeacher as jest.Mock
       ).mockRejectedValue(mockError);
 
-      await expect(temporaryDismissTeacher(1, new Date())).rejects.toThrow(
+      await expect(temporaryDismissTeacher(1, new Date(), 'no cumplia con los objetivos')).rejects.toThrow(
         'Failed to temporarily dismiss teacher'
       );
       expect(teacherRepository.temporaryDismissTeacher).toHaveBeenCalledWith(

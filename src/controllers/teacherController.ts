@@ -4,15 +4,13 @@ import {
   addTeacher,
   dismissTeacher,
   getAllTeachersNames,
-  getTeacherById,
+  getTeacherOwnData,
   getTeachers,
+  getTeachersContacts,
+  rehireTeacher,
   temporaryDismissTeacher,
   updateTeacher,
 } from '../modules/teacher';
-import {
-  getTeachersContacts,
-  rehireTeacher,
-} from '../modules/teacher/services/teacherService';
 import { returnError } from '../shared/utils/exceptions/handleExceptions';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
@@ -30,10 +28,10 @@ class TeacherController {
     }
   }
 
-  async getTeacherById(req: Request, res: Response) {
+  async getTeacherOwnData(req: Request, res: Response) {
     try {
       const teacherId = parseInt(req.params.id);
-      const teacher = await getTeacherById(teacherId, true);
+      const teacher = await getTeacherOwnData(teacherId);
       res.status(200).json(teacher);
     } catch (error) {
       if (error instanceof Error) {
@@ -45,7 +43,9 @@ class TeacherController {
   async dismissTeacher(req: Request, res: Response) {
     try {
       const teacherId = parseInt(req.params.id);
-      await dismissTeacher(teacherId);
+      const motive = req.body.dismissMotive;
+      
+      await dismissTeacher(teacherId, motive);
       res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {
@@ -71,7 +71,8 @@ class TeacherController {
       await inputTemporaryDismissSchema.validate(req.body);
       const teacherId = parseInt(req.params.id);
       const retentionDate = req.body.retentionDate;
-      temporaryDismissTeacher(teacherId, retentionDate);
+      const motive = req.body.dismissMotive;
+      temporaryDismissTeacher(teacherId, retentionDate, motive);
       res.status(204).send();
     } catch (error) {
       if (error instanceof Error) {

@@ -2,7 +2,11 @@ import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getSubjectById, teacherCoordinatorSubjects } from '../../subject';
-import { getUserByTeacherId, unsubscribeUser, subscribeUser } from '../../userManagement';
+import {
+  getUserByTeacherId,
+  subscribeUser,
+  unsubscribeUser,
+} from '../../userManagement';
 import {
   TeacherResponseDto,
   TeacherResponseDtoHelper,
@@ -107,28 +111,50 @@ export async function getTeacherById(
   return teacherDto;
 }
 
+export async function getTeacherOwnData(id: number) {
+  let teacher = await teacherRepository.getTeacherById(id);
+  if (!teacher) {
+    throw new ResourceNotFound(`El docente con ID ${id} no existe`);
+  }
+  let teacherDto: TeacherResponseDto;
+
+  let subjectsHistory: TeacherSubjectHistoryResponseDto[] = await Promise.all(
+    teacher.subjects_history.map(async (subjectsHistory) =>
+      TeacherSubjectHistoryResponseDtoHelper.fromModel(
+        subjectsHistory,
+        await getSubjectById(subjectsHistory.subject_id)
+      )
+    )
+  );
+  teacherDto = TeacherResponseDtoHelper.fromModel(teacher, subjectsHistory);
+  return teacherDto;
+}
+
 export async function getAllTeachersNames() {
   const teacherNames = await teacherRepository.getAllTeachersNames();
   return teacherNames;
 }
 
-export async function dismissTeacher(id: number) {
+export async function dismissTeacher(id: number, motive: string) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
+
+  await teacherRepository.addDismissalMotive(id, motive);
 
   await teacherRepository.dismissTeacher(id);
 
   await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
+
 
   if (user) {
     await unsubscribeUser(user.id);
@@ -145,17 +171,19 @@ export async function rehireTeacher(id: number) {
   }
 }
 
-export async function temporaryDismissTeacher(id: number, retentionDate: Date) {
+export async function temporaryDismissTeacher(id: number, retentionDate: Date, motive: string) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
+
+  await teacherRepository.addDismissalMotive(id, motive);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
 

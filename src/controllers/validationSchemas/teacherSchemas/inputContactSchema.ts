@@ -20,8 +20,8 @@ const inputContactSchema = yup.object().shape({
       is: (mean: string) => mean.toLowerCase() === 'whatsapp',
       then: (schema) =>
         schema.matches(
-          /^[0-9]{10}$/,
-          'El número de teléfono debe tener 10 dígitos'
+          /^[0-9]*$/,
+          'El número de teléfono debe contener solo números'
         ),
       otherwise: (schema) =>
         schema.required('La información de contacto es requerida'),

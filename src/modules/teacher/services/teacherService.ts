@@ -19,7 +19,7 @@ import Teacher from '../repositories/models/Teacher';
 import teacherRepository from '../repositories/teacherRepository';
 
 export async function addTeacher(teacher: Partial<Teacher>) {
-  return await teacherRepository.addTeacher(teacher);
+  await teacherRepository.addTeacher(teacher);
 }
 
 export async function getTeachersContacts(
@@ -155,7 +155,6 @@ export async function dismissTeacher(id: number, motive: string) {
 
   const user = await getUserByTeacherId(id);
 
-
   if (user) {
     await unsubscribeUser(user.id);
   }
@@ -171,7 +170,11 @@ export async function rehireTeacher(id: number) {
   }
 }
 
-export async function temporaryDismissTeacher(id: number, retentionDate: Date, motive: string) {
+export async function temporaryDismissTeacher(
+  id: number,
+  retentionDate: Date,
+  motive: string
+) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {

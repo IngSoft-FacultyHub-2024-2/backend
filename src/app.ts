@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database';
 import authRouter from './routers/authRouter';
 import degreeRouter from './routers/degreeRouter';
@@ -38,6 +40,20 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(logger('dev'));
+
+app.use(
+  '/swagger.json',
+  express.static(path.join(__dirname, 'docs', 'swagger.json'))
+);
+app.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(undefined, {
+    swaggerOptions: {
+      url: '/swagger.json',
+    },
+  })
+);
 
 app.use('/api/subjects', subjectRouter);
 app.use('/api/events', eventRouter);

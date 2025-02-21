@@ -1,20 +1,25 @@
-import { Request, Response } from 'express';
+import { Body, Controller, Post, Route, Tags } from 'tsoa';
 import { login } from '../modules/auth';
-import { returnError } from '../shared/utils/exceptions/handleExceptions';
+import { errorResolver } from '../shared/utils/exceptions/handleExceptions';
 import inputLoginSchema from './validationSchemas/authSchemas/inputLoginSchema';
 
-class AuthController {
-  async login(req: Request, res: Response) {
+@Tags('Auth')
+@Route('api/auth')
+class AuthController extends Controller {
+  @Post('/login')
+  public async login(
+    @Body() body: { teacher_employee_number: number; password: string }
+  ) {
     try {
-      await inputLoginSchema.validate(req.body);
-      const { teacher_employee_number, password } = req.body;
+      await inputLoginSchema.validate(body);
+      const { teacher_employee_number, password } = body;
 
       const result = await login(teacher_employee_number, password);
 
-      res.status(200).json(result);
+      return result;
     } catch (error) {
       if (error instanceof Error) {
-        returnError(res, error);
+        return errorResolver(error);
       }
     }
   }

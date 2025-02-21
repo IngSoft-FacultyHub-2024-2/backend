@@ -1,15 +1,18 @@
-import Teacher from '../../repositories/models/Teacher';import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
-import Prize from '../../repositories/models/Prize';
+import { Model } from 'sequelize';
 import CaesCourse from '../../repositories/models/CaesCourse';
 import Contact from '../../repositories/models/Contact';
-import TeacherCategory from '../../repositories/models/TeacherCategory';
-import TeacherBenefit from '../../repositories/models/TeacherBenefit';
-import TeacherSubjectGroup from '../../repositories/models/TeacherSubjectGroup';
+import Prize from '../../repositories/models/Prize';
+import Teacher from '../../repositories/models/Teacher';
 import TeacherAvailableModule from '../../repositories/models/TeacherAvailableModules';
+import TeacherBenefit from '../../repositories/models/TeacherBenefit';
+import TeacherCategory from '../../repositories/models/TeacherCategory';
+import TeacherSubjectGroup from '../../repositories/models/TeacherSubjectGroup';
+import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
 import {
   TeacherSubjectHistoryResponseDto,
 } from './teacherSubjectHistoryResponseDto';
 
+@Model()
 export interface TeacherResponseDto {
   id: number;
   name: string;

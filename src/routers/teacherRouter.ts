@@ -1,10 +1,8 @@
 import { Router } from 'express';
 import benefitController from '../controllers/benefitController';
 import categoryController from '../controllers/categoryController';
-import teacherController from '../controllers/teacherController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { isCoordinatorMiddleware } from '../middlewares/isCoordinatorMiddleware';
-import { isTeacherOwnDataMiddleware } from '../middlewares/isTeacherOwnDataMiddleware';
 
 const router = Router();
 
@@ -51,63 +49,63 @@ router.delete(
 );
 
 // Profesores
-router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
-router.get(
-  '/contacts',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.getTeachersContacts
-);
-router.post(
-  '/',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.addTeacher
-);
-router.get(
-  '/',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.getTeachers
-);
-router.get(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.getTeacherOwnData
-);
-router.patch(
-  '/:id',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.dismissTeacher
-);
-router.patch(
-  '/:id/temporary-dismiss',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.temporaryDismissTeacher
-);
+// router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
+// router.get(
+//   '/contacts',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.getTeachersContacts
+// );
+// router.post(
+//   '/',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.addTeacher
+// );
+// router.get(
+//   '/',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.getTeachers
+// );
+// router.get(
+//   '/:id',
+//   authMiddleware,
+//   isTeacherOwnDataMiddleware,
+//   teacherController.getTeacherOwnData
+// );
+// router.patch(
+//   '/:id',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.dismissTeacher
+// );
+// router.patch(
+//   '/:id/temporary-dismiss',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.temporaryDismissTeacher
+// );
 
-router.put(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.updateTeacher
-);
+// router.put(
+//   '/:id',
+//   authMiddleware,
+//   isTeacherOwnDataMiddleware,
+//   teacherController.updateTeacher
+// );
 
-router.patch(
-  '/:id/rehire',
-  authMiddleware,
-  isCoordinatorMiddleware,
-  teacherController.rehireTeacher
-);
+// router.patch(
+//   '/:id/rehire',
+//   authMiddleware,
+//   isCoordinatorMiddleware,
+//   teacherController.rehireTeacher
+// );
 
-router.put(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.updateTeacher
-);
+// router.put(
+//   '/:id',
+//   authMiddleware,
+//   isTeacherOwnDataMiddleware,
+//   teacherController.updateTeacher
+// );
 
 export default router;

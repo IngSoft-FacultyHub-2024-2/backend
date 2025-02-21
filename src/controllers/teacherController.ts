@@ -1,5 +1,20 @@
-import { Request, Response } from 'express';
 import fs from 'fs';
+import {
+  Body,
+  Controller,
+  Get,
+  Middlewares,
+  Patch,
+  Path,
+  Post,
+  Query,
+  Res,
+  Route,
+  Security,
+  TsoaResponse,
+} from 'tsoa';
+import { isCoordinatorMiddleware } from '../middlewares/isCoordinatorMiddleware';
+import { isTeacherOwnDataMiddleware } from '../middlewares/isTeacherOwnDataMiddleware';
 import {
   addTeacher,
   dismissTeacher,
@@ -8,83 +23,92 @@ import {
   getTeachers,
   getTeachersContacts,
   rehireTeacher,
+  TeacherResponseDto,
   temporaryDismissTeacher,
   updateTeacher,
 } from '../modules/teacher';
-import { returnError } from '../shared/utils/exceptions/handleExceptions';
+import { TeacherStates } from '../shared/utils/enums/teacherStates';
 import inputTeacherSchema from './validationSchemas/teacherSchemas/inputTeacherSchema';
 import inputTemporaryDismissSchema from './validationSchemas/teacherSchemas/inputTemporaryDismissSchema';
 
-class TeacherController {
-  async addTeacher(req: Request, res: Response) {
-    try {
-      await inputTeacherSchema.validate(req.body);
-      const teacher = await addTeacher(req.body);
-      res.status(201).json(teacher);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+@Route('teachers')
+export class TeacherController extends Controller {
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  @Post('/')
+  public async addTeacher(
+    @Body() body: any,
+    @Res() res: TsoaResponse<201, void>
+  ) {
+    await inputTeacherSchema.validate(body);
+    await addTeacher(body);
+    return res(201);
   }
 
-  async getTeacherOwnData(req: Request, res: Response) {
-    try {
-      const teacherId = parseInt(req.params.id);
-      const teacher = await getTeacherOwnData(teacherId);
-      res.status(200).json(teacher);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Middlewares(isTeacherOwnDataMiddleware)
+  @Get('/:id')
+  public async getTeacherOwnData(
+    @Path() id: number
+  ): Promise<TeacherResponseDto> {
+    return await getTeacherOwnData(id);
   }
 
-  async dismissTeacher(req: Request, res: Response) {
-    try {
-      const teacherId = parseInt(req.params.id);
-      const motive = req.body.dismissMotive;
-      
-      await dismissTeacher(teacherId, motive);
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  public async dismissTeacher(
+    @Body() body: any,
+    @Path() id: number,
+    @Res() resp: TsoaResponse<204, void>
+  ) {
+    const teacherId = id;
+    const motive = body.dismissMotive;
+
+    await dismissTeacher(teacherId, motive);
+    return resp(204);
   }
 
-  async rehireTeacher(req: Request, res: Response) {
-    try {
-      const teacherId = parseInt(req.params.id);
-      await rehireTeacher(teacherId);
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  @Patch('/:id/rehire')
+  public async rehireTeacher(
+    @Path() id: number,
+    @Res() resp: TsoaResponse<204, void>
+  ): Promise<void> {
+    const teacherId = id;
+    await rehireTeacher(teacherId);
+    resp(204);
   }
 
-  async temporaryDismissTeacher(req: Request, res: Response) {
-    try {
-      await inputTemporaryDismissSchema.validate(req.body);
-      const teacherId = parseInt(req.params.id);
-      const retentionDate = req.body.retentionDate;
-      const motive = req.body.dismissMotive;
-      temporaryDismissTeacher(teacherId, retentionDate, motive);
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  @Patch('/:id/temporary-dismiss')
+  public async temporaryDismissTeacher(
+    @Res() res: TsoaResponse<204, void>,
+    @Res() errorResponse: TsoaResponse<500, { message: string }>,
+    @Body() body: any,
+    @Path() id: number
+  ) {
+    await inputTemporaryDismissSchema.validate(body);
+    const teacherId = id;
+    const retentionDate = body.retentionDate;
+    const motive = body.dismissMotive;
+    temporaryDismissTeacher(teacherId, retentionDate, motive);
   }
 
-  async getTeachersContacts(req: any, res: Response) {
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  @Get('/contacts')
+  public async getTeachersContacts(
+    @Res() res: TsoaResponse<200, void>,
+    @Res() errorResponse: TsoaResponse<500, { message: string }>,
+    @Res() notFoundResponse: TsoaResponse<404, { message: string }>,
+    @Query() search?: string,
+    @Query() state?: TeacherStates,
+    @Query() unsubscribe_risk?: number,
+    @Query() subject_id?: number
+  ): Promise<void> {
     try {
-      const { search, state, unsubscribe_risk, subject_id } = req.query;
-
       const teachersContactsFilePath = await getTeachersContacts(
         search,
         state,
@@ -93,89 +117,86 @@ class TeacherController {
       );
 
       if (!teachersContactsFilePath) {
-        return res
-          .status(404)
-          .json({ message: 'Hubo un problema al generar el archivo' });
+        return notFoundResponse(404, {
+          message: 'No se encontraron docentes con los filtros ingresados',
+        });
       }
 
-      res.download(teachersContactsFilePath, 'contactos.csv', (err) => {
-        if (err) {
-          console.error('Error sending file:', err);
-          res
-            .status(500)
-            .json({ message: 'Hubo un problema al enviar el archivo' });
-        } else {
-          fs.unlink(teachersContactsFilePath, (unlinkErr) => {
-            if (unlinkErr) {
-              console.error('Error deleting file:', unlinkErr);
-            } else {
-              console.log('File deleted successfully');
-            }
-          });
+      res(200);
+      res(200).download(
+        teachersContactsFilePath,
+        'contactos.csv',
+        (err: any) => {
+          if (err) {
+            console.error('Error sending file:', err);
+            return errorResponse(500, {
+              message: 'Hubo un problema al enviar el archivo',
+            });
+          } else {
+            fs.unlink(teachersContactsFilePath, (unlinkErr) => {
+              if (unlinkErr) {
+                console.error('Error deleting file:', unlinkErr);
+              } else {
+                console.log('File deleted successfully');
+              }
+            });
+          }
         }
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
-  }
-
-  async getTeachers(req: any, res: Response) {
-    try {
-      const {
-        search,
-        state,
-        unsubscribe_risk,
-        subject_id,
-        sortField,
-        sortOrder,
-        withDeleted,
-        page,
-        pageSize,
-      } = req.query;
-      console.log(subject_id);
-      const teachersResponse = await getTeachers(
-        search,
-        state,
-        unsubscribe_risk,
-        subject_id,
-        sortField,
-        sortOrder,
-        page,
-        pageSize,
-        withDeleted
       );
-      res.status(200).json(teachersResponse);
     } catch (error) {
       if (error instanceof Error) {
-        returnError(res, error);
+        console.error('Error:', error.message);
+        return errorResponse(500, { message: error.message });
       }
     }
   }
 
-  async getAllTeachersNames(req: Request, res: Response) {
-    try {
-      const teachers = await getAllTeachersNames();
-      res.status(200).json(teachers);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Middlewares(isCoordinatorMiddleware)
+  @Get('/')
+  public async getTeachers(
+    @Query() search?: string,
+    @Query() state?: TeacherStates,
+    @Query() unsubscribe_risk?: number,
+    @Query() subject_id?: number,
+    @Query() sortField?: string,
+    @Query() sortOrder: 'ASC' | 'DESC' = 'ASC',
+    @Query() page: number = 1,
+    @Query() pageSize: number = 10,
+    @Query() withDeleted?: boolean
+  ): Promise<{
+    teachers: TeacherResponseDto[];
+    totalPages: number;
+    currentPage: number;
+  }> {
+    const teachersResponse = await getTeachers(
+      search,
+      state,
+      unsubscribe_risk,
+      subject_id,
+      sortField,
+      sortOrder,
+      page,
+      pageSize,
+      withDeleted
+    );
+    return teachersResponse;
   }
 
-  async updateTeacher(req: Request, res: Response) {
-    try {
-      const teacherId = parseInt(req.params.id);
-      await inputTeacherSchema.validate(req.body);
-      const teacher = await updateTeacher(teacherId, req.body);
-      res.status(200).json(teacher);
-    } catch (error) {
-      if (error instanceof Error) {
-        returnError(res, error);
-      }
-    }
+  @Security('jwt')
+  @Get('/names')
+  public async getAllTeachersNames() {
+    return await getAllTeachersNames();
+  }
+
+  @Security('jwt')
+  @Middlewares(isTeacherOwnDataMiddleware)
+  @Patch('/:id')
+  public async updateTeacher(@Body() body: any, @Path() id: number) {
+    const teacherId = id;
+    await inputTeacherSchema.validate(body);
+    const teacher = await updateTeacher(teacherId, body);
+    return teacher;
   }
 }
 

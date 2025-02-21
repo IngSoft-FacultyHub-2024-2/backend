@@ -1,0 +1,18 @@
+{
+  "entryFile": "src/app.ts",
+  "controllerPathGlobs": ["src/controllers/**/*.ts"],
+  "spec": {
+    "outputDirectory": "src/docs",
+    "specVersion": 3
+  },
+  "routes": {
+    "routesDir": "src/routes"
+  },
+  "securityDefinitions": {
+    "jwt": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

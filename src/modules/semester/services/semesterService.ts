@@ -189,26 +189,49 @@ export async function updateLecture(
         await Promise.all(
           lecture.lecture_roles.map(async (role) => {
             // if(role.role === SubjectRoles.TECHNOLOGY){
-            const subjectTeacherCount = subject.hour_configs
-              ?.filter((config) => config.role === role.role)
-              .reduce((acc, config) => acc + 1, 0);
-
-            let teacherCount = role.teachers.length;
 
             if (subject.is_teo_tec_at_same_time) {
-              teacherCount = role.teachers.filter(
-                (teacher) =>
-                  (role.role === SubjectRoles.THEORY &&
-                    !teacher.is_technology_teacher) ||
-                  (role.role === SubjectRoles.TECHNOLOGY &&
-                    teacher.is_technology_teacher)
-              ).length;
-            }
+              const expectedTeoTeachers =
+                subject.hour_configs
+                  ?.filter((config) => config.role === SubjectRoles.THEORY)
+                  .reduce((acc, config) => acc + 1, 0) || 0;
+              const expectedTecTeachers =
+                subject.hour_configs
+                  ?.filter((config) => config.role === SubjectRoles.TECHNOLOGY)
+                  .reduce((acc, config) => acc + 1, 0) || 0;
 
-            if (!subjectTeacherCount || teacherCount > subjectTeacherCount) {
-              throw new Error(
-                `La cantidad de profesores asignados al rol '${role.role}' supera la cantidad permitida`
-              );
+              const teoTeachers = role.teachers.filter(
+                (teacher) => !teacher.is_technology_teacher
+              ).length;
+              const tecTeachers = role.teachers.filter(
+                (teacher) => teacher.is_technology_teacher
+              ).length;
+
+              if (teoTeachers > expectedTeoTeachers) {
+                throw new Error(
+                  `La cantidad de profesores asignados al rol 'Teórico' supera la cantidad permitida`
+                );
+              }
+
+              if (tecTeachers > expectedTecTeachers) {
+                throw new Error(
+                  `La cantidad de profesores asignados al rol
+                  'Tecnología' supera la cantidad permitida`
+                );
+              }
+            } else {
+              const subjectTeacherCount =
+                subject.hour_configs
+                  ?.filter((config) => config.role === role.role)
+                  .reduce((acc, config) => acc + 1, 0) || 0;
+
+              let teacherCount = role.teachers.length;
+
+              if (!subjectTeacherCount || teacherCount > subjectTeacherCount) {
+                throw new Error(
+                  `La cantidad de profesores asignados al rol '${role.role}' supera la cantidad permitida`
+                );
+              }
             }
 
             const teachersPromises = role.teachers.map(async (teacher) => {

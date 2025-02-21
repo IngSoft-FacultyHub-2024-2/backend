@@ -177,10 +177,40 @@ export async function updateLecture(
   lectureId: number,
   lecture: Partial<Lecture>
 ) {
+  const subject = await getSubjectById(lecture.subject_id!);
+  if (!subject) {
+    throw new ResourceNotFound(
+      'No se encontró la materia con id ' + lecture.subject_id
+    );
+  }
+
   const teachers = lecture.lecture_roles
     ? (
         await Promise.all(
           lecture.lecture_roles.map(async (role) => {
+            // if(role.role === SubjectRoles.TECHNOLOGY){
+            const subjectTeacherCount = subject.hour_configs
+              ?.filter((config) => config.role === role.role)
+              .reduce((acc, config) => acc + 1, 0);
+
+            let teacherCount = role.teachers.length;
+
+            if (subject.is_teo_tec_at_same_time) {
+              teacherCount = role.teachers.filter(
+                (teacher) =>
+                  (role.role === SubjectRoles.THEORY &&
+                    !teacher.is_technology_teacher) ||
+                  (role.role === SubjectRoles.TECHNOLOGY &&
+                    teacher.is_technology_teacher)
+              ).length;
+            }
+
+            if (!subjectTeacherCount || teacherCount > subjectTeacherCount) {
+              throw new Error(
+                `La cantidad de profesores asignados al rol '${role.role}' supera la cantidad permitida`
+              );
+            }
+
             const teachersPromises = role.teachers.map(async (teacher) => {
               const teacherData = await getTeacherById(
                 teacher.teacher_id,

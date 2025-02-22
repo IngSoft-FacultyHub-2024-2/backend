@@ -126,7 +126,7 @@ export async function processLectures(
     }
   }
   for (const lecture of result) {
-    await addLecture(lecture as any);
+    await addLecture(lecture as any, false);
   }
   console.log('relevantSubjects', relevantSubjects);
 

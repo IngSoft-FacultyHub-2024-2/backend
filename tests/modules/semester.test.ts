@@ -143,7 +143,10 @@ describe('Semester Service', () => {
 
       const result = await addLecture(mockLecture);
 
-      expect(semesterRepository.addLecture).toHaveBeenCalledWith(mockLecture);
+      expect(semesterRepository.addLecture).toHaveBeenCalledWith(
+        mockLecture,
+        true
+      );
       expect(result).toEqual(mockLecture);
     });
   });

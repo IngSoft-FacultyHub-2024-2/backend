@@ -10,6 +10,7 @@ import LectureHourConfig from './models/LectureHourConfig';
 import LectureRole from './models/LectureRole';
 import LectureTeacher from './models/LectureTeacher';
 import Semester from './models/Semester';
+import { getSubjectById } from '../../subject';
 
 class SemesterRepository {
   async addSemster(semester: Partial<Semester>) {
@@ -91,9 +92,12 @@ class SemesterRepository {
     return await Semester.findByPk(semesterId);
   }
 
-  async addLecture(lecture: Partial<Lecture>) {
+  async addLecture(lecture: Partial<Lecture>, applyValidation = true) {
     const transaction: Transaction = await Lecture.sequelize!.transaction();
     try {
+      if (applyValidation) {
+        await this.checkAmountOfHoursOfLectureCorrect(lecture);
+      }
       const newLecture = await Lecture.create(lecture, {
         include: [
           {
@@ -130,6 +134,35 @@ class SemesterRepository {
       // Roll back the transaction if any operation fails
       await transaction.rollback();
       throw error;
+    }
+  }
+
+  async checkAmountOfHoursOfLectureCorrect(lecture: Partial<Lecture>) {
+    if (!lecture.subject_id) {
+      throw new Error('Seleccionar la materia es requerido');
+    }
+    const subject = await getSubjectById(lecture.subject_id);
+    const amountOfWeeksInSemester = 16;
+    if (!subject) {
+      throw new ResourceNotFound(
+        `Subject with ID ${lecture.subject_id} not found`
+      );
+    }
+    const weeklyHours = Math.floor(
+      subject.frontal_hours / amountOfWeeksInSemester
+    );
+    const lectureHours = lecture.lecture_roles?.reduce(
+      (acc_role, role) =>
+        acc_role +
+        role.hour_configs.reduce((acc, config) => {
+          return acc + config.modules.length;
+        }, 0),
+      0
+    );
+    if (!lectureHours || lectureHours !== weeklyHours) {
+      throw new Error(
+        `La materia ${subject.name} tiene ${weeklyHours} horas semanales y a este dictado se estan asignando ${lectureHours} horas`
+      );
     }
   }
 
@@ -224,6 +257,7 @@ class SemesterRepository {
     lectureData: Partial<Lecture>,
     teachers: TeacherResponseDto[]
   ) {
+    await this.checkAmountOfHoursOfLectureCorrect(lectureData);
     const transaction: Transaction = await Lecture.sequelize!.transaction();
 
     try {
@@ -440,7 +474,6 @@ class SemesterRepository {
           id: { [Op.ne]: updateLectureData.id },
         },
       });
-      // console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
         throw new Error(
           `Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`

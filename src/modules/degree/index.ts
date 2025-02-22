@@ -7,6 +7,8 @@ import {
   updateDegree,
 } from './services/degreeService';
 
+import Degree from './repositories/models/Degree';
+
 export {
   addDegree,
   deleteDegree,
@@ -14,4 +16,5 @@ export {
   getDegreeById,
   getDegrees,
   updateDegree,
+  Degree,
 };

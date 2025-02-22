@@ -440,7 +440,6 @@ class SemesterRepository {
           id: { [Op.ne]: updateLectureData.id },
         },
       });
-      // console.log('otherLectures:', JSON.stringify(otherLectures, null, 2));
       if (this.isAlreadyAssignedTeacher(otherLectures, updateLectureData)) {
         throw new Error(
           `Docente ${teacher.name} ${teacher.surname} ya está asignado a otro dictado en el mismo horario.`

@@ -21,7 +21,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       teacher_employee_number: {
-        type: Sequelize.NUMBER,
+        type: Sequelize.INTEGER,
         allowNull: false,
         unique: true,
       },

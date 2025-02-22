@@ -216,24 +216,42 @@ async function getUnassignedLecturesRolesIds(semesterId: number) {
       (assign) => assign.id === lecture.id
     );
 
+    const isTecTeoAtSameTime = lecture.subject.is_teo_tec_at_same_time;
     if (!lectureToAssign) {
       // If the lecture is not in `lecturesToAssign`, consider all roles unassigned
       return lecture.lecture_roles;
     }
 
     return lecture.lecture_roles.filter((role) => {
-      const requiredTeachers = lectureToAssign.subClasses.filter(
-        (subclass) => subclass.role === role.role
-      )[0].num_teachers;
-      const assignedTeachers = role.teachers.length;
-
-      // Role is unassigned if the required number of teachers is not met
-      return assignedTeachers < requiredTeachers;
+      if (isTecTeoAtSameTime) {
+        const requiredTeachersTechnology = lectureToAssign.subClasses.filter(
+          (subclass) => subclass.role === SubjectRoles.TECHNOLOGY
+        )[0].num_teachers;
+        const requiredTeachersTheory = lectureToAssign.subClasses.filter(
+          (subclass) => subclass.role === SubjectRoles.THEORY
+        )[0].num_teachers;
+        const assignedTeachersTechnology = role.teachers.filter(
+          (teacher) => teacher.is_technology_teacher
+        ).length;
+        const assignedTeachersTheory = role.teachers.filter(
+          (teacher) => !teacher.is_technology_teacher
+        ).length;
+        return (
+          assignedTeachersTechnology < requiredTeachersTechnology ||
+          assignedTeachersTheory < requiredTeachersTheory
+        );
+      } else {
+        const requiredTeachers = lectureToAssign.subClasses.filter(
+          (subclass) => subclass.role === role.role
+        )[0].num_teachers;
+        const assignedTeachers = role.teachers.length;
+        // Role is unassigned if the required number of teachers is not met
+        return assignedTeachers < requiredTeachers;
+      }
     });
   });
 
   const unassignedLecturesIds = unassignedLectures.map((lecture) => lecture.id);
-
   return unassignedLecturesIds;
 }
 

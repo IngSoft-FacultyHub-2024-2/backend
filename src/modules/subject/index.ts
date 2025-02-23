@@ -25,15 +25,16 @@ import {
 } from './services/studyPlanService';
 import {
   addSubject,
+  amountOfTeachersPerSubject,
   deleteSubject,
   getAllSubjectNames,
   getSubjectById,
   getSubjectNamesByStudyPlan,
   getSubjects,
+  getSubjectsIdsWithTecTeoAtSameTime,
   teacherCoordinatorSubjects,
   updateSubject,
-  amountOfTeachersPerSubject,
-  getSubjectsIdsWithTecTeoAtSameTime,
+  updateSubjectVigencyByStudyPlan,
 } from './services/subjectService';
 
 //Event
@@ -63,15 +64,16 @@ export { addStudyPlan, deleteStudyPlan, getStudyPlans, updateStudyPlan };
 export {
   addSubject,
   amountOfTeachersPerSubject,
-  getSubjectsIdsWithTecTeoAtSameTime,
   deleteSubject,
   getAllSubjectNames,
   getSubjectById,
   getSubjectNamesByStudyPlan,
   getSubjects,
+  getSubjectsIdsWithTecTeoAtSameTime,
   HourConfigResponseDto,
   SubjectRequestDto,
   SubjectResponseDto,
   teacherCoordinatorSubjects,
   updateSubject,
+  updateSubjectVigencyByStudyPlan,
 };

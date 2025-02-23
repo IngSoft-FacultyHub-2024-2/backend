@@ -12,6 +12,9 @@ jest.mock('../../src/modules/subject/repositories/studyPlanRepository', () => ({
   updateStudyPlan: jest.fn(),
   deleteStudyPlan: jest.fn(),
 }));
+jest.mock('../../src/modules/subject/services/subjectService', () => ({
+  updateSubjectVigencyByStudyPlan: jest.fn(),
+}));
 
 describe('StudyPlan Service', () => {
   describe('getStudyPlans', () => {

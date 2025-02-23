@@ -116,3 +116,10 @@ export async function getSubjectNamesByStudyPlan(studyPlanId: number) {
     await subjectRepository.getSubjectNamesByStudyPlan(studyPlanId);
   return subjects;
 }
+
+export async function updateSubjectVigencyByStudyPlan(
+  studyPlanId: number,
+  vigency: boolean
+) {
+  await subjectRepository.updateSubjectVigencyByStudyPlan(studyPlanId, vigency);
+}

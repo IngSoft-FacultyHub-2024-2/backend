@@ -7,20 +7,23 @@ import inputTeacherAvailableModuleSchema from './inputTeacherAvailableModuleSche
 import inputTeacherSubjectGroupSchema from './inputTeacherSubjectGroupSchema';
 
 const inputTeacherSchema = yup.object().shape({
-  name: yup.string().required('Name is required'),
-  surname: yup.string().required('Surname is required'),
+  name: yup.string().required('El nombre es requerido'),
+  surname: yup.string().required('El apellido es requerido'),
   birth_date: yup
     .date()
     .nullable()
     .transform((value, originalValue) => (originalValue === '' ? null : value)),
-  employee_number: yup.number().positive().nullable(),
+  employee_number: yup
+    .number()
+    .positive('El numero de funcionario debe contener solo números')
+    .nullable(),
   cv_file: yup.string().nullable(),
   how_they_found_us: yup.string().nullable(),
   id_photo: yup.string().nullable(),
   hiring_date: yup.date().nullable(),
   linkedin_link: yup
     .string()
-    .url('LinkedIn link must be a valid URL')
+    .url('El link de LinkedIn debe ser una URL válida')
     .nullable(),
   graduated: yup.boolean().nullable(),
   notes: yup.string().nullable(),
@@ -38,8 +41,10 @@ const inputTeacherSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        category_id: yup.number().required('Category ID is required'),
-        date: yup.date().required('Category date is required'),
+        category_id: yup
+          .number()
+          .required('El ID de la categoría es requerido'),
+        date: yup.date().required('La fecha de la categoría es requerida'),
       })
     )
     .nullable(),
@@ -47,8 +52,8 @@ const inputTeacherSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        benefit_id: yup.number().required('Benefit ID is required'),
-        date: yup.date().required('Benefit date is required'),
+        benefit_id: yup.number().required('El ID del beneficio es requerido'),
+        date: yup.date().required('La fecha del beneficio es requerida'),
       })
     )
     .nullable(),
@@ -57,7 +62,7 @@ const inputTeacherSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        subject_id: yup.number().required('Subject of interest ID is required'),
+        subject_id: yup.number().required('El ID de la materia es requerido'),
       })
     )
     .nullable(),

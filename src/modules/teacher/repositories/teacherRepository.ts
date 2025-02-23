@@ -111,15 +111,15 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -127,11 +127,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
@@ -199,15 +199,23 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+            {
+              [Op.and]: search.split(' ').map((word) => ({
+                [Op.or]: [
+                  { name: { [Op.iLike]: `%${word}%` } },
+                  { surname: { [Op.iLike]: `%${word}%` } },
+                ],
+              })),
+            },
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -316,7 +324,12 @@ class TeacherRepository {
 
   async rehireTeacher(id: number) {
     await Teacher.update(
-      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null, dismiss_motive: null },
+      {
+        state: TeacherStates.ACTIVE,
+        retentionDate: null,
+        deletedAt: null,
+        dismiss_motive: null,
+      },
       { where: { id }, paranoid: false }
     );
   }
@@ -602,7 +615,10 @@ class TeacherRepository {
 
   async addDismissalMotive(id: number, dismissalMotive: string) {
     console.log('motive', dismissalMotive);
-    await Teacher.update({ dismiss_motive: dismissalMotive }, { where: { id } });
+    await Teacher.update(
+      { dismiss_motive: dismissalMotive },
+      { where: { id } }
+    );
   }
 }
 

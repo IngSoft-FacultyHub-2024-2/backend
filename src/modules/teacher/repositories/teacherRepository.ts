@@ -111,15 +111,15 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -127,11 +127,11 @@ class TeacherRepository {
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
@@ -199,15 +199,15 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
@@ -316,7 +316,12 @@ class TeacherRepository {
 
   async rehireTeacher(id: number) {
     await Teacher.update(
-      { state: TeacherStates.ACTIVE, retentionDate: null, deletedAt: null, dismiss_motive: null },
+      {
+        state: TeacherStates.ACTIVE,
+        retentionDate: null,
+        deletedAt: null,
+        dismiss_motive: null,
+      },
       { where: { id }, paranoid: false }
     );
   }
@@ -505,29 +510,27 @@ class TeacherRepository {
     transaction: Transaction
   ) {
     const { teacher_subject_groups = [] } = teacherData;
-    if (teacher_subject_groups.length > 0) {
-      const groups = await TeacherSubjectGroupMember.findAll({
-        where: { teacher_id: teacherId },
+    const groups = await TeacherSubjectGroupMember.findAll({
+      where: { teacher_id: teacherId },
+      transaction,
+    });
+    const groupIds = groups.map((group) => group.teacher_subject_group_id);
+    groupIds.forEach(async (groupId) => {
+      await TeacherSubjectGroupMember.destroy({
+        where: { teacher_subject_group_id: groupId },
         transaction,
       });
-      const groupIds = groups.map((group) => group.teacher_subject_group_id);
-      groupIds.forEach(async (groupId) => {
-        await TeacherSubjectGroupMember.destroy({
-          where: { teacher_subject_group_id: groupId },
-          transaction,
-        });
-        await TeacherSubjectGroup.destroy({
-          where: { id: groupId },
-          transaction,
-        });
+      await TeacherSubjectGroup.destroy({
+        where: { id: groupId },
+        transaction,
       });
+    });
 
-      await this.associateTeacherSubjectGroups(
-        teacherId,
-        teacher_subject_groups,
-        transaction
-      );
-    }
+    await this.associateTeacherSubjectGroups(
+      teacherId,
+      teacher_subject_groups,
+      transaction
+    );
   }
 
   private async updateSubjectsOfInterest(
@@ -602,7 +605,10 @@ class TeacherRepository {
 
   async addDismissalMotive(id: number, dismissalMotive: string) {
     console.log('motive', dismissalMotive);
-    await Teacher.update({ dismiss_motive: dismissalMotive }, { where: { id } });
+    await Teacher.update(
+      { dismiss_motive: dismissalMotive },
+      { where: { id } }
+    );
   }
 }
 

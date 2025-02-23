@@ -8,6 +8,7 @@ import {
   getSubjects,
   SubjectRequestDto,
   updateSubject,
+  updateSubjectVigencyByStudyPlan,
 } from '../../src/modules/subject';
 import { SubjectRequestDtoHelper } from '../../src/modules/subject/dtos/request/subjectRequestDto';
 import eventRepository from '../../src/modules/subject/repositories/eventRepository';
@@ -22,6 +23,7 @@ jest.mock('../../src/modules/subject/repositories/subjectRepository', () => ({
   getAllSubjectNames: jest.fn(),
   getSubjectById: jest.fn(),
   updateSubject: jest.fn(),
+  updateSubjectVigencyByStudyPlan: jest.fn(),
 }));
 jest.mock('../../src/modules/subject/dtos/request/subjectRequestDto');
 jest.mock('../../src/modules/teacher/', () => ({
@@ -456,5 +458,35 @@ describe('addEvent', () => {
     // Assert
     expect(eventRepository.addEvent).toHaveBeenCalledWith(mockEvent);
     expect(result).toEqual(mockEvent);
+  });
+});
+
+describe('updateSubjectVigencyByStudyPlan', () => {
+  const studyPlanId = 1;
+  const vigency = true;
+
+  beforeEach(() => {
+    jest.clearAllMocks(); // Limpiar mocks antes de cada test
+  });
+
+  it('debe llamar a subjectRepository.updateSubjectVigencyByStudyPlan con los argumentos correctos', async () => {
+    await updateSubjectVigencyByStudyPlan(studyPlanId, vigency);
+
+    expect(
+      subjectRepository.updateSubjectVigencyByStudyPlan
+    ).toHaveBeenCalledTimes(1);
+    expect(
+      subjectRepository.updateSubjectVigencyByStudyPlan
+    ).toHaveBeenCalledWith(studyPlanId, vigency);
+  });
+
+  it('debe lanzar un error si subjectRepository.updateSubjectVigencyByStudyPlan falla', async () => {
+    (
+      subjectRepository.updateSubjectVigencyByStudyPlan as jest.Mock
+    ).mockRejectedValue(new Error('Database error'));
+
+    await expect(
+      updateSubjectVigencyByStudyPlan(studyPlanId, vigency)
+    ).rejects.toThrow('Database error');
   });
 });

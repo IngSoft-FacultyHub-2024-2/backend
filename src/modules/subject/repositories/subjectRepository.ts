@@ -262,5 +262,22 @@ class SubjectRepository {
       order: [['name', 'ASC']],
     });
   }
+
+  async updateSubjectVigencyByStudyPlan(
+    studyPlanId: number,
+    valid: boolean
+  ): Promise<void> {
+    const subjects = await Subject.findAll({
+      where: { study_plan_id: studyPlanId },
+      include: [
+        {
+          model: HourConfig,
+          as: 'hour_configs',
+        },
+      ],
+    });
+
+    await Promise.all(subjects.map((subject) => subject.update({ valid })));
+  }
 }
 export default new SubjectRepository();

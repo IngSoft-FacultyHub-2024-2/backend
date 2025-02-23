@@ -206,6 +206,14 @@ class TeacherRepository {
               sequelize.cast(sequelize.col('employee_number'), 'varchar'),
               { [Op.iLike]: `%${search}%` }
             ),
+            {
+              [Op.and]: search.split(' ').map((word) => ({
+                [Op.or]: [
+                  { name: { [Op.iLike]: `%${word}%` } },
+                  { surname: { [Op.iLike]: `%${word}%` } },
+                ],
+              })),
+            },
           ],
         }
       : {};

@@ -5,12 +5,18 @@ import {
 } from '../../../shared/utils/enums/subjectRoles';
 
 const inputSubjectSchema = yup.object().shape({
-  subject_id: yup.number().transform((value, originalValue) => Number(originalValue)).required('El id de la materia es requerido'),
+  subject_id: yup
+    .number()
+    .transform((value, originalValue) => Number(originalValue))
+    .required('El id de la materia es requerido'),
   role: yup
     .mixed<SubjectRoles.TECHNOLOGY | SubjectRoles.THEORY>()
     .oneOf(getSubjectRoles(), 'El rol debe ser Teoría o Tecnología')
-    .required('Role is required'),
-  start_date: yup.date().transform((value, originalValue) => new Date(originalValue)).required('La fecha de inicio es requerida'),
+    .required('El rol es requerido'),
+  start_date: yup
+    .date()
+    .transform((value, originalValue) => new Date(originalValue))
+    .required('La fecha de inicio es requerida'),
   end_date: yup
     .date()
     .nullable()
@@ -27,11 +33,15 @@ const subjectsHistorySchema = yup
     (subjects) => {
       if (!subjects) return true;
 
-      const grouped = new Map<string, { start_date: Date; end_date: Date | null }[]>();
+      const grouped = new Map<
+        string,
+        { start_date: Date; end_date: Date | null }[]
+      >();
 
       // Agrupar por subject_id y role
       for (const subject of subjects) {
-        if (!subject.subject_id || !subject.role || !subject.start_date) continue;
+        if (!subject.subject_id || !subject.role || !subject.start_date)
+          continue;
         const key = `${subject.subject_id}-${subject.role}`;
         const group = grouped.get(key) || [];
         group.push({
@@ -43,7 +53,9 @@ const subjectsHistorySchema = yup
 
       // Validar superposición de fechas
       for (const group of grouped.values()) {
-        const sorted = [...group].sort((a, b) => a.start_date.getTime() - b.start_date.getTime());
+        const sorted = [...group].sort(
+          (a, b) => a.start_date.getTime() - b.start_date.getTime()
+        );
         for (let i = 0; i < sorted.length - 1; i++) {
           const current = sorted[i];
           const next = sorted[i + 1];

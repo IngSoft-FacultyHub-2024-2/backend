@@ -518,29 +518,27 @@ class TeacherRepository {
     transaction: Transaction
   ) {
     const { teacher_subject_groups = [] } = teacherData;
-    if (teacher_subject_groups.length > 0) {
-      const groups = await TeacherSubjectGroupMember.findAll({
-        where: { teacher_id: teacherId },
+    const groups = await TeacherSubjectGroupMember.findAll({
+      where: { teacher_id: teacherId },
+      transaction,
+    });
+    const groupIds = groups.map((group) => group.teacher_subject_group_id);
+    groupIds.forEach(async (groupId) => {
+      await TeacherSubjectGroupMember.destroy({
+        where: { teacher_subject_group_id: groupId },
         transaction,
       });
-      const groupIds = groups.map((group) => group.teacher_subject_group_id);
-      groupIds.forEach(async (groupId) => {
-        await TeacherSubjectGroupMember.destroy({
-          where: { teacher_subject_group_id: groupId },
-          transaction,
-        });
-        await TeacherSubjectGroup.destroy({
-          where: { id: groupId },
-          transaction,
-        });
+      await TeacherSubjectGroup.destroy({
+        where: { id: groupId },
+        transaction,
       });
+    });
 
-      await this.associateTeacherSubjectGroups(
-        teacherId,
-        teacher_subject_groups,
-        transaction
-      );
-    }
+    await this.associateTeacherSubjectGroups(
+      teacherId,
+      teacher_subject_groups,
+      transaction
+    );
   }
 
   private async updateSubjectsOfInterest(

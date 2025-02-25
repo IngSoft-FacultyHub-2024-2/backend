@@ -83,8 +83,6 @@ export async function processLectures(
   const subjectNames = await getAllSubjectNames();
   const relevantSubjects: Subject[] = [];
 
-  console.log('subjectNames', subjectNames);
-
   const modules = await getModules();
   const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
@@ -128,7 +126,6 @@ export async function processLectures(
   for (const lecture of result) {
     await addLecture(lecture as any, false);
   }
-  console.log('relevantSubjects', relevantSubjects);
 
   return generateResultLectures(result, relevantSubjects);
 }

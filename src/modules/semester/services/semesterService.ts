@@ -8,12 +8,12 @@ import {
 } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
 import { getTimesOfModules } from '../../../shared/utils/modules';
-import { getDegreeById, getDegrees, Degree } from '../../degree';
+import { Degree, getDegreeById, getDegrees } from '../../degree';
 import {
   amountOfTeachersPerSubject,
   getSubjectById,
-  SubjectResponseDto,
   getSubjectsIdsWithTecTeoAtSameTime,
+  SubjectResponseDto,
 } from '../../subject';
 import { getTeacherById } from '../../teacher';
 import { LectureResponseDtoHelper } from '../dtos/response/lectureResponseDto';
@@ -80,7 +80,7 @@ export async function getSemesterLectures(
     group,
     teacherId
   );
-  console.log(semester);
+
   if (!semester) {
     console.log('No se encontro el semestre');
     throw new ResourceNotFound('No se encontro el semestre');
@@ -672,12 +672,12 @@ function checkAmountOfTeachersPerRole(
         ?.filter((config) => config.role === SubjectRoles.TECHNOLOGY)
         .reduce((acc, config) => acc + 1, 0) || 0;
 
-    const teoTeachers = role.teachers.filter(
-      (teacher) => !teacher.is_technology_teacher
-    ).length;
-    const tecTeachers = role.teachers.filter(
-      (teacher) => teacher.is_technology_teacher
-    ).length;
+    const teoTeachers =
+      role.teachers &&
+      role.teachers.filter((teacher) => !teacher.is_technology_teacher).length;
+    const tecTeachers =
+      role.teachers &&
+      role.teachers.filter((teacher) => teacher.is_technology_teacher).length;
 
     if (teoTeachers > expectedTeoTeachers) {
       throw new Error(
@@ -697,7 +697,7 @@ function checkAmountOfTeachersPerRole(
         ?.filter((config) => config.role === role.role)
         .reduce((acc, config) => acc + 1, 0) || 0;
 
-    let teacherCount = role.teachers.length;
+    let teacherCount = role.teachers && role.teachers.length;
 
     if (!subjectTeacherCount || teacherCount > subjectTeacherCount) {
       throw new Error(

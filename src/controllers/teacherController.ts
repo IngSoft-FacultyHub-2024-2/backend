@@ -44,7 +44,6 @@ class TeacherController {
     try {
       const teacherId = parseInt(req.params.id);
       const motive = req.body.dismissMotive;
-      
       await dismissTeacher(teacherId, motive);
       res.status(204).send();
     } catch (error) {

@@ -141,13 +141,17 @@ export async function dismissTeacher(id: number, motive: string) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
+  const date = new Date(Date.now()).toLocaleDateString('es-ES');
+  const type = 'Dado de Baja';
+  const structuredMotive = date + " - " + type + " - " + motive;
+
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
-  await teacherRepository.addDismissalMotive(id, motive);
+  await teacherRepository.addDismissalMotive(id, structuredMotive);
 
   await teacherRepository.dismissTeacher(id);
 
@@ -177,13 +181,18 @@ export async function temporaryDismissTeacher(id: number, retentionDate: Date, m
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-        coordinatorSubjects.map((subject) => subject.name).join(', ')
+      coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
+  const date = new Date(Date.now()).toLocaleDateString('es-ES');
+
+  const type = `Dado de Baja Temporal (${retentionDate})`;
+  const structuredMotive = date + " - " + type + " - " + motive;
+
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
-  await teacherRepository.addDismissalMotive(id, motive);
+  await teacherRepository.addDismissalMotive(id, structuredMotive);
 
   await teacherRepository.temporaryDismissTeacher(id, retentionDate);
 

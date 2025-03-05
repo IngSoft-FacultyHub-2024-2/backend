@@ -1,4 +1,4 @@
-import Teacher from '../../repositories/models/Teacher';import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
+import Teacher from '../../repositories/models/Teacher'; import TeacherSubjectOfInterest from '../../repositories/models/TeacherSubjectOfInterest';
 import Prize from '../../repositories/models/Prize';
 import CaesCourse from '../../repositories/models/CaesCourse';
 import Contact from '../../repositories/models/Contact';
@@ -35,7 +35,7 @@ export interface TeacherResponseDto {
   benefits: TeacherBenefit[];
   teacher_subject_groups: TeacherSubjectGroup[];
   teacher_available_modules: TeacherAvailableModule[];
-  dismiss_motive?: string | null;
+  dismiss_motive?: string[] | null;
 }
 
 export class TeacherResponseDtoHelper {

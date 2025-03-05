@@ -357,8 +357,17 @@ class SemesterRepository {
           }
           if (lockingAction) {
             console.log('lockingAction:', lockingAction, lectureRole.role);
+            if (!lectureRole || lectureRole.teachers.length === 0) {
+              throw new Error('No se puede lockear un dictado sin profesores.');
+            }
+            const teachersIdsOfLectureRole = lectureRole.teachers.map(
+              (teacher) => teacher.teacher_id.toString()
+            );
+            const teachersToValidate = teachers.filter((teacher) =>
+              teachersIdsOfLectureRole.includes(teacher.id.toString())
+            );
             await this.validateLockedLectures(
-              teachers,
+              teachersToValidate,
               lecture,
               lectureRole.role
             );
@@ -431,7 +440,6 @@ class SemesterRepository {
         'No se puede lockear un dictado con profesores repetidos.'
       );
     }
-
     for (const teacher of teachers) {
       // 1. Validate if the teacher has available hours
       const availableModules = teacher.teacher_available_modules;

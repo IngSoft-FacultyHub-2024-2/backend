@@ -60,7 +60,6 @@ class userManagementController {
   }
 
   async updatePassword(req: Request, res: Response) {
-    console.log('updatePassword');
     try {
       await inputUpdatePasswordSchema.validate(req.body);
 

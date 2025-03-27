@@ -4,7 +4,8 @@ import {
   deleteLecture,
   deleteSemester,
   deleteTeachersAssignations,
-  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
+  getAssignedLecturesCsv,
+  getLectureIdsFromTeoTecSubjects,
   getPreassignedTeachers,
   getSemesterById,
   getSemesterLectures,
@@ -15,7 +16,6 @@ import {
   submitTeacherReview,
   updateLecture,
   updateSemester,
-  getAssignedLecturesCsv,
 } from './services/semesterService';
 
 import {
@@ -29,7 +29,8 @@ export {
   deleteLecture,
   deleteSemester,
   deleteTeachersAssignations,
-  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
+  getAssignedLecturesCsv,
+  getLectureIdsFromTeoTecSubjects,
   getPreassignedTeachers,
   getSemesterById,
   getSemesterLectures,
@@ -42,5 +43,4 @@ export {
   submitTeacherReview,
   updateLecture,
   updateSemester,
-  getAssignedLecturesCsv,
 };

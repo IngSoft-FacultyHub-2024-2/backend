@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SubjectRoles } from '../../../shared/utils/enums/subjectRoles';
 import {
   deleteTeachersAssignations,
-  getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime,
+  getLectureIdsFromTeoTecSubjects,
   getPreassignedTeachers,
   getSemesterLectures,
   getSemesterLecturesToAssign,
@@ -57,8 +57,8 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
     {}
   );
 
-  const lectureIdsOfSubjectsIdsWithTecTeoAtSameTime =
-    await getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(semesterId);
+  const lectureIdsFromTeoTecSubjects =
+    await getLectureIdsFromTeoTecSubjects(semesterId);
   assignPayload.classes = lecturesToAssign.reduce(
     (acc: { [key: number]: LectureToAssign }, lecture) => {
       acc[lecture.id] = lecture;
@@ -70,7 +70,6 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
   // Set the amount of teachers to assign to each lecture lock as the number of teacher they are there
   setNumberOfTeacherToLockedLectures(preassigned, assignPayload);
   const response = await sendAssignation(assignPayload);
-  console.log(response.status);
   if (response.status === 'Infeasible') {
     throw new Error(
       'Fallo al asignar profesores la optimizacion, problema imposible, chequee los locks'
@@ -98,9 +97,7 @@ export async function assignTeachersToSemesterLectures(semesterId: number) {
               amount_of_lectures_assigned += 1;
               const is_technology_teacher =
                 role === SubjectRoles.TECHNOLOGY &&
-                lectureIdsOfSubjectsIdsWithTecTeoAtSameTime.includes(
-                  Number(lectureId)
-                );
+                lectureIdsFromTeoTecSubjects.includes(Number(lectureId));
               await setTeacherToLecture(
                 Number(lectureId),
                 Number(teacherId),

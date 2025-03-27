@@ -368,7 +368,7 @@ export async function getLecturesWithTeachers(semesterId: number) {
   return semesterLectures;
 }
 
-export async function getLectureIdsOfSubjectsIdsWithTecTeoAtSameTime(
+export async function getLectureIdsFromTeoTecSubjects(
   semesterId: number
 ): Promise<number[]> {
   const semester = await semesterRepository.getSemesterLectures(semesterId);

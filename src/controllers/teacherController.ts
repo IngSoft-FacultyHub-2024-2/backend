@@ -133,7 +133,7 @@ class TeacherController {
         page,
         pageSize,
       } = req.query;
-      console.log(subject_id);
+
       const teachersResponse = await getTeachers(
         search,
         state,

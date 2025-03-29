@@ -8,7 +8,7 @@ import { isTeacherOwnDataMiddleware } from '../middlewares/isTeacherOwnDataMiddl
 
 const router = Router();
 
-// Beneficios
+// Benefits
 router.get('/benefits', authMiddleware, benefitController.getBenefits);
 router.post(
   '/benefits',
@@ -29,7 +29,7 @@ router.delete(
   benefitController.deleteBenefit
 );
 
-// Categorías
+// Categories
 router.get('/categories', authMiddleware, categoryController.getCategories);
 router.post(
   '/categories',
@@ -50,7 +50,7 @@ router.delete(
   categoryController.deleteCategory
 );
 
-// Profesores
+// Teachers
 router.get('/names', authMiddleware, teacherController.getAllTeachersNames);
 router.get(
   '/contacts',
@@ -77,7 +77,7 @@ router.get(
   teacherController.getTeacherOwnData
 );
 router.patch(
-  '/:id',
+  '/:id/dismiss',
   authMiddleware,
   isCoordinatorMiddleware,
   teacherController.dismissTeacher

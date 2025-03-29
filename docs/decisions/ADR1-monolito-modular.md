@@ -2,7 +2,7 @@
 
 ## Contexto y Declaración del Problema
 
-Para la arquitectura del backend, decidimos implementar un monolito modular en lugar de un monolito tradicional. Como se mencionó en la sección de ingeniería de requerimientos, un atributo de calidad clave para nosotros es la mantenibilidad. Un monolito modular organiza la aplicación en módulos independientes con límites bien definidos, manteniendo una única unidad desplegable. Cada módulo encapsula una funcionalidad específica del negocio, incluyendo modelos de datos, lógica de negocio e interfaces, y se comunica con otros módulos a través de APIs bien definidas, lo que mejora la cohesión y minimiza las dependencias.
+Para la arquitectura del backend, decidimos implementar un monolito modular en lugar de un monolito tradicional. Un atributo de calidad clave para nosotros es la mantenibilidad. Un monolito modular organiza la aplicación en módulos independientes con límites bien definidos, manteniendo una única unidad desplegable. Cada módulo encapsula una funcionalidad específica del negocio, incluyendo modelos de datos, lógica de negocio e interfaces, y se comunica con otros módulos a través de APIs bien definidas, lo que mejora la cohesión y minimiza las dependencias.
 
 ## Factores de Decisión
 
@@ -41,7 +41,6 @@ Opción elegida: **Monolito Modular**, porque proporciona una arquitectura más 
 La correcta implementación del monolito modular se validará mediante:
 
 - Revisión de código para asegurar que cada módulo encapsula correctamente su funcionalidad.
-- Pruebas unitarias e integración para verificar la independencia de los módulos.
 - Documentación clara de las interfaces de cada módulo.
 
 ## Pros y Contras de las Opciones
@@ -81,7 +80,7 @@ La correcta implementación del monolito modular se validará mediante:
 - **Contras:**
   - Complejidad operativa y de despliegue mayor.
   - Sobrecarga en la comunicación entre servicios.
-  - Requiere una infraestructura más compleja desde el inicio.
+  - Requiere una infraestructura más compleja desde el inicio, lo cual incrementaria los costos.
 
 ## Más Información
 

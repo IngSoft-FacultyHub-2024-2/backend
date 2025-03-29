@@ -10,10 +10,10 @@ Adicionalmente, se necesitaba una solución para la persistencia de datos con un
 
 Se eligió AWS como proveedor de nube y se utilizaron los siguientes servicios:
 
-1. **Frontend**: Desplegado como una Single Page Application (SPA) en **AWS S3** con CloudFront para distribución de contenido.
+1. **Frontend**: Desplegado como una Single Page Application (SPA) en **AWS S3**.
 2. **Backend**: Implementado en **Node.js con TypeScript**, expuesto como una API REST con **Express**, y desplegado en **AWS Elastic Beanstalk** para facilitar la administración y escalabilidad.
 3. **Base de datos**: Se utilizó **AWS RDS con PostgreSQL** como motor de base de datos relacional.
-4. **LectureTeacherAssignator**: Microservicio desarrollado en **Python con OR-Tools**, expuesto a través de una **API REST** y alojado en **Elastic Beanstalk**. Se eligió este enfoque en lugar de un background job debido a que los tiempos de ejecución eran rápidos (~1s para un caso promedio y ~4s en escenarios ampliados), lo que permitía responder en tiempo real.
+4. **LectureTeacherAssignator**: Microservicio desarrollado en **Python con OR-Tools**, expuesto a través de una **API REST** y alojado en **Elastic Beanstalk**. Se eligió este enfoque en lugar de un background job debido a que los tiempos de ejecución eran rápidos (~1s para un caso promedio), lo que permitía responder en tiempo real.
 
 ## Justificación
 

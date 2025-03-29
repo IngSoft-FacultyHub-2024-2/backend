@@ -32,7 +32,7 @@ Opción elegida: "Google OR-Tools", debido a que es una librería de optimizaci�
 
 ### Confirmación
 
-La implementación de OR-Tools en Python se validará mediante pruebas unitarias y de integración en el servicio LectureTeacherAssociator, asegurando que la asignación de docentes cumpla con las restricciones definidas.
+La implementación de OR-Tools en Python se validará mediante pruebas unitarias en el servicio LectureTeacherAssociator, asegurando que la asignación de docentes cumpla con las restricciones definidas.
 
 ## Pros y Contras de las Opciones
 
@@ -79,4 +79,4 @@ La implementación de OR-Tools en Python se validará mediante pruebas unitarias
 
 ## Más Información
 
-Esta decisión será revisada periódicamente en función del mantenimiento de OR-Tools y la evolución de las necesidades del sistema. La documentación oficial de OR-Tools se encuentra en: https://developers.google.com/optimization
+La documentación oficial de OR-Tools se encuentra en: https://developers.google.com/optimization

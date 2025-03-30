@@ -89,13 +89,6 @@ router.patch(
   teacherController.temporaryDismissTeacher
 );
 
-router.put(
-  '/:id',
-  authMiddleware,
-  isTeacherOwnDataMiddleware,
-  teacherController.updateTeacher
-);
-
 router.patch(
   '/:id/rehire',
   authMiddleware,

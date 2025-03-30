@@ -55,6 +55,7 @@ router.get(
 router.get(
   '/:semesterId/assigned-lectures-csv',
   authMiddleware,
+  isCoordinatorMiddleware,
   semesterController.getAssignedLecturesCsv
 );
 router.patch(

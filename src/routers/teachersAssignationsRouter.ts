@@ -6,13 +6,13 @@ import { isCoordinatorMiddleware } from '../middlewares/isCoordinatorMiddleware'
 const router = Router();
 
 router.post(
-  '/',
+  '/semester/:semesterId',
   authMiddleware,
   isCoordinatorMiddleware,
   TeacherAssignationsController.assignTeachersToSemesterLectures
 );
 router.get(
-  '/conflicts/:semesterId',
+  '/semester/:semesterId/conflicts',
   authMiddleware,
   isCoordinatorMiddleware,
   TeacherAssignationsController.getAssignationsConflicts

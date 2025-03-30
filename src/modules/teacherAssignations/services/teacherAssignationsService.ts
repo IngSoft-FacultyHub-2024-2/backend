@@ -162,17 +162,17 @@ async function sendAssignation(
 
       // Throw a custom error with detailed information
       throw new Error(
-        `Request failed with status ${error.response?.status}: ${error.response?.statusText}. ${
+        `La request fallo con status ${error.response?.status}: ${error.response?.statusText}. ${
           JSON.stringify(error.response?.data) || 'Detalles no disponibles.'
         }`
       );
     } else {
       // Handle non-Axios errors
       console.error(
-        'Unexpected error when connecting to algorithm server:',
+        'Error inesperado al conectar con el servidor del algoritmo:',
         error
       );
-      throw new Error('An unexpected error occurred during the request.');
+      throw new Error('Ocurrio un error inesperado durante la request.');
     }
   }
 }

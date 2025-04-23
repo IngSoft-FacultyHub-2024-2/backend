@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
 import { translateWeekDayToEnglish } from '../../../shared/utils/enums/WeekDays';
 import { ResourceNotFound } from '../../../shared/utils/exceptions/customExceptions';
@@ -28,12 +30,47 @@ export async function getTeachersContacts(
   risk?: number,
   subject_id?: number
 ) {
-  return await teacherRepository.getTeachersContacts(
+  const teacherContacts = await teacherRepository.getTeachersContacts(
     search,
     state,
     risk,
     subject_id
   );
+
+  return await generateContactsCsv(teacherContacts);
+}
+
+async function generateContactsCsv(teachers: Teacher[]) {
+  try {
+    const contacts = teachers
+      .flatMap((teacher) => {
+        if (teacher.contacts) {
+          // Get all emails
+          return teacher.contacts
+            .filter((contact) => contact.mean === 'Mail')
+            .map((contact) => contact.data);
+        }
+      })
+      .filter((contact): contact is string => Boolean(contact));
+
+    // Convertir los contactos en formato CSV
+    const csvRows = ['Contactos'];
+    contacts.forEach((contact) => {
+      csvRows.push(contact); // Añadir cada contacto como una fila
+    });
+
+    const csvString = csvRows.join('\n');
+
+    // Escribir el archivo CSV
+    const date = new Date().toISOString().replace(/:/g, '-');
+    const filePath = `./contacts-${date}.csv`;
+    fs.writeFileSync(filePath, csvString, 'utf8');
+
+    const absoluteFilePath = path.resolve(filePath);
+    return absoluteFilePath;
+  } catch (error) {
+    console.error('Error generating contacts CSV file:', error);
+  }
 }
 
 export async function getTeachers(
@@ -141,13 +178,13 @@ export async function dismissTeacher(id: number, motive: string) {
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   const date = new Date(Date.now()).toLocaleDateString('es-ES');
   const type = 'Dado de Baja';
-  const structuredMotive = date + " - " + type + " - " + motive;
+  const structuredMotive = date + ' - ' + type + ' - ' + motive;
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 
@@ -158,7 +195,6 @@ export async function dismissTeacher(id: number, motive: string) {
   await teacherRepository.closeOpenSubjects(id);
 
   const user = await getUserByTeacherId(id);
-
 
   if (user) {
     await unsubscribeUser(user.id);
@@ -175,20 +211,24 @@ export async function rehireTeacher(id: number) {
   }
 }
 
-export async function temporaryDismissTeacher(id: number, retentionDate: Date, motive: string) {
+export async function temporaryDismissTeacher(
+  id: number,
+  retentionDate: Date,
+  motive: string
+) {
   const coordinatorSubjects = await teacherCoordinatorSubjects(id);
 
   if (coordinatorSubjects.length > 0) {
     throw new Error(
       'Este docente es coordinador de una materia y no puede ser dado de baja temporal: ' +
-      coordinatorSubjects.map((subject) => subject.name).join(', ')
+        coordinatorSubjects.map((subject) => subject.name).join(', ')
     );
   }
 
   const date = new Date(Date.now()).toLocaleDateString('es-ES');
 
   const type = `Dado de Baja Temporal (${retentionDate})`;
-  const structuredMotive = date + " - " + type + " - " + motive;
+  const structuredMotive = date + ' - ' + type + ' - ' + motive;
 
   await teacherRepository.deleteTeacherSubjectGroups(id);
 

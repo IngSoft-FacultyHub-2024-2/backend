@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { Op, Order, Transaction } from 'sequelize';
 import sequelize from '../../../config/database';
 import { TeacherStates } from '../../../shared/utils/enums/teacherStates';
@@ -59,20 +57,6 @@ class TeacherRepository {
     }
   }
 
-  private async associateSubjectsOfInterest(
-    teacherId: number,
-    subject_ids: any[],
-    transaction: any
-  ) {
-    const subjectAssociations = subject_ids.map((subject_id) => ({
-      subject_id: subject_id,
-      teacher_id: teacherId,
-    }));
-    await TeacherSubjectOfInterest.bulkCreate(subjectAssociations, {
-      transaction,
-    });
-  }
-
   private async associateTeacherSubjectGroups(
     teacherId: number,
     teacherSubjectGroups: any[],
@@ -111,33 +95,39 @@ class TeacherRepository {
   ) {
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
     const riskQuery = risk ? { unsubscribe_risk: risk } : {};
+    const notAdminQuery = {
+      employee_number: {
+        [Op.ne]: 0,
+      },
+    };
 
     const subjectInclude = subject_id
       ? {
-        model: TeacherSubjectHistory,
-        as: 'subjects_history',
-        where: { subject_id },
-        required: true,
-      }
+          model: TeacherSubjectHistory,
+          as: 'subjects_history',
+          where: { subject_id },
+          required: true,
+        }
       : { model: TeacherSubjectHistory, as: 'subjects_history' };
 
     const whereClause = {
       ...searchQuery,
       ...stateQuery,
       ...riskQuery,
+      ...notAdminQuery,
     };
 
     const teachers = await Teacher.findAll({
@@ -145,43 +135,8 @@ class TeacherRepository {
       include: [{ model: Contact, as: 'contacts' }, subjectInclude],
     });
 
-    const contactsFilePath = await this.generateContactsCsv(teachers);
-
-    return contactsFilePath;
+    return teachers;
   }
-
-  generateContactsCsv = async (teachers: Teacher[]) => {
-    try {
-      const contacts = teachers
-        .flatMap((teacher) => {
-          if (teacher.contacts) {
-            // Get all emails
-            return teacher.contacts
-              .filter((contact) => contact.mean === 'Mail')
-              .map((contact) => contact.data);
-          }
-        })
-        .filter((contact): contact is string => Boolean(contact));
-
-      // Convertir los contactos en formato CSV
-      const csvRows = ['Contactos'];
-      contacts.forEach((contact) => {
-        csvRows.push(contact); // Añadir cada contacto como una fila
-      });
-
-      const csvString = csvRows.join('\n');
-
-      // Escribir el archivo CSV
-      const date = new Date().toISOString().replace(/:/g, '-');
-      const filePath = `./contacts-${date}.csv`;
-      fs.writeFileSync(filePath, csvString, 'utf8');
-
-      const absoluteFilePath = path.resolve(filePath);
-      return absoluteFilePath;
-    } catch (error) {
-      console.error('Error generating contacts CSV file:', error);
-    }
-  };
 
   async getTeachers(
     limit: number,
@@ -199,33 +154,39 @@ class TeacherRepository {
       : ([['id', sortOrder]] as Order);
     const searchQuery = search
       ? {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { surname: { [Op.iLike]: `%${search}%` } },
-          sequelize.where(
-            sequelize.cast(sequelize.col('employee_number'), 'varchar'),
-            { [Op.iLike]: `%${search}%` }
-          ),
-          {
-            [Op.and]: search.split(' ').map((word) => ({
-              [Op.or]: [
-                { name: { [Op.iLike]: `%${word}%` } },
-                { surname: { [Op.iLike]: `%${word}%` } },
-              ],
-            })),
-          },
-        ],
-      }
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${search}%` } },
+            { surname: { [Op.iLike]: `%${search}%` } },
+            sequelize.where(
+              sequelize.cast(sequelize.col('employee_number'), 'varchar'),
+              { [Op.iLike]: `%${search}%` }
+            ),
+            {
+              [Op.and]: search.split(' ').map((word) => ({
+                [Op.or]: [
+                  { name: { [Op.iLike]: `%${word}%` } },
+                  { surname: { [Op.iLike]: `%${word}%` } },
+                ],
+              })),
+            },
+          ],
+        }
       : {};
 
     const stateQuery = state ? { state } : {};
     const riskQuery = risk ? { unsubscribe_risk: risk } : {};
     const subjectQuery = subject_id ? { subject_id } : {};
+    const notAdminQuery = {
+      employee_number: {
+        [Op.ne]: 0,
+      },
+    };
 
     const whereClause = {
       ...searchQuery,
       ...stateQuery,
       ...riskQuery,
+      ...notAdminQuery,
     };
 
     return await Teacher.findAndCountAll({
@@ -285,6 +246,12 @@ class TeacherRepository {
     return await Teacher.findAll({
       attributes: ['id', 'name', 'surname'],
       order: [['surname', 'ASC']],
+      where: {
+        state: TeacherStates.ACTIVE,
+        employee_number: {
+          [Op.ne]: 0,
+        },
+      },
     });
   }
 
@@ -589,7 +556,12 @@ class TeacherRepository {
 
   async getTeachersToAssignLectures() {
     const teachers = await Teacher.findAll({
-      where: { state: TeacherStates.ACTIVE },
+      where: {
+        state: TeacherStates.ACTIVE,
+        employee_number: {
+          [Op.ne]: 0,
+        },
+      },
       include: [
         {
           model: TeacherSubjectGroup,
@@ -623,12 +595,8 @@ class TeacherRepository {
       ? [...teacher.dismiss_motive, dismissalMotive]
       : [dismissalMotive];
 
-    await Teacher.update(
-      { dismiss_motive: updatedMotives },
-      { where: { id } }
-    );
+    await Teacher.update({ dismiss_motive: updatedMotives }, { where: { id } });
   }
-
 }
 
 export default new TeacherRepository();

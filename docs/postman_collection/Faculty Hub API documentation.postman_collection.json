@@ -1,0 +1,3255 @@
+{
+	"info": {
+		"_postman_id": "4c361d6c-f094-42bf-8ce0-f55944c7ca76",
+		"name": "Faculty Hub API documentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36727641",
+		"_collection_link": "https://tesis5.postman.co/workspace/tesis~e3757c93-2b3e-4307-8458-f4512f0f3af5/collection/36727641-4c361d6c-f094-42bf-8ce0-f55944c7ca76?action=share&source=collection_link&creator=36727641"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifica si la respuesta contiene el token",
+									"if (pm.response.code === 200) {",
+									"    const jsonResponse = pm.response.json();",
+									"    ",
+									"    // Asegúrate de que la respuesta tenga un token",
+									"    if (jsonResponse.token) {",
+									"        pm.globals.set(\"TOKEN\", jsonResponse.token);",
+									"        console.log(\"Token guardado correctamente:\", jsonResponse.token);",
+									"    } else {",
+									"        console.log(\"No se encontró token en la respuesta\");",
+									"    }",
+									"} else {",
+									"    console.log(\"Error en la solicitud de login:\", pm.response.code);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"teacher_employee_number\": 0,\n    \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Degree",
+			"item": [
+				{
+					"name": "Add Degree",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ingeniería en Sistemas\",\n    \"acronym\": \"ID\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/degrees",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"degrees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Degree",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ingeniería en Sistemas\",\n    \"acronym\": \"ID\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/degrees/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"degrees",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Degree",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/degrees/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"degrees",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Degrees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/degrees",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"degrees"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Get Events",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/events",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"events"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Obligatorio1",
+									"disabled": true
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"disabled": true
+								},
+								{
+									"key": "sortField",
+									"value": "id",
+									"disabled": true
+								},
+								{
+									"key": "pageSize",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Parcial 3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/events",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Parcial 4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/events/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"events",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/events/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"events",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "File Processor",
+			"item": [
+				{
+					"name": "Process Lectures File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/user/Desktop/TESIS/Horarios EI 2.xlsx"
+								},
+								{
+									"key": "fileType",
+									"value": "LECTURES",
+									"type": "text"
+								},
+								{
+									"key": "semesterId",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/file-processor",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"file-processor"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Matching Algorithm",
+			"item": [
+				{
+					"name": "sanityCheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{ALGORITHM_URL}}",
+							"protocol": "http",
+							"host": [
+								"{{ALGORITHM_URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AssignTeachers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ],\r\n  \"Tuesday\": [ 5, 4, 3, 2, 1 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+							"protocol": "http",
+							"host": [
+								"{{ALGORITHM_URL}}"
+							],
+							"path": [
+								"assignTeachers"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "AssignTeachers With preassigned",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ],\r\n  \"Tuesday\": [ 5, 4, 3, 2, 1 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": {\"9\": {\"Teórico\": [\"5\"]}}\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers Without any preassigned",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ],\r\n  \"Tuesday\": [ 5, 4, 3, 2, 1 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ],\r\n  \"Tuesday\": [ 5, 4, 3, 2, 1 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"1\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers Teacher do not know the role",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Tecnología\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ],\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers Teacher unavailable at that time",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 1, 2 ],\r\n  \"Monday\": [ 1, 2, 3, 4, 5 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 },\r\n    { \"role\": \"Tecnología\", \"times\": { \"Tuesday\": [ 1, 2, 3 ] }, \"num_teachers\": 1 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers Partially assigned class",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"teachers\": {\r\n    \"5\": {\r\n      \"id\": 5,\r\n      \"name\": \"Andy\",\r\n      \"lastname\": \"Perez\",\r\n      \"seniority\": 4,\r\n      \"subject_he_know_how_to_teach\": [{\r\n                    \"subject\": \"4\",\r\n                    \"role\": [\r\n                        \"Teórico\"\r\n                    ]\r\n                }],\r\n      \"available_times\": {\r\n  \"Friday\": [ 4, 1, 2, 3, 5 ]\r\n},\r\n      \"weekly_hours_max_work\": 80,\r\n      \"groups\": []\r\n    }\r\n  },\r\n  \"classes\": {\r\n    \"9\": {\r\n        \"id\": 9, \"subject\": \"4\",\r\n  \"subClasses\": [\r\n    { \"role\": \"Teórico\", \"times\": { \"Friday\": [ 1, 2, 3 ] }, \"num_teachers\": 2 }\r\n  ]}\r\n  },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "AssignTeachers Prefer group over seniority",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n     \"teachers\": {\r\n        \"teacher1\": {\r\n            \"seniority\": 1,\r\n            \"subject_he_know_how_to_teach\": [\r\n                {\"subject\": \"Arq1\", \"role\": [\"Teórico\"]}\r\n            ],\r\n            \"available_times\": {\r\n                \"Monday\": [9, 10, 11]\r\n            },\r\n            \"weekly_hours_max_work\": 10,\r\n            \"groups\": [{\r\n                \"my_role\": [\"Teórico\"],\r\n                \"subject\": \"Arq1\",\r\n                \"other_teacher\": [{\"teacher\": \"teacher2\", \"role\": [\"Teórico\"]}]\r\n            }]\r\n        },\r\n        \"teacher2\": {\r\n            \"seniority\": 1,\r\n            \"subject_he_know_how_to_teach\": [\r\n                {\"subject\": \"Arq1\", \"role\": [\"Teórico\"]}\r\n            ],\r\n            \"available_times\": {\r\n                \"Monday\": [9, 10, 11]\r\n            },\r\n            \"weekly_hours_max_work\": 10,\r\n            \"groups\": [{\r\n                \"my_role\": [\"Teórico\"],\r\n                \"subject\": \"Arq1\",\r\n                \"other_teacher\": [{\"teacher\": \"teacher1\", \"role\": [\"Teórico\"]}]\r\n            }]\r\n        },\r\n        \"teacher3\": {\r\n            \"seniority\": 8,\r\n            \"subject_he_know_how_to_teach\": [\r\n                {\"subject\": \"Arq1\", \"role\": [\"Teórico\"]}\r\n            ],\r\n            \"available_times\": {\r\n                \"Monday\": [9, 10, 11]\r\n            },\r\n            \"weekly_hours_max_work\": 10\r\n        }\r\n    },\r\n    \"classes\": {\r\n        \"class1\": {\r\n            \"subject\": \"Arq1\",\r\n            \"subClasses\": [\r\n                {\r\n                    \"role\": \"Teórico\",\r\n                    \"times\": {\"Monday\": [9, 10]},\r\n                    \"num_teachers\": 2\r\n                }\r\n            ]\r\n        }\r\n    },\r\n  \"teacher_names_with_classes\": [],\r\n      \"modules\": [\r\n    {\r\n        \"id\": 1,\r\n        \"time\": \"08:00 - 08:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"time\": \"09:00 - 09:55\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 3,\r\n        \"time\": \"10:05 - 11:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"time\": \"11:05 - 12:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 5,\r\n        \"time\": \"12:05 - 13:00\",\r\n        \"turn\": \"Matutino\"\r\n    },\r\n    {\r\n        \"id\": 6,\r\n        \"time\": \"18:30 - 19:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 7,\r\n        \"time\": \"19:30 - 20:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 8,\r\n        \"time\": \"20:30 - 21:25\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 9,\r\n        \"time\": \"21:35 - 22:30\",\r\n        \"turn\": \"Nocturno\"\r\n    },\r\n    {\r\n        \"id\": 10,\r\n        \"time\": \"22:35 - 23:30\",\r\n        \"turn\": \"Nocturno\"\r\n    }\r\n],\r\n\"preassigned\": null\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{ALGORITHM_URL}}/assignTeachers",
+									"protocol": "http",
+									"host": [
+										"{{ALGORITHM_URL}}"
+									],
+									"path": [
+										"assignTeachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Modules",
+			"item": [
+				{
+					"name": "Get modules",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/modules",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"modules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"turn\": \"Nocturno\",\n    \"time\": \"17:30 - 18:25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/modules",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"modules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"turn\": \"Nocturno\",\n    \"time\": \"22:35 - 23:30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/modules/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"modules",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Need",
+			"item": [
+				{
+					"name": "Get Needs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/needs",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"needs"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "laboratorio",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Need",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"pizarron\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/needs",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"needs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Need",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"pizarra\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/needs/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"needs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Need",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/needs/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"needs",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Semester",
+			"item": [
+				{
+					"name": "Create Semester",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Agosto/Diciembre 2025\",\n    \"start_date\": \"2025-07-01\",\n    \"end_date\": \"2025-12-10\",\n    \"study_plan_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Semester",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Agosto/Diciembre 2025\",\n    \"start_date\": \"2025-07-01\",\n    \"end_date\": null,\n    \"study_plan_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Semester",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Agosto/Diciembre 2025\",\n    \"start_date\": \"2025-07-01\",\n    \"end_date\": null,\n    \"study_plan_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Semester Lecture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"semester_id\":1,\n    \"subject_id\":1,\n    \"lecture_groups\": [{\n        \"degree_id\":1,\n        \"group\":\"M2A\"\n    }],\n    \"lecture_roles\": [{\n        \"role\": \"Teórico\",\n        \"is_lecture_locked\": false,\n        \"teachers\": [{\"teacher_id\": \"\"}],\n        \"hour_configs\": [\n            {\n                \"day_of_week\": \"Martes\",\n                \"modules\": [1,2]\n            }\n        ]\n    },\n    {\n        \"role\": \"Tecnología\",\n        \"is_lecture_locked\": false,\n        \"hour_configs\": [\n            {\n                \"day_of_week\": \"Jueves\",\n                \"modules\": [1,2]\n            }\n        ]\n    }]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/lectures",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								"lectures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Semester Lecture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"semester_id\":1,\n    \"subject_id\":1,\n\n    \"lecture_groups\": [{\n        \"degree_id\":1,\n        \"group\":\"M2A\"\n    }],\n    \"lecture_roles\": [{\n        \"role\": \"Teórico\",\n        \"is_lecture_locked\": false,\n        \"teachers\": [{\"teacher_id\": \"\"}],\n        \"hour_configs\": [\n            {\n                \"day_of_week\": \"Martes\",\n                \"modules\": [1,2]\n            }\n        ]\n    },\n    {\n        \"role\": \"Tecnología\",\n        \"is_lecture_locked\": false,\n        \"hour_configs\": [\n            {\n                \"day_of_week\": \"Jueves\",\n                \"modules\": [1,2]\n            }\n        ]\n    }]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/lectures/:lectureId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								"lectures",
+								":lectureId"
+							],
+							"variable": [
+								{
+									"key": "lectureId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Semester Lecture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/lectures/:lectureId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								"lectures",
+								":lectureId"
+							],
+							"variable": [
+								{
+									"key": "lectureId",
+									"value": "685"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Semester Lectures",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/:semesterId/lectures",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								":semesterId",
+								"lectures"
+							],
+							"query": [
+								{
+									"key": "degreeId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "subjectId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "group",
+									"value": "M3B",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "semesterId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Semester Assignation CSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/:semesterId/assigned-lectures-csv",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								":semesterId",
+								"assigned-lectures-csv"
+							],
+							"variable": [
+								{
+									"key": "semesterId",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Semester Lectures groups",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/:semesterId/lectures/groups",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								":semesterId",
+								"lectures",
+								"groups"
+							],
+							"variable": [
+								{
+									"key": "semesterId",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get semesters",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Review Lecture Hours",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"approved\": true,\n    \"reason\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/semesters/lectures/:lectureId/teacher-review",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"semesters",
+								"lectures",
+								":lectureId",
+								"teacher-review"
+							],
+							"variable": [
+								{
+									"key": "lectureId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Approve Lecture Hours",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"approved\": true,\n    \"reason\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/semesters/lectures/:lectureId/teacher-review",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"semesters",
+										"lectures",
+										":lectureId",
+										"teacher-review"
+									],
+									"variable": [
+										{
+											"key": "lectureId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Approve Lecture Hours",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"approved\": false,\n    \"reason\": \"no puedo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/semesters/lectures/:lectureId/teacher-review",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"semesters",
+										"lectures",
+										":lectureId",
+										"teacher-review"
+									],
+									"variable": [
+										{
+											"key": "lectureId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Study Plan",
+			"item": [
+				{
+					"name": "GetStudyPlans",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/study-plans",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"study-plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add StudyPlan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"year\": 2009\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/study-plans",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"study-plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update StudyPlan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"year\": 2010\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/study-plans/:studyPlanId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"study-plans",
+								":studyPlanId"
+							],
+							"variable": [
+								{
+									"key": "studyPlanId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete StudyPlan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/study-plans/:studyPlanId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"study-plans",
+								":studyPlanId"
+							],
+							"variable": [
+								{
+									"key": "studyPlanId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subject",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Arquitectura de software\",\r\n    \"subject_code\": \"code\",\r\n    \"acronym\": \"AR\",\r\n    \"study_plan_id\": 3,\r\n    \"associated_coordinator\": 5,\r\n    \"index\": 1,\r\n    \"frontal_hours\": 120,\r\n    \"intro_folder\": \"/src/\",\r\n    \"subject_folder\": \"/src/r\",\r\n    \"technologies\": \"ruby\",\r\n    \"notes\": \"nueva materia\",\r\n    \"hour_configs\": [{\r\n        \"role\": \"Teórico\",\r\n        \"total_hours\": 100\r\n    },\r\n    {\r\n        \"role\": \"Tecnología\",\r\n        \"total_hours\": 20\r\n    }\r\n    ],\r\n    \"needs_ids\":null,\r\n    \"needs_notes\": \"\",\r\n    \"events\": [{\r\n        \"event_id\": 1,\r\n        \"description\": \"El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos\"\r\n    }],\r\n    \"is_teo_tec_at_same_time\":false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Right",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Arquitectura de software\",\r\n    \"subject_code\": \"code\",\r\n    \"acronym\": \"AR\",\r\n    \"study_plan_id\": 3,\r\n    \"associated_coordinator\": 5,\r\n    \"index\": 1,\r\n    \"frontal_hours\": 120,\r\n    \"intro_folder\": \"/src/\",\r\n    \"subject_folder\": \"/src/r\",\r\n    \"technologies\": \"ruby\",\r\n    \"notes\": \"nueva materia\",\r\n    \"hour_configs\": [{\r\n        \"role\": \"Teórico\",\r\n        \"total_hours\": 100\r\n    },\r\n    {\r\n        \"role\": \"Tecnología\",\r\n        \"total_hours\": 20\r\n    }\r\n    ],\r\n    \"needs_ids\":null,\r\n    \"needs_notes\": \"\",\r\n    \"events\": [{\r\n        \"event_id\": 1,\r\n        \"description\": \"El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos\"\r\n    }],\r\n    \"is_teo_tec_at_same_time\":false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/subjects",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"subjects"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Create Wrong",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Diseño de aplicaciones 1\",\r\n    \"subject_code\": \"code\",\r\n    \"study_plan_year\": 2000,\r\n    \"associated_teacher\": 15,\r\n    \"associated_coordinator\": 16,\r\n    \"index\": 1.2,\r\n    \"frontal_hours\": 120,\r\n    \"intro_folder\": \"/src/\",\r\n    \"subject_folder\": \"/src/r\",\r\n    \"technologies\": \"ruby\",\r\n    \"notes\": \"nueva materia\",\r\n    \"hourConfigs\": [\r\n    ],\r\n    \"needs\":[{\r\n        \"name\": \"laboratorio\"\r\n    },{\r\n        \"name\": \"salon de 25 personas\"\r\n    }]\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/subjects",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"subjects"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Update Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"diseño23\",\r\n    \"subject_code\": \"code\",\r\n    \"acronym\": \"DA1\",\r\n    \"study_plan_id\": 2,\r\n    \"associated_coordinator\": 5,\r\n    \"index\": 1,\r\n    \"frontal_hours\": 120,\r\n    \"intro_folder\": \"/src/\",\r\n    \"subject_folder\": \"/src/r\",\r\n    \"technologies\": \"ruby\",\r\n    \"notes\": \"nueva materia\",\r\n    \"hour_configs\": [{\r\n        \"id\": 53,\r\n        \"role\": \"Teórico\",\r\n        \"total_hours\": 100\r\n    },\r\n    {\r\n        \"id\": 54,\r\n        \"role\": \"Tecnología\",\r\n        \"total_hours\": 20\r\n    }\r\n    ],\r\n    \"needs\":[{\r\n        \"name\": \"laboratorio\"\r\n    },{\r\n        \"name\": \"salon de 25 personas\"\r\n    }],\r\n    \"needs_notes\": \"\",\r\n    \"events\": [{\r\n        \"event_id\": 2,\r\n        \"description\": \"A El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos\"\r\n    }]\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects/:subjectId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								":subjectId"
+							],
+							"variable": [
+								{
+									"key": "subjectId",
+									"value": "15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subjects",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "andy2",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "49",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "\"\"",
+									"disabled": true
+								},
+								{
+									"key": "study_plan_year",
+									"value": "2024",
+									"disabled": true
+								},
+								{
+									"key": "valid",
+									"value": "false",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects/:subjectId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								":subjectId"
+							],
+							"variable": [
+								{
+									"key": "subjectId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Subject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects/:subjectId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								":subjectId"
+							],
+							"variable": [
+								{
+									"key": "subjectId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subject Names",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects/names",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"names"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get subjects by study plan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/subjects/study-plan/:studyPlanId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"study-plan",
+								":studyPlanId"
+							],
+							"variable": [
+								{
+									"key": "studyPlanId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Teacher",
+			"item": [
+				{
+					"name": "Benefit",
+					"item": [
+						{
+							"name": "Get Benefits",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/benefits",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"benefits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Benefit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"beneficio nuevo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/benefits",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"benefits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Benefit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"updated benefit\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/benefits/:id",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"benefits",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Benefit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/benefits/:id",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"benefits",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "Add Category",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"categoria nueva\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/categories",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Categories",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/categories",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"updated category\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/categories/:id",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{TOKEN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers/categories/:id",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers",
+										"categories",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Add Teacher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\",\n  \"birth_date\": \"1985-05-15\",\n  \"employee_number\": 223458567,\n  \"cv_file\": \"https://example.com/cv/john_doe.pdf\",\n  \"how_they_found_us\": \"LinkedIn\",\n  \"id_photo\": \"https://example.com/photos/john_doe.jpg\",\n  \"hiring_date\": \"2023-01-15\",\n  \"linkedin_link\": \"https://linkedin.com/in/johndoe\",\n  \"graduated\": true,\n  \"notes\": \"Experienced in various technologies.\",\n  \"prizes\": [\n    {\n      \"name\": \"Best Teacher Award\",\n      \"year\": \"2022-01-01\"\n    }\n  ],\n  \"caes_courses\": [\n    {\n      \"name\": \"Advanced Teaching Methods\",\n      \"date\": \"2021-08-10\"\n    }\n  ],\n  \"contacts\": [\n    {\n      \"mean\": \"Mail\",\n      \"data\": \"johndoeqo47@example.com\",\n      \"prefered\": true\n    },\n    {\n      \"mean\": \"Phone\",\n      \"data\": \"+123456789199\",\n      \"prefered\": false\n    }\n  ],\n  \"categories\": [{\"category_id\": 1, \"date\":\"2021-08-10\"}],\n  \"benefits\": [{\"benefit_id\": 1, \"date\":\"2021-08-10\"}],\n  \"subjects_history\": [\n    {\n      \"subject_id\": 1,\n      \"role\": \"Tecnología\",\n      \"start_date\": \"2022-09-01\",\n      \"end_date\": null\n    }\n  ],\n  \"subjects_of_interest\": [{\n    \"subject_id\": 1\n  }],\n  \"teacher_subject_groups\": [{\n    \"subject_id\": 1,\n    \"own_role\": \"Teórico\",\n    \"teachers\": [\n        {\n            \"teacher_id\": 1,\n            \"role\": \"Tecnología\"\n        }\n    ]\n  }],\n  \"teacher_available_modules\": [\n    {\"day_of_week\": \"Lunes\", \"module_id\": 3 },\n    {\"day_of_week\": \"Lunes\", \"module_id\": 4},\n    {\"day_of_week\": \"Jueves\", \"module_id\": 7}\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Add Teacher",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\",\n  \"birth_date\": \"1985-05-15\",\n  \"employee_number\": 223458567,\n  \"cv_file\": \"https://example.com/cv/john_doe.pdf\",\n  \"how_they_found_us\": \"LinkedIn\",\n  \"id_photo\": \"https://example.com/photos/john_doe.jpg\",\n  \"hiring_date\": \"2023-01-15\",\n  \"linkedin_link\": \"https://linkedin.com/in/johndoe\",\n  \"graduated\": true,\n  \"notes\": \"Experienced in various technologies.\",\n  \"prizes\": [\n    {\n      \"name\": \"Best Teacher Award\",\n      \"year\": \"2022-01-01\"\n    }\n  ],\n  \"caes_courses\": [\n    {\n      \"name\": \"Advanced Teaching Methods\",\n      \"date\": \"2021-08-10\"\n    }\n  ],\n  \"contacts\": [\n    {\n      \"mean\": \"Mail\",\n      \"data\": \"johndoeqo47@example.com\",\n      \"prefered\": true\n    },\n    {\n      \"mean\": \"Phone\",\n      \"data\": \"+123456789199\",\n      \"prefered\": false\n    }\n  ],\n  \"categories\": [{\"category_id\": 1, \"date\":\"2021-08-10\"}],\n  \"benefits\": [{\"benefit_id\": 1, \"date\":\"2021-08-10\"}],\n  \"subjects_history\": [\n    {\n      \"subject_id\": 1,\n      \"role\": \"Tecnología\",\n      \"start_date\": \"2022-09-01\",\n      \"end_date\": null\n    }\n  ],\n  \"subjects_of_interest\": [{\n    \"subject_id\": 1\n  }],\n  \"teacher_subject_groups\": [{\n    \"subject_id\": 1,\n    \"own_role\": \"Teórico\",\n    \"teachers\": [\n        {\n            \"teacher_id\": 1,\n            \"role\": \"Tecnología\"\n        }\n    ]\n  }],\n  \"teacher_available_modules\": [\n    {\"day_of_week\": \"Lunes\", \"module_id\": 3 },\n    {\"day_of_week\": \"Lunes\", \"module_id\": 4},\n    {\"day_of_week\": \"Jueves\", \"module_id\": 7}\n  ]\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Add Teacher With Basics",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\",\n  \"employee_number\": 223458568,\n  \"contacts\": [\n    {\n      \"mean\": \"Mail\",\n      \"data\": \"johndoeqo48@example.com\",\n      \"prefered\": true\n    }\n  ]\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{BACKEND_URL}}/api/teachers",
+									"protocol": "http",
+									"host": [
+										"{{BACKEND_URL}}"
+									],
+									"path": [
+										"api",
+										"teachers"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get Teachers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Doe9",
+									"disabled": true
+								},
+								{
+									"key": "state",
+									"value": "activo",
+									"disabled": true
+								},
+								{
+									"key": "subject_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "pageSize",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "unsubscribe_risk",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "sortField",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "sortOrder",
+									"value": "ASC",
+									"disabled": true
+								},
+								{
+									"key": "withDeleted",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teachers Names",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/names",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								"names"
+							],
+							"query": [
+								{
+									"key": "surname",
+									"value": "Doe9",
+									"disabled": true
+								},
+								{
+									"key": "state",
+									"value": "activo",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "maria",
+									"disabled": true
+								},
+								{
+									"key": "state",
+									"value": "activo",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dismiss teacher",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/:id/dismiss",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								":id",
+								"dismiss"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Temporary dismiss",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"retentionDate\":  \"2025-20-10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/:id/temporary-dismiss",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								":id",
+								"temporary-dismiss"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Rehire Teacher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/:id/rehire",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								":id",
+								"rehire"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/:teacherId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								":teacherId"
+							],
+							"variable": [
+								{
+									"key": "teacherId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update teacher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe Updated\",\n  \"birth_date\": \"2000-05-15\",\n  \"employee_number\": 223458567,\n  \"cv_file\": \"https://example.com/cv/john_doe.pdf\",\n  \"how_they_found_us\": \"LinkedIn\",\n  \"id_photo\": \"https://example.com/photos/john_doe.jpg\",\n  \"hiring_date\": \"2023-01-15\",\n  \"linkedin_link\": \"https://linkedin.com/in/johndoe\",\n  \"graduated\": true,\n  \"notes\": \"Experienced in various technologies.\",\n  \"prizes\": [\n    {\n      \"name\": \"Best Teacher Award\",\n      \"year\": \"2022-01-01\"\n    }\n  ],\n  \"caes_courses\": [\n    {\n      \"name\": \"Advanced Teaching Methods\",\n      \"date\": \"2021-08-10\"\n    }\n  ],\n  \"contacts\": [\n    {\n      \"mean\": \"Mail\",\n      \"data\": \"johndoeqo47@example.com\",\n      \"prefered\": true\n    },\n    {\n      \"mean\": \"Phone\",\n      \"data\": \"+123456789199\",\n      \"prefered\": false\n    }\n  ],\n  \"categories\": [{\"category_id\": 1, \"date\":\"2021-08-10\"}],\n  \"benefits\": [{\"benefit_id\": 1, \"date\":\"2021-08-10\"}],\n  \"subjects_history\": [\n    {\n      \"subject_id\": 1,\n      \"role\": \"Tecnología\",\n      \"start_date\": \"2022-09-01\",\n      \"end_date\": null\n    }\n  ],\n  \"subjects_of_interest\": [{\n    \"subject_id\": 1\n  }],\n  \"teacher_subject_groups\": [{\n    \"subject_id\": 1,\n    \"own_role\": \"Teórico\",\n    \"teachers\": [\n        {\n            \"teacher_id\": 1,\n            \"role\": \"Tecnología\"\n        }\n    ]\n  }],\n  \"teacher_available_modules\": [\n    {\"day_of_week\": \"Lunes\", \"module_id\": 3 },\n    {\"day_of_week\": \"Lunes\", \"module_id\": 4},\n    {\"day_of_week\": \"Jueves\", \"module_id\": 7}\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/:id",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teachers Contacts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers/contacts",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers",
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Teacher Assignations",
+			"item": [
+				{
+					"name": "Assign teachers to lectures",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers-assignations/semester/:semesterId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers-assignations",
+								"semester",
+								":semesterId"
+							],
+							"variable": [
+								{
+									"key": "semesterId",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign teachers to lectures Conflicts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/teachers-assignations/semester/:semesterId/conflicts",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"teachers-assignations",
+								"semester",
+								":semesterId",
+								"conflicts"
+							],
+							"variable": [
+								{
+									"key": "semesterId",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"teacher_id\": 144,\n    \"role_id\": 1,\n    \"password\": \"user123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users/:userId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Password",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"teacher_employee_number\":4040,\n    \"old_password\": \"gaston123\",\n    \"new_password\": \"123abc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users/update-password",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"update-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Roles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users/roles",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": 1,\n    \"password\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{BACKEND_URL}}/api/users/:userId",
+							"protocol": "http",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-API-Key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://farming-simulator.pstmn.io"
+		}
+	]
+}

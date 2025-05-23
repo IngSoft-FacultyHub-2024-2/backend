@@ -1,0 +1,1071 @@
+# Faculty Hub API documentation
+
+###
+# group: Auth
+# @name Login
+POST http://{{BACKEND_URL}}/api/auth/login
+X-API-Key: {{token}}
+Content-Type: application/json
+
+{
+  "teacher_employee_number": 0,
+  "password": "admin123"
+}
+
+> {%
+  // TODO: migrate to HTTP Client Response handler API
+  // // Verifica si la respuesta contiene el token
+  // if (pm.response.code === 200) {
+  //     const jsonResponse = pm.response.json();
+  //
+  //     // Asegúrate de que la respuesta tenga un token
+  //     if (jsonResponse.token) {
+  //         pm.globals.set("TOKEN", jsonResponse.token);
+  //         console.log("Token guardado correctamente:", jsonResponse.token);
+  //     } else {
+  //         console.log("No se encontró token en la respuesta");
+  //     }
+  // } else {
+  //     console.log("Error en la solicitud de login:", pm.response.code);
+  // }
+  //
+%}
+
+###
+# group: Degree
+# @name Add Degree
+POST http://{{BACKEND_URL}}/api/degrees
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Ingeniería en Sistemas",
+  "acronym": "ID"
+}
+
+###
+# group: Degree
+# @name Update Degree
+PUT http://{{BACKEND_URL}}/api/degrees/{{id}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Ingeniería en Sistemas",
+  "acronym": "ID"
+}
+
+###
+# group: Degree
+# @name Delete Degree
+DELETE http://{{BACKEND_URL}}/api/degrees/{{id_1}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Degree
+# @name Get Degrees
+GET http://localhost:3000/api/degrees
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Event
+# @name Get Events
+GET http://{{BACKEND_URL}}/api/events?
+    title=Obligatorio1&
+    sortOrder=desc&
+    sortField=id&
+    pageSize=2&
+    page=1
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Event
+# @name Add Event
+POST http://{{BACKEND_URL}}/api/events
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "title": "Parcial 3"
+}
+
+###
+# group: Event
+# @name Update Event
+PUT http://{{BACKEND_URL}}/api/events/{{id_2}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "title": "Parcial 4"
+}
+
+###
+# group: Event
+# @name Delete Event
+DELETE http://{{BACKEND_URL}}/api/events/{{id_3}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: File Processor
+# @name Process Lectures File
+POST http://{{BACKEND_URL}}/api/file-processor
+Authorization: Bearer {{TOKEN}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="Horarios EI 2.xlsx"
+
+< /Users/user/Desktop/TESIS/Horarios EI 2.xlsx
+--WebAppBoundary
+Content-Disposition: form-data; name="fileType"
+
+LECTURES
+--WebAppBoundary
+Content-Disposition: form-data; name="semesterId"
+
+1
+--WebAppBoundary
+
+###
+# group: Matching Algorithm
+# @name sanityCheck
+GET http://{{ALGORITHM_URL}}
+X-API-Key: {{token}}
+
+###
+# group: Matching Algorithm
+# @name AssignTeachers
+POST http://{{ALGORITHM_URL}}/assignTeachers
+X-API-Key: {{token}}
+Content-Type: application/json
+
+{
+  "teachers": {
+    "5": {
+      "id": 5,
+      "name": "Andy",
+      "lastname": "Perez",
+      "seniority": 4,
+      "subject_he_know_how_to_teach": [
+        {
+          "subject": "4",
+          "role": [
+            "Teórico"
+          ]
+        }
+      ],
+      "available_times": {
+        "Friday": [
+          4,
+          1,
+          2,
+          3,
+          5
+        ],
+        "Monday": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "Tuesday": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "weekly_hours_max_work": 80,
+      "groups": []
+    }
+  },
+  "classes": {
+    "9": {
+      "id": 9,
+      "subject": "4",
+      "subClasses": [
+        {
+          "role": "Teórico",
+          "times": {
+            "Friday": [
+              1,
+              2,
+              3
+            ]
+          },
+          "num_teachers": 1
+        },
+        {
+          "role": "Tecnología",
+          "times": {
+            "Tuesday": [
+              1,
+              2,
+              3
+            ]
+          },
+          "num_teachers": 1
+        }
+      ]
+    }
+  },
+  "teacher_names_with_classes": [],
+  "modules": [
+    {
+      "id": 1,
+      "time": "08:00 - 08:55",
+      "turn": "Matutino"
+    },
+    {
+      "id": 2,
+      "time": "09:00 - 09:55",
+      "turn": "Matutino"
+    },
+    {
+      "id": 3,
+      "time": "10:05 - 11:00",
+      "turn": "Matutino"
+    },
+    {
+      "id": 4,
+      "time": "11:05 - 12:00",
+      "turn": "Matutino"
+    },
+    {
+      "id": 5,
+      "time": "12:05 - 13:00",
+      "turn": "Matutino"
+    },
+    {
+      "id": 6,
+      "time": "18:30 - 19:25",
+      "turn": "Nocturno"
+    },
+    {
+      "id": 7,
+      "time": "19:30 - 20:25",
+      "turn": "Nocturno"
+    },
+    {
+      "id": 8,
+      "time": "20:30 - 21:25",
+      "turn": "Nocturno"
+    },
+    {
+      "id": 9,
+      "time": "21:35 - 22:30",
+      "turn": "Nocturno"
+    },
+    {
+      "id": 10,
+      "time": "22:35 - 23:30",
+      "turn": "Nocturno"
+    }
+  ],
+  "preassigned": null
+}
+
+
+###
+# group: Modules
+# @name Get modules
+GET http://{{BACKEND_URL}}/api/modules
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Modules
+# @name add module
+POST http://{{BACKEND_URL}}/api/modules
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "turn": "Nocturno",
+  "time": "17:30 - 18:25"
+}
+
+###
+# group: Modules
+# @name Update Module
+PUT http://{{BACKEND_URL}}/api/modules/{{id_4}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "turn": "Nocturno",
+  "time": "22:35 - 23:30"
+}
+
+###
+# group: Need
+# @name Get Needs
+GET http://{{BACKEND_URL}}/api/needs?
+    name=laboratorio
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Need
+# @name Create Need
+POST http://{{BACKEND_URL}}/api/needs
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "pizarron"
+}
+
+###
+# group: Need
+# @name Update Need
+PUT http://{{BACKEND_URL}}/api/needs/{{id_5}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "pizarra"
+}
+
+###
+# group: Need
+# @name Delete Need
+DELETE http://{{BACKEND_URL}}/api/needs/{{id_6}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Create Semester
+POST http://{{BACKEND_URL}}/api/semesters
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": "2025-12-10",
+  "study_plan_id": 1
+}
+
+###
+# group: Semester
+# @name Update Semester
+PUT http://{{BACKEND_URL}}/api/semesters/{{id_7}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": null,
+  "study_plan_id": 1
+}
+
+###
+# group: Semester
+# @name Delete Semester
+DELETE http://{{BACKEND_URL}}/api/semesters/{{id_8}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": null,
+  "study_plan_id": 1
+}
+
+###
+# group: Semester
+# @name Create Semester Lecture
+POST http://{{BACKEND_URL}}/api/semesters/lectures
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "semester_id": 1,
+  "subject_id": 1,
+  "lecture_groups": [
+    {
+      "degree_id": 1,
+      "group": "M2A"
+    }
+  ],
+  "lecture_roles": [
+    {
+      "role": "Teórico",
+      "is_lecture_locked": false,
+      "teachers": [
+        {
+          "teacher_id": ""
+        }
+      ],
+      "hour_configs": [
+        {
+          "day_of_week": "Martes",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "role": "Tecnología",
+      "is_lecture_locked": false,
+      "hour_configs": [
+        {
+          "day_of_week": "Jueves",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+###
+# group: Semester
+# @name Update Semester Lecture
+PUT http://{{BACKEND_URL}}/api/semesters/lectures/{{lectureId}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "semester_id": 1,
+  "subject_id": 1,
+  "lecture_groups": [
+    {
+      "degree_id": 1,
+      "group": "M2A"
+    }
+  ],
+  "lecture_roles": [
+    {
+      "role": "Teórico",
+      "is_lecture_locked": false,
+      "teachers": [
+        {
+          "teacher_id": ""
+        }
+      ],
+      "hour_configs": [
+        {
+          "day_of_week": "Martes",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "role": "Tecnología",
+      "is_lecture_locked": false,
+      "hour_configs": [
+        {
+          "day_of_week": "Jueves",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+###
+# group: Semester
+# @name Delete Semester Lecture
+DELETE http://{{BACKEND_URL}}/api/semesters/lectures/{{lectureId_1}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Get Semester Lectures
+GET http://{{BACKEND_URL}}/api/semesters/{{semesterId}}/lectures?
+    degreeId=1&
+    subjectId=1&
+    group=M3B
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Get Semester Assignation CSV
+GET http://{{BACKEND_URL}}/api/semesters/{{semesterId_1}}/assigned-lectures-csv
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Get Semester Lectures groups
+GET http://{{BACKEND_URL}}/api/semesters/{{semesterId_2}}/lectures/groups
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Get semesters
+GET http://{{BACKEND_URL}}/api/semesters
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Semester
+# @name Review Lecture Hours
+PATCH http://{{BACKEND_URL}}/api/semesters/lectures/{{lectureId_2}}/teacher-review
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "approved": true,
+  "reason": null
+}
+
+###
+# group: Study Plan
+# @name GetStudyPlans
+GET http://{{BACKEND_URL}}/api/study-plans
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Study Plan
+# @name Add StudyPlan
+POST http://{{BACKEND_URL}}/api/study-plans
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "year": 2009
+}
+
+###
+# group: Study Plan
+# @name Update StudyPlan
+PUT http://{{BACKEND_URL}}/api/study-plans/{{studyPlanId}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "year": 2010
+}
+
+###
+# group: Study Plan
+# @name Delete StudyPlan
+DELETE http://{{BACKEND_URL}}/api/study-plans/{{studyPlanId_1}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Subject
+# @name Create
+POST http://{{BACKEND_URL}}/api/subjects
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "Arquitectura de software",
+  "subject_code": "code",
+  "acronym": "AR",
+  "study_plan_id": 3,
+  "associated_coordinator": 5,
+  "index": 1,
+  "frontal_hours": 120,
+  "intro_folder": "/src/",
+  "subject_folder": "/src/r",
+  "technologies": "ruby",
+  "notes": "nueva materia",
+  "hour_configs": [
+    {
+      "role": "Teórico",
+      "total_hours": 100
+    },
+    {
+      "role": "Tecnología",
+      "total_hours": 20
+    }
+  ],
+  "needs_ids": null,
+  "needs_notes": "",
+  "events": [
+    {
+      "event_id": 1,
+      "description": "El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
+    }
+  ],
+  "is_teo_tec_at_same_time": false
+}
+
+###
+# group: Subject
+# @name Update Subject
+PUT http://{{BACKEND_URL}}/api/subjects/{{subjectId}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "diseño23",
+  "subject_code": "code",
+  "acronym": "DA1",
+  "study_plan_id": 2,
+  "associated_coordinator": 5,
+  "index": 1,
+  "frontal_hours": 120,
+  "intro_folder": "/src/",
+  "subject_folder": "/src/r",
+  "technologies": "ruby",
+  "notes": "nueva materia",
+  "hour_configs": [
+    {
+      "id": 53,
+      "role": "Teórico",
+      "total_hours": 100
+    },
+    {
+      "id": 54,
+      "role": "Tecnología",
+      "total_hours": 20
+    }
+  ],
+  "needs": [
+    {
+      "name": "laboratorio"
+    },
+    {
+      "name": "salon de 25 personas"
+    }
+  ],
+  "needs_notes": "",
+  "events": [
+    {
+      "event_id": 2,
+      "description": "A El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
+    }
+  ]
+}
+
+###
+# group: Subject
+# @name Get Subjects
+GET http://{{BACKEND_URL}}/api/subjects?
+    name=andy2&
+    id=49&
+    page=1&
+    search=""&
+    study_plan_year=2024&
+    valid=false
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Subject
+# @name Get Subject
+GET http://{{BACKEND_URL}}/api/subjects/{{subjectId_1}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Subject
+# @name Delete Subject
+DELETE http://{{BACKEND_URL}}/api/subjects/{{subjectId_2}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Subject
+# @name Get Subject Names
+GET http://{{BACKEND_URL}}/api/subjects/names
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Subject
+# @name Get subjects by study plan
+GET http://{{BACKEND_URL}}/api/subjects/study-plan/{{studyPlanId_2}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher / Benefit
+# @name Get Benefits
+GET http://{{BACKEND_URL}}/api/teachers/benefits
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher / Benefit
+# @name Add Benefit
+POST http://{{BACKEND_URL}}/api/teachers/benefits
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "beneficio nuevo"
+}
+
+###
+# group: Teacher / Benefit
+# @name Update Benefit
+PUT http://{{BACKEND_URL}}/api/teachers/benefits/{{id_9}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "updated benefit"
+}
+
+###
+# group: Teacher / Benefit
+# @name Delete Benefit
+PUT http://{{BACKEND_URL}}/api/teachers/benefits/{{id_10}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher / Categories
+# @name Add Category
+POST http://{{BACKEND_URL}}/api/teachers/categories
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "categoria nueva"
+}
+
+###
+# group: Teacher / Categories
+# @name Get Categories
+GET http://{{BACKEND_URL}}/api/teachers/categories
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher / Categories
+# @name Update Category
+PUT http://{{BACKEND_URL}}/api/teachers/categories/{{id_11}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "updated category"
+}
+
+###
+# group: Teacher / Categories
+# @name Delete Category
+PUT http://{{BACKEND_URL}}/api/teachers/categories/{{id_12}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher
+# @name Add Teacher
+POST http://{{BACKEND_URL}}/api/teachers
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "John",
+  "surname": "Doe",
+  "birth_date": "1985-05-15",
+  "employee_number": 223458567,
+  "cv_file": "https://example.com/cv/john_doe.pdf",
+  "how_they_found_us": "LinkedIn",
+  "id_photo": "https://example.com/photos/john_doe.jpg",
+  "hiring_date": "2023-01-15",
+  "linkedin_link": "https://linkedin.com/in/johndoe",
+  "graduated": true,
+  "notes": "Experienced in various technologies.",
+  "prizes": [
+    {
+      "name": "Best Teacher Award",
+      "year": "2022-01-01"
+    }
+  ],
+  "caes_courses": [
+    {
+      "name": "Advanced Teaching Methods",
+      "date": "2021-08-10"
+    }
+  ],
+  "contacts": [
+    {
+      "mean": "Mail",
+      "data": "johndoeqo47@example.com",
+      "prefered": true
+    },
+    {
+      "mean": "Phone",
+      "data": "+123456789199",
+      "prefered": false
+    }
+  ],
+  "categories": [
+    {
+      "category_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "benefits": [
+    {
+      "benefit_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "subjects_history": [
+    {
+      "subject_id": 1,
+      "role": "Tecnología",
+      "start_date": "2022-09-01",
+      "end_date": null
+    }
+  ],
+  "subjects_of_interest": [
+    {
+      "subject_id": 1
+    }
+  ],
+  "teacher_subject_groups": [
+    {
+      "subject_id": 1,
+      "own_role": "Teórico",
+      "teachers": [
+        {
+          "teacher_id": 1,
+          "role": "Tecnología"
+        }
+      ]
+    }
+  ],
+  "teacher_available_modules": [
+    {
+      "day_of_week": "Lunes",
+      "module_id": 3
+    },
+    {
+      "day_of_week": "Lunes",
+      "module_id": 4
+    },
+    {
+      "day_of_week": "Jueves",
+      "module_id": 7
+    }
+  ]
+}
+
+
+###
+# group: Teacher
+# @name Get Teachers
+GET http://{{BACKEND_URL}}/api/teachers?
+    search=Doe9&
+    state=activo&
+    subject_id=1&
+    page=2&
+    pageSize=3&
+    unsubscribe_risk=1&
+    sortField=name&
+    sortOrder=ASC&
+    withDeleted=true
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher
+# @name Get Teachers Names
+GET http://{{BACKEND_URL}}/api/teachers/names?
+    surname=Doe9&
+    state=activo&
+    name=maria
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher
+# @name Dismiss teacher
+PATCH http://{{BACKEND_URL}}/api/teachers/{{id_13}}/dismiss
+X-API-Key: {{token}}
+
+###
+# group: Teacher
+# @name Temporary dismiss
+PATCH http://{{BACKEND_URL}}/api/teachers/{{id_14}}/temporary-dismiss
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "retentionDate": "2025-20-10"
+}
+
+###
+# group: Teacher
+# @name Rehire Teacher
+PATCH http://{{BACKEND_URL}}/api/teachers/{{id_15}}/rehire
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher
+# @name Get Teacher
+GET http://{{BACKEND_URL}}/api/teachers/{{teacherId}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher
+# @name Update teacher
+PUT http://{{BACKEND_URL}}/api/teachers/{{id_16}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "name": "John",
+  "surname": "Doe Updated",
+  "birth_date": "2000-05-15",
+  "employee_number": 223458567,
+  "cv_file": "https://example.com/cv/john_doe.pdf",
+  "how_they_found_us": "LinkedIn",
+  "id_photo": "https://example.com/photos/john_doe.jpg",
+  "hiring_date": "2023-01-15",
+  "linkedin_link": "https://linkedin.com/in/johndoe",
+  "graduated": true,
+  "notes": "Experienced in various technologies.",
+  "prizes": [
+    {
+      "name": "Best Teacher Award",
+      "year": "2022-01-01"
+    }
+  ],
+  "caes_courses": [
+    {
+      "name": "Advanced Teaching Methods",
+      "date": "2021-08-10"
+    }
+  ],
+  "contacts": [
+    {
+      "mean": "Mail",
+      "data": "johndoeqo47@example.com",
+      "prefered": true
+    },
+    {
+      "mean": "Phone",
+      "data": "+123456789199",
+      "prefered": false
+    }
+  ],
+  "categories": [
+    {
+      "category_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "benefits": [
+    {
+      "benefit_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "subjects_history": [
+    {
+      "subject_id": 1,
+      "role": "Tecnología",
+      "start_date": "2022-09-01",
+      "end_date": null
+    }
+  ],
+  "subjects_of_interest": [
+    {
+      "subject_id": 1
+    }
+  ],
+  "teacher_subject_groups": [
+    {
+      "subject_id": 1,
+      "own_role": "Teórico",
+      "teachers": [
+        {
+          "teacher_id": 1,
+          "role": "Tecnología"
+        }
+      ]
+    }
+  ],
+  "teacher_available_modules": [
+    {
+      "day_of_week": "Lunes",
+      "module_id": 3
+    },
+    {
+      "day_of_week": "Lunes",
+      "module_id": 4
+    },
+    {
+      "day_of_week": "Jueves",
+      "module_id": 7
+    }
+  ]
+}
+
+
+###
+# group: Teacher
+# @name Get Teachers Contacts
+GET http://{{BACKEND_URL}}/api/teachers/contacts
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher Assignations
+# @name Assign teachers to lectures
+POST http://{{BACKEND_URL}}/api/teachers-assignations/semester/{{semesterId_3}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: Teacher Assignations
+# @name Assign teachers to lectures Conflicts
+GET http://{{BACKEND_URL}}/api/teachers-assignations/semester/{{semesterId_4}}/conflicts
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: User
+# @name Get Users
+GET http://{{BACKEND_URL}}/api/users
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: User
+# @name Create User
+POST http://{{BACKEND_URL}}/api/users
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "teacher_id": 144,
+  "role_id": 1,
+  "password": "user123"
+}
+
+###
+# group: User
+# @name Get User
+GET http://{{BACKEND_URL}}/api/users/{{userId}}
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: User
+# @name Update Password
+PUT http://{{BACKEND_URL}}/api/users/update-password
+X-API-Key: {{token}}
+Content-Type: application/json
+
+{
+  "teacher_employee_number": 4040,
+  "old_password": "gaston123",
+  "new_password": "123abc"
+}
+
+###
+# group: User
+# @name Get Roles
+GET http://{{BACKEND_URL}}/api/users/roles
+Authorization: Bearer {{TOKEN}}
+
+###
+# group: User
+# @name Update User
+PUT http://{{BACKEND_URL}}/api/users/{{userId_1}}
+Authorization: Bearer {{TOKEN}}
+Content-Type: application/json
+
+{
+  "role_id": 1,
+  "password": null
+}

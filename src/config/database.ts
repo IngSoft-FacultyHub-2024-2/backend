@@ -26,5 +26,23 @@ const sequelize = new Sequelize(
     logging: false,
   }
 );
-
+/*
+const sequelize = new Sequelize(
+  'faculty_hub_db', 'postgres', 'postgres',
+  {
+  host: '127.0.0.1',
+    port: 5432,
+    dialect: 'postgres',
+    dialectOptions: isSSLRequired
+      ? {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      }
+      : undefined, // No `ssl` option when SSL is not required
+    logging: false,
+  }
+);
+*/
 export default sequelize;

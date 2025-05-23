@@ -8,27 +8,27 @@ X-API-Key: {{token}}
 Content-Type: application/json
 
 {
-    "teacher_employee_number": 0,
-    "password": "admin123"
+  "teacher_employee_number": 0,
+  "password": "admin123"
 }
 
 > {%
-    // TODO: migrate to HTTP Client Response handler API
-    // // Verifica si la respuesta contiene el token
-    // if (pm.response.code === 200) {
-    //     const jsonResponse = pm.response.json();
-    //     
-    //     // Asegúrate de que la respuesta tenga un token
-    //     if (jsonResponse.token) {
-    //         pm.globals.set("TOKEN", jsonResponse.token);
-    //         console.log("Token guardado correctamente:", jsonResponse.token);
-    //     } else {
-    //         console.log("No se encontró token en la respuesta");
-    //     }
-    // } else {
-    //     console.log("Error en la solicitud de login:", pm.response.code);
-    // }
-    //
+  // TODO: migrate to HTTP Client Response handler API
+  // // Verifica si la respuesta contiene el token
+  // if (pm.response.code === 200) {
+  //     const jsonResponse = pm.response.json();
+  //
+  //     // Asegúrate de que la respuesta tenga un token
+  //     if (jsonResponse.token) {
+  //         pm.globals.set("TOKEN", jsonResponse.token);
+  //         console.log("Token guardado correctamente:", jsonResponse.token);
+  //     } else {
+  //         console.log("No se encontró token en la respuesta");
+  //     }
+  // } else {
+  //     console.log("Error en la solicitud de login:", pm.response.code);
+  // }
+  //
 %}
 
 ###
@@ -39,8 +39,8 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Ingeniería en Sistemas",
-    "acronym": "ID"
+  "name": "Ingeniería en Sistemas",
+  "acronym": "ID"
 }
 
 ###
@@ -51,8 +51,8 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Ingeniería en Sistemas",
-    "acronym": "ID"
+  "name": "Ingeniería en Sistemas",
+  "acronym": "ID"
 }
 
 ###
@@ -86,7 +86,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "title": "Parcial 3"
+  "title": "Parcial 3"
 }
 
 ###
@@ -97,7 +97,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "title": "Parcial 4"
+  "title": "Parcial 4"
 }
 
 ###
@@ -147,83 +147,125 @@ Content-Type: application/json
       "name": "Andy",
       "lastname": "Perez",
       "seniority": 4,
-      "subject_he_know_how_to_teach": [{
-                    "subject": "4",
-                    "role": [
-                        "Teórico"
-                    ]
-                }],
+      "subject_he_know_how_to_teach": [
+        {
+          "subject": "4",
+          "role": [
+            "Teórico"
+          ]
+        }
+      ],
       "available_times": {
-  "Friday": [ 4, 1, 2, 3, 5 ],
-  "Monday": [ 1, 2, 3, 4, 5 ],
-  "Tuesday": [ 5, 4, 3, 2, 1 ]
-},
+        "Friday": [
+          4,
+          1,
+          2,
+          3,
+          5
+        ],
+        "Monday": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "Tuesday": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
       "weekly_hours_max_work": 80,
       "groups": []
     }
   },
   "classes": {
     "9": {
-        "id": 9, "subject": "4",
-  "subClasses": [
-    { "role": "Teórico", "times": { "Friday": [ 1, 2, 3 ] }, "num_teachers": 1 },
-    { "role": "Tecnología", "times": { "Tuesday": [ 1, 2, 3 ] }, "num_teachers": 1 }
-  ]}
+      "id": 9,
+      "subject": "4",
+      "subClasses": [
+        {
+          "role": "Teórico",
+          "times": {
+            "Friday": [
+              1,
+              2,
+              3
+            ]
+          },
+          "num_teachers": 1
+        },
+        {
+          "role": "Tecnología",
+          "times": {
+            "Tuesday": [
+              1,
+              2,
+              3
+            ]
+          },
+          "num_teachers": 1
+        }
+      ]
+    }
   },
   "teacher_names_with_classes": [],
-      "modules": [
+  "modules": [
     {
-        "id": 1,
-        "time": "08:00 - 08:55",
-        "turn": "Matutino"
+      "id": 1,
+      "time": "08:00 - 08:55",
+      "turn": "Matutino"
     },
     {
-        "id": 2,
-        "time": "09:00 - 09:55",
-        "turn": "Matutino"
+      "id": 2,
+      "time": "09:00 - 09:55",
+      "turn": "Matutino"
     },
     {
-        "id": 3,
-        "time": "10:05 - 11:00",
-        "turn": "Matutino"
+      "id": 3,
+      "time": "10:05 - 11:00",
+      "turn": "Matutino"
     },
     {
-        "id": 4,
-        "time": "11:05 - 12:00",
-        "turn": "Matutino"
+      "id": 4,
+      "time": "11:05 - 12:00",
+      "turn": "Matutino"
     },
     {
-        "id": 5,
-        "time": "12:05 - 13:00",
-        "turn": "Matutino"
+      "id": 5,
+      "time": "12:05 - 13:00",
+      "turn": "Matutino"
     },
     {
-        "id": 6,
-        "time": "18:30 - 19:25",
-        "turn": "Nocturno"
+      "id": 6,
+      "time": "18:30 - 19:25",
+      "turn": "Nocturno"
     },
     {
-        "id": 7,
-        "time": "19:30 - 20:25",
-        "turn": "Nocturno"
+      "id": 7,
+      "time": "19:30 - 20:25",
+      "turn": "Nocturno"
     },
     {
-        "id": 8,
-        "time": "20:30 - 21:25",
-        "turn": "Nocturno"
+      "id": 8,
+      "time": "20:30 - 21:25",
+      "turn": "Nocturno"
     },
     {
-        "id": 9,
-        "time": "21:35 - 22:30",
-        "turn": "Nocturno"
+      "id": 9,
+      "time": "21:35 - 22:30",
+      "turn": "Nocturno"
     },
     {
-        "id": 10,
-        "time": "22:35 - 23:30",
-        "turn": "Nocturno"
+      "id": 10,
+      "time": "22:35 - 23:30",
+      "turn": "Nocturno"
     }
-],
-"preassigned": null
+  ],
+  "preassigned": null
 }
 
 
@@ -241,8 +283,8 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "turn": "Nocturno",
-    "time": "17:30 - 18:25"
+  "turn": "Nocturno",
+  "time": "17:30 - 18:25"
 }
 
 ###
@@ -253,8 +295,8 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "turn": "Nocturno",
-    "time": "22:35 - 23:30"
+  "turn": "Nocturno",
+  "time": "22:35 - 23:30"
 }
 
 ###
@@ -272,7 +314,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "pizarron"
+  "name": "pizarron"
 }
 
 ###
@@ -283,7 +325,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "pizarra"
+  "name": "pizarra"
 }
 
 ###
@@ -300,10 +342,10 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Agosto/Diciembre 2025",
-    "start_date": "2025-07-01",
-    "end_date": "2025-12-10",
-    "study_plan_id": 1
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": "2025-12-10",
+  "study_plan_id": 1
 }
 
 ###
@@ -314,10 +356,10 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Agosto/Diciembre 2025",
-    "start_date": "2025-07-01",
-    "end_date": null,
-    "study_plan_id": 1
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": null,
+  "study_plan_id": 1
 }
 
 ###
@@ -328,10 +370,10 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Agosto/Diciembre 2025",
-    "start_date": "2025-07-01",
-    "end_date": null,
-    "study_plan_id": 1
+  "name": "Agosto/Diciembre 2025",
+  "start_date": "2025-07-01",
+  "end_date": null,
+  "study_plan_id": 1
 }
 
 ###
@@ -342,33 +384,47 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "semester_id":1,
-    "subject_id":1,
-    "lecture_groups": [{
-        "degree_id":1,
-        "group":"M2A"
-    }],
-    "lecture_roles": [{
-        "role": "Teórico",
-        "is_lecture_locked": false,
-        "teachers": [{"teacher_id": ""}],
-        "hour_configs": [
-            {
-                "day_of_week": "Martes",
-                "modules": [1,2]
-            }
-        ]
+  "semester_id": 1,
+  "subject_id": 1,
+  "lecture_groups": [
+    {
+      "degree_id": 1,
+      "group": "M2A"
+    }
+  ],
+  "lecture_roles": [
+    {
+      "role": "Teórico",
+      "is_lecture_locked": false,
+      "teachers": [
+        {
+          "teacher_id": ""
+        }
+      ],
+      "hour_configs": [
+        {
+          "day_of_week": "Martes",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     {
-        "role": "Tecnología",
-        "is_lecture_locked": false,
-        "hour_configs": [
-            {
-                "day_of_week": "Jueves",
-                "modules": [1,2]
-            }
-        ]
-    }]
+      "role": "Tecnología",
+      "is_lecture_locked": false,
+      "hour_configs": [
+        {
+          "day_of_week": "Jueves",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    }
+  ]
 }
 
 ###
@@ -379,34 +435,47 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "semester_id":1,
-    "subject_id":1,
-
-    "lecture_groups": [{
-        "degree_id":1,
-        "group":"M2A"
-    }],
-    "lecture_roles": [{
-        "role": "Teórico",
-        "is_lecture_locked": false,
-        "teachers": [{"teacher_id": ""}],
-        "hour_configs": [
-            {
-                "day_of_week": "Martes",
-                "modules": [1,2]
-            }
-        ]
+  "semester_id": 1,
+  "subject_id": 1,
+  "lecture_groups": [
+    {
+      "degree_id": 1,
+      "group": "M2A"
+    }
+  ],
+  "lecture_roles": [
+    {
+      "role": "Teórico",
+      "is_lecture_locked": false,
+      "teachers": [
+        {
+          "teacher_id": ""
+        }
+      ],
+      "hour_configs": [
+        {
+          "day_of_week": "Martes",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
     },
     {
-        "role": "Tecnología",
-        "is_lecture_locked": false,
-        "hour_configs": [
-            {
-                "day_of_week": "Jueves",
-                "modules": [1,2]
-            }
-        ]
-    }]
+      "role": "Tecnología",
+      "is_lecture_locked": false,
+      "hour_configs": [
+        {
+          "day_of_week": "Jueves",
+          "modules": [
+            1,
+            2
+          ]
+        }
+      ]
+    }
+  ]
 }
 
 ###
@@ -450,8 +519,8 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "approved": true,
-    "reason": null
+  "approved": true,
+  "reason": null
 }
 
 ###
@@ -468,7 +537,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "year": 2009
+  "year": 2009
 }
 
 ###
@@ -479,7 +548,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "year": 2010
+  "year": 2010
 }
 
 ###
@@ -496,33 +565,36 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "Arquitectura de software",
-    "subject_code": "code",
-    "acronym": "AR",
-    "study_plan_id": 3,
-    "associated_coordinator": 5,
-    "index": 1,
-    "frontal_hours": 120,
-    "intro_folder": "/src/",
-    "subject_folder": "/src/r",
-    "technologies": "ruby",
-    "notes": "nueva materia",
-    "hour_configs": [{
-        "role": "Teórico",
-        "total_hours": 100
+  "name": "Arquitectura de software",
+  "subject_code": "code",
+  "acronym": "AR",
+  "study_plan_id": 3,
+  "associated_coordinator": 5,
+  "index": 1,
+  "frontal_hours": 120,
+  "intro_folder": "/src/",
+  "subject_folder": "/src/r",
+  "technologies": "ruby",
+  "notes": "nueva materia",
+  "hour_configs": [
+    {
+      "role": "Teórico",
+      "total_hours": 100
     },
     {
-        "role": "Tecnología",
-        "total_hours": 20
+      "role": "Tecnología",
+      "total_hours": 20
     }
-    ],
-    "needs_ids":null,
-    "needs_notes": "",
-    "events": [{
-        "event_id": 1,
-        "description": "El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
-    }],
-    "is_teo_tec_at_same_time":false
+  ],
+  "needs_ids": null,
+  "needs_notes": "",
+  "events": [
+    {
+      "event_id": 1,
+      "description": "El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
+    }
+  ],
+  "is_teo_tec_at_same_time": false
 }
 
 ###
@@ -533,39 +605,44 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "diseño23",
-    "subject_code": "code",
-    "acronym": "DA1",
-    "study_plan_id": 2,
-    "associated_coordinator": 5,
-    "index": 1,
-    "frontal_hours": 120,
-    "intro_folder": "/src/",
-    "subject_folder": "/src/r",
-    "technologies": "ruby",
-    "notes": "nueva materia",
-    "hour_configs": [{
-        "id": 53,
-        "role": "Teórico",
-        "total_hours": 100
+  "name": "diseño23",
+  "subject_code": "code",
+  "acronym": "DA1",
+  "study_plan_id": 2,
+  "associated_coordinator": 5,
+  "index": 1,
+  "frontal_hours": 120,
+  "intro_folder": "/src/",
+  "subject_folder": "/src/r",
+  "technologies": "ruby",
+  "notes": "nueva materia",
+  "hour_configs": [
+    {
+      "id": 53,
+      "role": "Teórico",
+      "total_hours": 100
     },
     {
-        "id": 54,
-        "role": "Tecnología",
-        "total_hours": 20
+      "id": 54,
+      "role": "Tecnología",
+      "total_hours": 20
     }
-    ],
-    "needs":[{
-        "name": "laboratorio"
-    },{
-        "name": "salon de 25 personas"
-    }],
-    "needs_notes": "",
-    "events": [{
-        "event_id": 2,
-        "description": "A El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
-    }]
-
+  ],
+  "needs": [
+    {
+      "name": "laboratorio"
+    },
+    {
+      "name": "salon de 25 personas"
+    }
+  ],
+  "needs_notes": "",
+  "events": [
+    {
+      "event_id": 2,
+      "description": "A El 1er obligatorio, es de a 2 maximo y da 40 puntos maximo y tiene un minimo de 10 puntos"
+    }
+  ]
 }
 
 ###
@@ -618,7 +695,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "beneficio nuevo"
+  "name": "beneficio nuevo"
 }
 
 ###
@@ -629,7 +706,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "updated benefit"
+  "name": "updated benefit"
 }
 
 ###
@@ -646,7 +723,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "categoria nueva"
+  "name": "categoria nueva"
 }
 
 ###
@@ -663,7 +740,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "updated category"
+  "name": "updated category"
 }
 
 ###
@@ -715,8 +792,18 @@ Content-Type: application/json
       "prefered": false
     }
   ],
-  "categories": [{"category_id": 1, "date":"2021-08-10"}],
-  "benefits": [{"benefit_id": 1, "date":"2021-08-10"}],
+  "categories": [
+    {
+      "category_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "benefits": [
+    {
+      "benefit_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
   "subjects_history": [
     {
       "subject_id": 1,
@@ -725,23 +812,36 @@ Content-Type: application/json
       "end_date": null
     }
   ],
-  "subjects_of_interest": [{
-    "subject_id": 1
-  }],
-  "teacher_subject_groups": [{
-    "subject_id": 1,
-    "own_role": "Teórico",
-    "teachers": [
+  "subjects_of_interest": [
+    {
+      "subject_id": 1
+    }
+  ],
+  "teacher_subject_groups": [
+    {
+      "subject_id": 1,
+      "own_role": "Teórico",
+      "teachers": [
         {
-            "teacher_id": 1,
-            "role": "Tecnología"
+          "teacher_id": 1,
+          "role": "Tecnología"
         }
-    ]
-  }],
+      ]
+    }
+  ],
   "teacher_available_modules": [
-    {"day_of_week": "Lunes", "module_id": 3 },
-    {"day_of_week": "Lunes", "module_id": 4},
-    {"day_of_week": "Jueves", "module_id": 7}
+    {
+      "day_of_week": "Lunes",
+      "module_id": 3
+    },
+    {
+      "day_of_week": "Lunes",
+      "module_id": 4
+    },
+    {
+      "day_of_week": "Jueves",
+      "module_id": 7
+    }
   ]
 }
 
@@ -784,7 +884,7 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "retentionDate":  "2025-20-10"
+  "retentionDate": "2025-20-10"
 }
 
 ###
@@ -842,8 +942,18 @@ Content-Type: application/json
       "prefered": false
     }
   ],
-  "categories": [{"category_id": 1, "date":"2021-08-10"}],
-  "benefits": [{"benefit_id": 1, "date":"2021-08-10"}],
+  "categories": [
+    {
+      "category_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
+  "benefits": [
+    {
+      "benefit_id": 1,
+      "date": "2021-08-10"
+    }
+  ],
   "subjects_history": [
     {
       "subject_id": 1,
@@ -852,23 +962,36 @@ Content-Type: application/json
       "end_date": null
     }
   ],
-  "subjects_of_interest": [{
-    "subject_id": 1
-  }],
-  "teacher_subject_groups": [{
-    "subject_id": 1,
-    "own_role": "Teórico",
-    "teachers": [
+  "subjects_of_interest": [
+    {
+      "subject_id": 1
+    }
+  ],
+  "teacher_subject_groups": [
+    {
+      "subject_id": 1,
+      "own_role": "Teórico",
+      "teachers": [
         {
-            "teacher_id": 1,
-            "role": "Tecnología"
+          "teacher_id": 1,
+          "role": "Tecnología"
         }
-    ]
-  }],
+      ]
+    }
+  ],
   "teacher_available_modules": [
-    {"day_of_week": "Lunes", "module_id": 3 },
-    {"day_of_week": "Lunes", "module_id": 4},
-    {"day_of_week": "Jueves", "module_id": 7}
+    {
+      "day_of_week": "Lunes",
+      "module_id": 3
+    },
+    {
+      "day_of_week": "Lunes",
+      "module_id": 4
+    },
+    {
+      "day_of_week": "Jueves",
+      "module_id": 7
+    }
   ]
 }
 
@@ -905,9 +1028,9 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "teacher_id": 144,
-    "role_id": 1,
-    "password": "user123"
+  "teacher_id": 144,
+  "role_id": 1,
+  "password": "user123"
 }
 
 ###
@@ -924,9 +1047,9 @@ X-API-Key: {{token}}
 Content-Type: application/json
 
 {
-    "teacher_employee_number":4040,
-    "old_password": "gaston123",
-    "new_password": "123abc"
+  "teacher_employee_number": 4040,
+  "old_password": "gaston123",
+  "new_password": "123abc"
 }
 
 ###
@@ -943,6 +1066,6 @@ Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-    "role_id": 1,
-    "password": null
+  "role_id": 1,
+  "password": null
 }

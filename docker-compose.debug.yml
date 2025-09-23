@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    ports:
+      - '8080:3000'  # App port
+      - '9229:9229'  # Debug port
+    depends_on:
+      - postgres
+    environment:
+      - NAME_DB=faculty_hub_db
+      - USER_DB=postgres
+      - PASSWORD_DB=postgres
+      - HOST_DB=postgres
+      - PORT_DB=5432
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    # Enable debugging
+    command: ["npm", "run", "debug"]
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: faculty_hub_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

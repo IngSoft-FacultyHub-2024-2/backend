@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8080:3000'
- # original mapping     - '8080:8080'
+      - '9229:9229'  # Add debug port
     depends_on:
       - postgres
     environment:
@@ -19,6 +19,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    command: ["npm", "run", "debug"]  # Use debug script
 
   postgres:
     image: postgres:latest

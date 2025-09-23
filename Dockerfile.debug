@@ -1,0 +1,19 @@
+# Dockerfile for debugging
+FROM node:20
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Expose both app and debug ports
+EXPOSE 3000 9229
+
+# Start with debugging enabled
+CMD ["npm", "run", "debug"]

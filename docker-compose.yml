@@ -6,8 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '8080:3000'
- # original mapping     - '8080:8080'
+      - '3000:3000'
     depends_on:
       - postgres
     environment:
@@ -16,6 +15,9 @@ services:
       - PASSWORD_DB=postgres
       - HOST_DB=postgres
       - PORT_DB=5432
+      - ALGORITHM_URL=http://host.docker.internal:8080
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     volumes:
       - .:/app
       - /app/node_modules
@@ -27,7 +29,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-  # original    - '5433:5432'
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data

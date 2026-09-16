@@ -38,7 +38,7 @@ PASSWORD_DB='postgres'
 HOST_DB='localhost'
 PORT_DB=5432
 DB_SSL=false // en AWS poner como true
-ALGORITHM_URL='http://localhost:8000' // en AWS poner la URL deployada
+ALGORITHM_URL='http://localhost:8080' // en AWS poner la URL deployada
 JWT_SECRET=yourSecret
 ```
 Estas variables deben estar correctamente configuradas para que el backend se conecte a la base de datos PostgreSQL en local.

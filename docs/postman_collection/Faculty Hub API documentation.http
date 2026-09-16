@@ -64,7 +64,7 @@ Authorization: Bearer {{TOKEN}}
 ###
 # group: Degree
 # @name Get Degrees
-GET http://localhost:3000/api/degrees
+GET http://{{BACKEND_URL}}/api/degrees
 Authorization: Bearer {{TOKEN}}
 
 ###
@@ -136,7 +136,7 @@ X-API-Key: {{token}}
 ###
 # group: Matching Algorithm
 # @name AssignTeachers
-POST http://{{ALGORITHM_URL}}/assignTeachers
+POST http://{{ALGORITHM_URL}}/assignTeachers/
 X-API-Key: {{token}}
 Content-Type: application/json
 

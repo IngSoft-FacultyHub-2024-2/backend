@@ -138,7 +138,7 @@ async function sendAssignation(
 ): Promise<AssignationsResults> {
   try {
     const response = await axios.post(
-      process.env.ALGORITHM_URL + '/assignTeachers',
+      process.env.ALGORITHM_URL + '/assignTeachers/',
       assignPayload,
       {
         headers: {
